@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <typeHandlers>
+        <typeHandler handler="org.refit.spring.auth.enums.UserRoleTypeHandler"
+                     javaType="org.refit.spring.auth.enums.UserRole"/>
+    </typeHandlers>
+<!--    <typeAliases>-->
+
+<!--    </typeAliases>-->
+</configuration>
