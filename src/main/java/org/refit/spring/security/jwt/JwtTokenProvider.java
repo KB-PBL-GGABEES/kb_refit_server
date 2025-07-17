@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.Date;
@@ -43,6 +44,14 @@ public class JwtTokenProvider {
     public String getUsername(String token) {
         return Jwts.parserBuilder().setSigningKey(secretKey.getBytes()).build()
                 .parseClaimsJws(token).getBody().getSubject();
+    }
+
+    public Long getUserIdFromToken(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(secretKey.getBytes(StandardCharsets.UTF_8))
+                .parseClaimsJws(token)
+                .getBody();
+        return Long.parseLong(claims.get("userId").toString());
     }
 
     public Authentication getAuthentication(String token) {

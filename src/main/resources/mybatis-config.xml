@@ -3,11 +3,11 @@
         PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
+    <settings>
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+    </settings>
     <typeHandlers>
         <typeHandler handler="org.refit.spring.auth.enums.UserRoleTypeHandler"
                      javaType="org.refit.spring.auth.enums.UserRole"/>
     </typeHandlers>
-<!--    <typeAliases>-->
-
-<!--    </typeAliases>-->
 </configuration>
