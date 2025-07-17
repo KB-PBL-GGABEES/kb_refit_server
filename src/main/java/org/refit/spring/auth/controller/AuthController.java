@@ -3,7 +3,9 @@ package org.refit.spring.auth.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.refit.spring.auth.dto.LoginRequestDto;
+import org.refit.spring.auth.dto.UserResponseDto;
 import org.refit.spring.auth.entity.User;
+import org.refit.spring.auth.service.UserService;
 import org.refit.spring.mapper.UserMapper;
 import org.refit.spring.security.jwt.JwtTokenProvider;
 import org.springframework.http.HttpStatus;
@@ -20,6 +22,7 @@ import java.util.Map;
 public class AuthController {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserMapper userMapper;
+    private final UserService userService;
 
     //security에서 제공하는 login 사용할 예정
     @GetMapping("/test")
@@ -27,6 +30,24 @@ public class AuthController {
         return new BCryptPasswordEncoder().encode("1234");
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<?> getMyData(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+
+        if (!jwtTokenProvider.validateAccessToken(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("invalid token");
+        }
+
+        String username = jwtTokenProvider.getUsername(token);
+        User user = userService.findByUsername(username);
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+
+        UserResponseDto dto = UserResponseDto.from(user);
+        return ResponseEntity.ok(dto);
+    }
 
 
     @PostMapping("/refresh")
