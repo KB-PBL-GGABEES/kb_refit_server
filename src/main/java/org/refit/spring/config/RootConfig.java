@@ -20,6 +20,7 @@ import javax.sql.DataSource;
 @PropertySource({"classpath:/application.properties"})
 @ComponentScan(basePackages = {
         "org.refit.spring.auth",
+        "org.refit.spring.receipt",
         "org.refit.spring.mapper",
         "org.refit.spring.test",
         "org.refit.spring.security"
