@@ -40,13 +40,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                     .antMatchers("/api/auth/login",
-                            "/api/auth/**",
+                            "/api/auth/refresh",
                             "/swagger-ui.html",
                             "/swagger-ui/**",
                             "/swagger-resources/**",
                             "/v2/api-docs",
+                            "/api/test",
                             "/webjars/**").permitAll()
-                    .antMatchers("/api/test").authenticated()
                     .anyRequest().authenticated()
                 .and()
                 .addFilter(jwtLoginFilter)
