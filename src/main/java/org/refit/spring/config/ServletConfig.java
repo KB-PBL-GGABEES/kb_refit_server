@@ -19,7 +19,7 @@ import java.util.List;
 public class ServletConfig implements WebMvcConfigurer {
     //web과 통신에 관련된 Bean은 ServletConfig에서 등록합니다.
     //@Controller, @RestController
-    // 🔥 한글 깨짐 방지용 컨버터 등록
+    //한글 깨짐 방지용 컨버터 등록
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
         converters.add(0, new StringHttpMessageConverter(StandardCharsets.UTF_8));

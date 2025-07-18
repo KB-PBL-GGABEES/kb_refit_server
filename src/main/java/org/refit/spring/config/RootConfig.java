@@ -17,14 +17,17 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import javax.sql.DataSource;
 
 @Configuration
-@PropertySource({"classpath:/application.properties"})
+@PropertySource(value = {
+        "classpath:/application.properties",
+        "file:/home/ubuntu/refit/application.properties"
+}, ignoreResourceNotFound = true)
 @ComponentScan(basePackages = {
         "org.refit.spring.auth",
         "org.refit.spring.mapper",
         "org.refit.spring.test",
         "org.refit.spring.security"
 })
-@MapperScan(basePackages = {"org.refit.spring.mapper"})
+@MapperScan(basePackages = {"org.refit.spring"})
 public class RootConfig {
     //application 전역에 필요한 Bean은 RootConfig에서 등록
     //@Service, @Repository, @Component 등

@@ -57,7 +57,7 @@ public class AuthController {
         }
 
         String username = jwtTokenProvider.getUsername(refreshToken);
-        String role = getRoleFromDB(username); // ✅ 이제 정상 동작
+        String role = getRoleFromDB(username);
 
         String newAccessToken = jwtTokenProvider.createToken(username, role);
         return ResponseEntity.ok(Map.of("accessToken", newAccessToken));
