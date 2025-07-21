@@ -24,7 +24,9 @@ public class CeoController {
     }
 
     // 경비 청구 항목 상세 조회
-
+//    @GetMapping("/detail")
+//    public ResponseEntity<CeoListDTO> getListDetail() {
+//    }
 
     // 경비 처리 완료 내역 조회
 
