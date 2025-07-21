@@ -72,6 +72,7 @@ public class ReceiptService {
     @Transactional(readOnly = true)
     public Receipt get(Long userId, Long cursorId, Long receiptId) {
         if (cursorId == null) cursorId = Long.MAX_VALUE;
+
         Receipt receipt = receiptMapper.get(receiptId);
         if (receipt == null) {
             throw new NoSuchElementException();
