@@ -52,6 +52,7 @@ public class ReceiptController {
     public ResponseEntity<?> getList(
             @RequestHeader("Authorization") String authHeader,
             @RequestParam(required = false) Long cursorId) {
+
         String token = authHeader.replace("Bearer ", "");
 
         if (!jwtTokenProvider.validateAccessToken(token)) {

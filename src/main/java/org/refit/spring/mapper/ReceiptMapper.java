@@ -7,6 +7,8 @@ import org.springframework.security.core.parameters.P;
 
 import java.util.List;
 
+import java.util.List;
+
 @Mapper
 public interface ReceiptMapper {
     @Insert("INSERT INTO receipt (total_price, supply_price, surtax, transaction_type, is_refund, created_at, updated_at) VALUES (#{totalPrice}, #{supplyPrice}, #{surtax}, #{transactionType}, #{isRefund}, NOW(), NOW())")
@@ -31,4 +33,5 @@ public interface ReceiptMapper {
 
     @Select("SELECT SUM(totalPrice) FROM receipt WHERE (is_refund = 0) AND (created_at BETWEEN DATE_ADD(NOW(), INTERVAL -1 MONTH) AND NOW())")
     Long getTotal();
+
 }
