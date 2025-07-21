@@ -24,11 +24,11 @@ import javax.sql.DataSource;
 }, ignoreResourceNotFound = true)
 @ComponentScan(basePackages = {
         "org.refit.spring.auth",
-        "org.refit.spring.mapper",
+//        "org.refit.spring.mapper",
         "org.refit.spring.test",
         "org.refit.spring.security"
 })
-@MapperScan(basePackages = {"org.refit.spring"})
+@MapperScan(basePackages = {"org.refit.spring.mapper"})
 public class RootConfig {
     //application 전역에 필요한 Bean은 RootConfig에서 등록
     //@Service, @Repository, @Component 등
