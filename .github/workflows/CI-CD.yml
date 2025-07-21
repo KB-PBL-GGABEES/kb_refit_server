@@ -67,6 +67,10 @@ jobs:
           port: 22
           script: |
             set -e
+            
+            echo "🔐 EC2에서 Docker Hub 로그인"
+            docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
+            
             echo "▶️ 현재 실행 중인 서비스 확인"
             CURRENT=$(docker ps --filter "name=refit-" --format "{{.Names}}" | grep -E 'refit-blue|refit-green' || true)
             
