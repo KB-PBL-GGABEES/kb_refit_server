@@ -6,6 +6,7 @@ import org.refit.spring.mapper.ReceiptMapper;
 import org.refit.spring.merchandise.entity.Merchandise;
 import org.refit.spring.receipt.dto.ReceiptContentDto;
 import org.refit.spring.receipt.dto.ReceiptContentRequestsDto;
+import org.refit.spring.receipt.dto.ReceiptListDto;
 import org.refit.spring.receipt.dto.ReceiptRequestDto;
 import org.refit.spring.receipt.entity.Receipt;
 import org.refit.spring.receipt.entity.ReceiptContent;
@@ -58,15 +59,26 @@ public class ReceiptService {
         return receipt;
     }
 
-    public List<Receipt> getList() {
-        return receiptMapper.getList();
+    /*
+    @Transactional(readOnly = true)
+    public ReceiptListDto getList(Long userId, Long cursorId) {
+        if (cursorId == null) cursorId = Long.MAX_VALUE;
+        List<Receipt> receipts = receiptMapper.getList(userId, cursorId);
+        Long nextCursorId = cursorId + 20;
+        return ReceiptListDto.from(userId, receipts, nextCursorId);
     }
 
-    public Receipt get(Long id) {
-        Receipt receipt = receiptMapper.get(id);
+    public Receipt get(Long receiptId) {
+        Receipt receipt = receiptMapper.get(receiptId);
         if (receipt == null) {
             throw new NoSuchElementException();
         }
         return receipt;
     }
+
+    public Long getTotal() {
+        return receiptMapper.getTotal();
+    }
+
+     */
 }
