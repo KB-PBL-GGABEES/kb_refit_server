@@ -4,6 +4,7 @@ import org.apache.ibatis.annotations.*;
 import org.refit.spring.receipt.entity.Receipt;
 import org.refit.spring.receipt.entity.ReceiptContent;
 import org.springframework.security.core.parameters.P;
+import org.springframework.security.core.parameters.P;
 
 import java.util.List;
 
