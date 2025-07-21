@@ -12,6 +12,7 @@ import java.util.List;
 
 @EnableWebMvc
 @ComponentScan(basePackages = {
+        "org.refit.spring",
         "org.refit.spring.test",
         "org.refit.spring.auth.controller",
         "org.refit.spring.security"
