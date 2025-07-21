@@ -15,6 +15,7 @@ public class CeoVO {
     private Long totalPrice;    // 결제금액
     private String receiptDate; // 결제일
     private String receiptTime; // 결제시간
+    private String processState; // 영수처리 여부
 
 //    private String storeImage;  // 상호이미지
 }

@@ -17,6 +17,10 @@ public class CeoListDTO {
     private String receiptDate; // 결제일
     private String receiptTime; // 결제시간
 
+    // 영수처리에 대한 상태 확인이 없음
+    // 현재는 영수증 리스트 그 자체만 가져오고 있음
+    private String processState; // 영수처리 여부
+
 //    private String storeImage;  // 상호이미지
 
     public static CeoListDTO of(CeoVO vo) {
@@ -27,6 +31,7 @@ public class CeoListDTO {
                 .receiptDate(vo.getReceiptDate())
                 .receiptTime(vo.getReceiptTime())
 //                .storeImage(vo.getStoreImage())
+                .processState(vo.getProcessState())
                 .build();
 
         return ceo;
