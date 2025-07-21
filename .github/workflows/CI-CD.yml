@@ -93,7 +93,7 @@ jobs:
             echo "🚀 새 컨테이너 실행 (refit-$TARGET)"
             docker run -d --name refit-$TARGET \
             --env-file /home/ubuntu/app-$TARGET/refit.env \
-            --network refit-network \   
+            --network refit-network \
             -p $PORT:8080 \
             ${{ secrets.DOCKERHUB_USERNAME }}/refit
             
