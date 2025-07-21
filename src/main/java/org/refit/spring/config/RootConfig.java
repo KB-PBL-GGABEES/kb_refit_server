@@ -18,8 +18,9 @@ import javax.sql.DataSource;
 
 @Configuration
 @PropertySource(value = {
-        "classpath:/application.properties",
-        "file:/home/ubuntu/refit/application.properties"
+        "classpath:/application.properties", //로컬용
+        "file:/home/ubuntu/app-blue/refit.env", //EC2용 (blue)
+        "file:/home/ubuntu/app-green/refit.env" //EC2용 (green)
 }, ignoreResourceNotFound = true)
 @ComponentScan(basePackages = {
         "org.refit.spring.auth",
