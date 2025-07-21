@@ -10,17 +10,17 @@ import java.util.List;
 public interface CeoMapper {
 
     // 경비 처리가 필요한 내역 조회
-    @Select("        SELECT\n" +
+    @Select("SELECT\n" +
             "            r.receipt_id,\n" +
             "            c.company_name,\n" +
             "            DATE_FORMAT(r.created_at, '%Y.%m.%d') AS receipt_date,\n" +
             "            DATE_FORMAT(r.created_at, '%H:%i') AS receipt_time,\n" +
-            "            r.total_price\n" +
+            "            r.total_price,\n" +
+            "            p.process_state\n" +
             "        FROM receipt r\n" +
-            "                 JOIN company c ON r.company_id = c.company_id\n" +
-            "        WHERE r.receipt_id NOT IN (\n" +
-            "            SELECT receipt_id FROM receipt_process WHERE process_state IS NOT NULL\n" +
-            "        )\n" +
+            "            JOIN company c ON r.company_id = c.company_id\n" +
+            "            JOIN receipt_process p ON r.receipt_id = p.receipt_id\n" +
+            "        WHERE p.process_state = 'none'\n" +
             "        ORDER BY r.created_at DESC")
     List<CeoVO> getListUndone();
 
