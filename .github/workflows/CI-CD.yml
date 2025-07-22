@@ -35,16 +35,16 @@ jobs:
       - name: Build With Gradle
         run: ./gradlew build -x test
 
-      - name: docker image build
+      - name: Docker Image Build
         run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/refit .
 
-      - name: docker login
+      - name: Docker Login
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      - name: docker Hub push
+      - name: Docker Hub Push
         run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/refit
 
   deploy:
@@ -52,7 +52,7 @@ jobs:
     needs: build
     if: github.event_name == 'push'
     steps:
-      - name: docker login
+      - name: Docker Login
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -67,50 +67,38 @@ jobs:
           port: 22
           script: |
             set -e
-            
+
             echo "🔐 EC2에서 Docker Hub 로그인"
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
-            
+
             echo "▶️ 현재 실행 중인 서비스 확인"
             CURRENT=$(docker ps --filter "name=refit-" --format "{{.Names}}" | grep -E 'refit-blue|refit-green' || true)
-            
+
             if [[ "$CURRENT" == *"blue"* ]]; then
-            TARGET="green"
-            PORT=8082
+              TARGET="green"
+              PORT=8082
             else
-            TARGET="blue"
-            PORT=8081
+              TARGET="blue"
+              PORT=8081
             fi
-            
+
             echo "🌀 대상 색상: $TARGET"
-            
+
             echo "📦 이미지 pull"
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/refit
-            
+
             echo "🧹 기존 컨테이너 삭제 (refit-$TARGET)"
             docker rm -f refit-$TARGET || true
-            
+
             echo "🚀 새 컨테이너 실행 (refit-$TARGET)"
             docker run -d --name refit-$TARGET \
-            --env-file /home/ubuntu/app-$TARGET/refit.env \
-            --network refit-network \
-            -p $PORT:8080 \
-            ${{ secrets.DOCKERHUB_USERNAME }}/refit
-            
+              --env-file /home/ubuntu/app-$TARGET/refit.env \
+              --network refit-network \
+              -p $PORT:8080 \
+              ${{ secrets.DOCKERHUB_USERNAME }}/refit
+
             echo "🔀 Nginx 설정 스위칭"
-            sudo cp /etc/nginx/sites-available/$TARGET.conf /etc/nginx/sites-enabled/default
+            sudo ln -sf /etc/nginx/sites-available/$TARGET.conf /etc/nginx/sites-enabled/default
             sudo nginx -s reload
-            
+
             echo "✅ 무중단 배포 완료 ($TARGET 컨테이너로 전환)"
-            
-            #            echo " [1] 아까 만든 refit 디렉토리로 이동"
-            #            cd ~/refit/app-blue
-            #
-            #            echo " [2] 도커 이미지 pull"
-            #            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/refit
-            #
-            #            echo " [3] 도커 컴포즈 재시작"
-            #            docker compose down
-            #            docker compose up -d
-            #
-            #            echo " 배포 완료"
