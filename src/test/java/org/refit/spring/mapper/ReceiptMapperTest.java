@@ -25,6 +25,7 @@ class ReceiptMapperTest {
     @Autowired
     private ReceiptMapper receiptMapper;
 
+
     @DisplayName("새로운 영수증을 생성합니다.")
     @Test
     void create() {
@@ -33,7 +34,6 @@ class ReceiptMapperTest {
         receipt.setSupplyPrice(9091L);
         receipt.setSurtax(909L);
         receipt.setTransactionType("카드결제");
-        receipt.setRefund(false);
 
         receiptMapper.create(receipt);
 
@@ -48,7 +48,6 @@ class ReceiptMapperTest {
         receipt.setSupplyPrice(9091L);
         receipt.setSurtax(909L);
         receipt.setTransactionType("카드결제");
-        receipt.setRefund(false);
         receiptMapper.create(receipt);
         ReceiptContent content = new ReceiptContent();
         content.setReceiptId(receipt.getReceiptId());
@@ -69,7 +68,6 @@ class ReceiptMapperTest {
         receipt.setSupplyPrice(9091L);
         receipt.setSurtax(909L);
         receipt.setTransactionType("CARD");
-        receipt.setRefund(false);
         receiptMapper.create(receipt);
 
         receipt.setTotalPrice(15000L);
@@ -94,7 +92,6 @@ class ReceiptMapperTest {
             receipt.setSupplyPrice(9000L + i);
             receipt.setSurtax(1000L + i);
             receipt.setTransactionType("카드결제");
-            receipt.setRefund(false);
             receiptMapper.create(receipt);
         }
         List<Receipt> list = receiptMapper.getList(9999L);
@@ -117,7 +114,6 @@ class ReceiptMapperTest {
         receipt.setSupplyPrice(9000L);
         receipt.setSurtax(1000L);
         receipt.setTransactionType("카드결제");
-        receipt.setRefund(false);
         receiptMapper.create(receipt);
         long merchandiseId = 1L;
         for (int i = 0; i < 3; i++) {
@@ -146,7 +142,6 @@ class ReceiptMapperTest {
         receipt.setSupplyPrice(9000L);
         receipt.setSurtax(1000L);
         receipt.setTransactionType("카드결제");
-        receipt.setRefund(false);
         receiptMapper.create(receipt);
         Receipt result = receiptMapper.get(receipt.getReceiptId());
         assertNotNull(result);
@@ -155,9 +150,9 @@ class ReceiptMapperTest {
         assertEquals(Long.valueOf(9000L), result.getSupplyPrice());
         assertEquals(Long.valueOf(1000L), result.getSurtax());
         assertEquals("카드결제", result.getTransactionType());
-        assertFalse(result.isRefund());
     }
 
+    @DisplayName("최근 한 달간 사용한 총 금액을 계산합니다.")
     @Test
     void getTotal() {
     }

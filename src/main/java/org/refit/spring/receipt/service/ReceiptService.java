@@ -25,41 +25,64 @@ public class ReceiptService {
     private final MerchandiseMapper merchandiseMapper;
 
 
+    @Transactional
     public Receipt create(ReceiptRequestDto dto) {
-        Receipt receipt = new Receipt();
-        receipt.setTotalPrice(0L);
-        receipt.setSupplyPrice(0L);
-        receipt.setSurtax(0L);
-        receipt.setTransactionType("카드 결제");
-        receipt.setRefund(false);
-        receipt.setCreatedAt(new Date());
-        receiptMapper.create(receipt);
-        Long total = 0L;
-        List<ReceiptContentDto> list = new ArrayList<>();
-        for (ReceiptContentRequestsDto contentDto: dto.getContentsList()) {
-            Merchandise merchandise = merchandiseMapper.findByMerchandiseId(contentDto.getMerchandiseId());
-            ReceiptContent content = new ReceiptContent();
-            ReceiptContentDto contentDetailDto = new ReceiptContentDto();
-            contentDetailDto.setMerchandiseId(merchandise.getMerchandiseId());
-            contentDetailDto.setMerchandiseName(merchandise.getMerchandiseName());
-            contentDetailDto.setMerchandisePrice(merchandise.getMerchandisePrice());
-            contentDetailDto.setAmount(contentDto.getAmount());
-            content.setAmount(contentDto.getAmount());
-            content.setReceiptId(receipt.getReceiptId());
-            content.setCreatedAt(new Date());
-            content.setMerchandiseId(merchandise.getMerchandiseId());
-            total += merchandise.getMerchandisePrice() * contentDto.getAmount();
-            receiptMapper.createReceiptContent(content);
-            list.add(contentDetailDto);
-        }
-        receipt.setTotalPrice(total);
-        receipt.setSupplyPrice((long) (total / 1.1));
-        receipt.setSurtax(total - receipt.getSupplyPrice());
+        Receipt receipt = initReceipt();
+        List<ReceiptContentDto> list = makeContents(dto.getContentsList(), receipt);
+        updatePrice(receipt);
         receipt.setContentList(list);
         receiptMapper.update(receipt);
         return receipt;
     }
 
+    private Receipt initReceipt() {
+        Receipt receipt = new Receipt();
+        receipt.setTotalPrice(0L);
+        receipt.setSupplyPrice(0L);
+        receipt.setSurtax(0L);
+        receipt.setTransactionType("카드 결제");
+        receipt.setCreatedAt(new Date());
+        receiptMapper.create(receipt);
+        return receipt;
+    }
+
+    private List<ReceiptContentDto> makeContents(List<ReceiptContentRequestsDto> list, Receipt receipt) {
+        List<ReceiptContentDto> contentDtoList = new ArrayList<>();
+        for (ReceiptContentRequestsDto requestsDto: list) {
+            Merchandise merchandise = merchandiseMapper.findByMerchandiseId(requestsDto.getMerchandiseId());
+            ReceiptContent content = makeContent(requestsDto, merchandise, receipt.getReceiptId());
+            receiptMapper.createReceiptContent(content);
+
+            contentDtoList.add(makeMerchandise(merchandise, requestsDto));
+            receipt.setTotalPrice(receipt.getTotalPrice() + merchandise.getMerchandisePrice() * requestsDto.getAmount());
+        }
+        return contentDtoList;
+    }
+
+    private ReceiptContent makeContent(ReceiptContentRequestsDto dto, Merchandise merchandise, Long receiptId) {
+        ReceiptContent content = new ReceiptContent();
+        content.setAmount(dto.getAmount());
+        content.setReceiptId(receiptId);
+        content.setCreatedAt(new Date());
+        content.setMerchandiseId(merchandise.getMerchandiseId());
+        return content;
+    }
+
+    private ReceiptContentDto makeMerchandise(Merchandise merchandise, ReceiptContentRequestsDto dto) {
+        ReceiptContentDto result = new ReceiptContentDto();
+        result.setMerchandiseId(merchandise.getMerchandiseId());
+        result.setMerchandiseName(merchandise.getMerchandiseName());
+        result.setMerchandisePrice(merchandise.getMerchandisePrice());
+        result.setAmount(dto.getAmount());
+        return result;
+    }
+
+    private void updatePrice(Receipt receipt) {
+        long total = receipt.getTotalPrice();
+        long supply = (long) (total / 1.1);
+        receipt.setSupplyPrice(supply);
+        receipt.setSurtax(total - supply);
+    }
 
     @Transactional(readOnly = true)
     public ReceiptListDto getList(Long userId, Long cursorId) {
@@ -70,7 +93,7 @@ public class ReceiptService {
     }
 
     @Transactional(readOnly = true)
-    public Receipt get(Long userId, Long cursorId, Long receiptId) {
+    public Receipt get(Long cursorId, Long receiptId) {
         if (cursorId == null) cursorId = Long.MAX_VALUE;
 
         Receipt receipt = receiptMapper.get(receiptId);
