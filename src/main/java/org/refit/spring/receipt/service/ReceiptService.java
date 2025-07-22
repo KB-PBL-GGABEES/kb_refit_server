@@ -64,7 +64,7 @@ public class ReceiptService {
     @Transactional(readOnly = true)
     public ReceiptListDto getList(Long userId, Long cursorId) {
         if (cursorId == null) cursorId = Long.MAX_VALUE;
-        List<Receipt> receipts = receiptMapper.getList(userId, cursorId);
+        List<Receipt> receipts = receiptMapper.getList(cursorId);
         Long nextCursorId = receipts.size() < 20 ? null : receipts.get(receipts.size() - 1).getReceiptId();
         return ReceiptListDto.from(userId, receipts, nextCursorId);
     }

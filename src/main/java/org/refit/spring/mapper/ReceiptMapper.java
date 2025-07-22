@@ -20,7 +20,7 @@ public interface ReceiptMapper {
     void update(Receipt receipt);
 
     @Select("SELECT * FROM receipt WHERE receipt_id < #{cursorId} ORDER BY receipt_id DESC LIMIT 20")
-    List<Receipt> getList(@Param("userId") Long userId, @Param("cursorId") Long cursorId);
+    List<Receipt> getList(@Param("cursorId") Long cursorId);
 
     @Select("SELECT * FROM receiptContent WHERE receipt_id = #{receiptId}")
     List<ReceiptContent> findContentsByReceiptId(@Param("receiptId") Long receiptId);
