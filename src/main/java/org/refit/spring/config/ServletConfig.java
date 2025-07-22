@@ -15,6 +15,7 @@ import java.util.List;
         "org.refit.spring",
         "org.refit.spring.test",
         "org.refit.spring.auth.controller",
+        "org.refit.spring.receipt.controller",
         "org.refit.spring.security"
 })
 public class ServletConfig implements WebMvcConfigurer {
