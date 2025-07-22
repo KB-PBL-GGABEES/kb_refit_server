@@ -1,6 +1,7 @@
 package org.refit.spring.ceo.service;
 
 import org.refit.spring.ceo.dto.CeoListDTO;
+import org.refit.spring.ceo.dto.ReceiptDetailDTO;
 
 import java.util.List;
 
@@ -10,6 +11,7 @@ public interface CeoService {
     List<CeoListDTO> getListUndone();
 
     // 경비 청구 항목 상세 조회
+    ReceiptDetailDTO getReceiptDetail(Long receipted);
 
     // 경비 처리 완료 내역 조회
 

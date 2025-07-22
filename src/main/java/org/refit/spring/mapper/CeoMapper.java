@@ -3,6 +3,7 @@ package org.refit.spring.mapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.refit.spring.ceo.domain.CeoVO;
+import org.refit.spring.ceo.dto.ReceiptDetailDTO;
 
 import java.util.List;
 
@@ -25,6 +26,19 @@ public interface CeoMapper {
     List<CeoVO> getListUndone();
 
     // 경비 청구 항목 상세 조회
+    @Select("SELECT \n" +
+            "        u.user_id AS userId,\n" +
+            "        u.name AS name,\n" +
+            "        p.progress_type AS progressType,\n" +
+            "        p.progress_detail AS progressDetail,\n" +
+            "        r.receipt_id AS receiptId\n" +
+            "    FROM receipt r\n" +
+            "    JOIN user u ON r.user_id = u.user_id\n" +
+            "    JOIN receipt_process p ON r.receipt_id = p.receipt_id\n" +
+            "    WHERE r.receipt_id = #{receiptId}\n" +
+            "    LIMIT 1")
+    ReceiptDetailDTO getReceiptDetail(Long receiptId);
+
 
     // 경비 처리 완료 내역 조회
 
