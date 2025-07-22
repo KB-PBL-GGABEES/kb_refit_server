@@ -92,17 +92,16 @@ public class ReceiptController {
         Receipt receipt = receiptService.get(user.getUserId(), cursorId, receiptId);
         return ResponseEntity.ok(receipt);
     }
-    /*
 
-    @GetMapping("total")
-    public ResponseEntity<?> getTotal(@RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.replace("Bearer ", "");
+//    @GetMapping("/total")
+//    public ResponseEntity<?> getTotal(@RequestHeader("Authorization") String authHeader) {
+//        String token = authHeader.replace("Bearer ", "");
+//
+//        if (!jwtTokenProvider.validateAccessToken(token)) {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("invalid token");
+//        }
+//        return ResponseEntity.ok();
+//
+//    }
 
-        if (!jwtTokenProvider.validateAccessToken(token)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("invalid token");
-        }
-
-    }
-
- */
 }
