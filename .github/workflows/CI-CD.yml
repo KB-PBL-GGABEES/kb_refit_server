@@ -98,19 +98,8 @@ jobs:
             ${{ secrets.DOCKERHUB_USERNAME }}/refit
             
             echo "🔀 Nginx 설정 스위칭"
-            sudo cp /etc/nginx/sites-available/$TARGET.conf /etc/nginx/sites-enabled/default
+#            sudo cp /etc/nginx/sites-available/$TARGET.conf /etc/nginx/sites-enabled/default
+            sudo ln -sf /etc/nginx/sites-available/$TARGET.conf /etc/nginx/sites-enabled/default
             sudo nginx -s reload
             
             echo "✅ 무중단 배포 완료 ($TARGET 컨테이너로 전환)"
-            
-            #            echo " [1] 아까 만든 refit 디렉토리로 이동"
-            #            cd ~/refit/app-blue
-            #
-            #            echo " [2] 도커 이미지 pull"
-            #            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/refit
-            #
-            #            echo " [3] 도커 컴포즈 재시작"
-            #            docker compose down
-            #            docker compose up -d
-            #
-            #            echo " 배포 완료"
