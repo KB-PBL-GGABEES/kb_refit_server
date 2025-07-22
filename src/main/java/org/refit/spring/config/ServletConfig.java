@@ -15,7 +15,8 @@ import java.util.List;
         "org.refit.spring",
         "org.refit.spring.test",
         "org.refit.spring.auth.controller",
-        "org.refit.spring.security"
+        "org.refit.spring.security",
+        "org.refit.spring.hospital"
 })
 public class ServletConfig implements WebMvcConfigurer {
     //web과 통신에 관련된 Bean은 ServletConfig에서 등록합니다.
