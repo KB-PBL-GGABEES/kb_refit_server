@@ -139,6 +139,7 @@ public class ReceiptService {
         ReceiptTotalDto dto = new ReceiptTotalDto();
         dto.setUserId(userId);
         dto.setTotal(receiptMapper.getTotal());
+        dto.setLastMonth(receiptMapper.getLastMonthTotal());
         return dto;
     }
 }
