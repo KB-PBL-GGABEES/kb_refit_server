@@ -14,8 +14,8 @@ import java.util.List;
 public class HospitalService {
     private final HospitalMapper hospitalMapper;
 
-    public HospitalExpenseResponseDto findHospitalExpenseById(Long hospitalProcessId) {
-        return hospitalMapper.findByHospitalProcessId(hospitalProcessId);
+    public List<HospitalExpenseResponseDto>  findHospitalExpenseById(Long userId) {
+        return hospitalMapper.findByAllHospitalExpenseByUserId(userId);
     }
 
     public HospitalExpenseDetailResponseDto findHospitalExpenseDetailById(Long receiptId) {
