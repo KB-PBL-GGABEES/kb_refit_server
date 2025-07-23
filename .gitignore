@@ -44,7 +44,7 @@ bin/
 ### 민감한 설정 파일 무시 ###
 .env
 .env.*
-application.properties
+src/main/resources/application.properties
 application.yml
 application-*.properties
 application-*.yml

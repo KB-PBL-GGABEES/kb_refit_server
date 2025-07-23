@@ -24,7 +24,8 @@ import javax.sql.DataSource;
 }, ignoreResourceNotFound = true)
 @ComponentScan(basePackages = {
         "org.refit.spring.auth",
-//        "org.refit.spring.mapper",
+        "org.refit.spring.receipt",
+        "org.refit.spring.mapper",
         "org.refit.spring.test",
         "org.refit.spring.security",
         "org.refit.spring.ceo"
