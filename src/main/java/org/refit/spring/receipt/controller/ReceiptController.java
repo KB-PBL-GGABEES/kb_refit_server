@@ -23,7 +23,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReceiptController {
     private final JwtTokenProvider jwtTokenProvider;
-    private final ReceiptMapper receiptMapper;
     private final ReceiptService receiptService;
 
     private final UserService userService;
@@ -52,6 +51,7 @@ public class ReceiptController {
     public ResponseEntity<?> getList(
             @RequestHeader("Authorization") String authHeader,
             @RequestParam(required = false) Long cursorId) {
+
         String token = authHeader.replace("Bearer ", "");
 
         if (!jwtTokenProvider.validateAccessToken(token)) {
@@ -89,7 +89,7 @@ public class ReceiptController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
 
-        Receipt receipt = receiptService.get(user.getUserId(), cursorId, receiptId);
+        Receipt receipt = receiptService.get(cursorId, receiptId);
         return ResponseEntity.ok(receipt);
     }
 
