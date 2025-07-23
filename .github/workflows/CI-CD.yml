@@ -82,7 +82,7 @@ jobs:
               PORT=8081
             fi
 
-            echo "🌀 대상 색상: $TARGET"
+            echo "🌀 대상 색상: $TARGET (포트: $PORT)"
 
             echo "📦 이미지 pull"
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/refit
@@ -97,8 +97,8 @@ jobs:
               -p $PORT:8080 \
               ${{ secrets.DOCKERHUB_USERNAME }}/refit
 
-            echo "🔀 Nginx 설정 스위칭"
-            sudo ln -sf /etc/nginx/sites-available/$TARGET.conf /etc/nginx/sites-enabled/default
-            sudo nginx -s reload
+            echo "🔀 Nginx 설정 proxy_pass 전환"
+            sudo sed -i "s|proxy_pass http://localhost:[0-9]\+;|proxy_pass http://localhost:$PORT;|" /etc/nginx/conf.d/default.conf
+            sudo nginx -t && sudo systemctl reload nginx
 
-            echo "✅ 무중단 배포 완료 ($TARGET 컨테이너로 전환)"
+            echo "✅ 무중단 배포 완료 → 현재: $TARGET"
