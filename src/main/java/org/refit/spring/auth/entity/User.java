@@ -14,7 +14,11 @@ public class User {
     private String username;
     private String password;
     private String name;
+<<<<<<< Updated upstream
     private String birthDate;
+=======
+    private String brithDate;
+>>>>>>> Stashed changes
     private Long totalCarbonPoint;
     private Long totalStarPoint;
     //enum으로 사업자/일반유저 분리
