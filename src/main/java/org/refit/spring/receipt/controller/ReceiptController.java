@@ -47,8 +47,8 @@ public class ReceiptController {
         ReceiptResponseDto dto = ReceiptResponseDto.from(receipt, user.getUserId(), receiptRequestDto.getReward());
         return ResponseEntity.ok(dto);
     }
-/*
-    @GetMapping("list")
+
+    @GetMapping("/list")
     public ResponseEntity<?> getList(
             @RequestHeader("Authorization") String authHeader,
             @RequestParam(required = false) Long cursorId) {
@@ -57,24 +57,42 @@ public class ReceiptController {
         if (!jwtTokenProvider.validateAccessToken(token)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("invalid token");
         }
-        Long userId = jwtTokenProvider.getUserIdFromToken(token);
 
-        List<Receipt> list = receiptService.getList(userId, cursorId);
-        Long nextCursorId = list.isEmpty() ? null : list.get(list.size() - 1).getReceiptId();
-        ReceiptListDto dto = ReceiptListDto.from(list, 1L, 5L);
+        String username = jwtTokenProvider.getUsername(token);
+        User user = userService.findByUsername(username);
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+
+        ReceiptListDto dto = receiptService.getList(user.getUserId(), cursorId);
+
         return ResponseEntity.ok(dto);
     }
 
-    @GetMapping("get/{receiptId}")
-    public ResponseEntity<?> get(@RequestHeader("Authorization") String authHeader, @PathVariable("receiptId") Long receiptId) {
+
+    @GetMapping("/get")
+    public ResponseEntity<?> get(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestParam(required = false) Long cursorId,
+            @RequestParam("receiptId") Long receiptId) {
         String token = authHeader.replace("Bearer ", "");
 
         if (!jwtTokenProvider.validateAccessToken(token)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("invalid token");
         }
-        Receipt receipt = receiptService.get(receiptId);
+
+        String username = jwtTokenProvider.getUsername(token);
+        User user = userService.findByUsername(username);
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+
+        Receipt receipt = receiptService.get(user.getUserId(), cursorId, receiptId);
         return ResponseEntity.ok(receipt);
     }
+    /*
 
     @GetMapping("total")
     public ResponseEntity<?> getTotal(@RequestHeader("Authorization") String authHeader) {

@@ -24,6 +24,7 @@ public class ReceiptService {
     private final ReceiptMapper receiptMapper;
     private final MerchandiseMapper merchandiseMapper;
 
+
     public Receipt create(ReceiptRequestDto dto) {
         Receipt receipt = new Receipt();
         receipt.setTotalPrice(0L);
@@ -59,26 +60,39 @@ public class ReceiptService {
         return receipt;
     }
 
-    /*
+
     @Transactional(readOnly = true)
     public ReceiptListDto getList(Long userId, Long cursorId) {
         if (cursorId == null) cursorId = Long.MAX_VALUE;
         List<Receipt> receipts = receiptMapper.getList(userId, cursorId);
-        Long nextCursorId = cursorId + 20;
+        Long nextCursorId = receipts.size() < 20 ? null : receipts.get(receipts.size() - 1).getReceiptId();
         return ReceiptListDto.from(userId, receipts, nextCursorId);
     }
 
-    public Receipt get(Long receiptId) {
+    @Transactional(readOnly = true)
+    public Receipt get(Long userId, Long cursorId, Long receiptId) {
+        if (cursorId == null) cursorId = Long.MAX_VALUE;
         Receipt receipt = receiptMapper.get(receiptId);
         if (receipt == null) {
             throw new NoSuchElementException();
         }
+        List<ReceiptContent> contents = receiptMapper.findContentsByReceiptId(receiptId);
+        List<ReceiptContentDto> contentDtoList = new ArrayList<>();
+        for (ReceiptContent content: contents) {
+            Merchandise merchandise = merchandiseMapper.findByMerchandiseId(content.getMerchandiseId());
+            ReceiptContentDto dto = new ReceiptContentDto();
+            dto.setMerchandiseId(merchandise.getMerchandiseId());
+            dto.setMerchandiseName(merchandise.getMerchandiseName());
+            dto.setMerchandisePrice(merchandise.getMerchandisePrice());
+            dto.setAmount(content.getAmount());
+            contentDtoList.add(dto);
+        }
+        receipt.setContentList(contentDtoList);
         return receipt;
     }
+
 
     public Long getTotal() {
         return receiptMapper.getTotal();
     }
-
-     */
 }
