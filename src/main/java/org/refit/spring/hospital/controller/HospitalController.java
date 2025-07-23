@@ -26,13 +26,13 @@ public class HospitalController {
 //    public HospitalExpenseResponseDto findHospitalExpense(@RequestParam("hospitalProcessId") Long hospitalProcessId) {
 //        return hospitalService.findHospitalExpenseById(hospitalProcessId);
 //    }
-  @GetMapping("/")
-    public ResponseEntity<?> findHospitalExpense(@RequestParam("hospitalProcessId") Long hospitalProcessId) {
-    HospitalExpenseResponseDto result = hospitalService.findHospitalExpenseById(hospitalProcessId);
+@GetMapping("/")
+public ResponseEntity<?> getHospitalExpenseList(@RequestParam("userId") Long userId) {
+    List<HospitalExpenseResponseDto> result = hospitalService.findHospitalExpenseById(userId);
 
-    if (result == null) {
+    if (result == null || result.isEmpty()) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Collections.singletonMap("message", "해당 hospitalProcessId의 데이터가 존재하지 않습니다."));
+                .body(Collections.singletonMap("message", "해당 유저의 병원 영수증 데이터가 없습니다."));
     }
 
     return ResponseEntity.ok(result);
