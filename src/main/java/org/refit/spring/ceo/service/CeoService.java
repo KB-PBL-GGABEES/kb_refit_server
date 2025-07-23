@@ -14,6 +14,7 @@ public interface CeoService {
     ReceiptDetailDto getReceiptDetail(Long receipted);
 
     // 경비 처리 완료 내역 조회
+    List<CeoListDto> getListDone(int period);
 
     // 처리 완료된 항목 이메일 전송
 

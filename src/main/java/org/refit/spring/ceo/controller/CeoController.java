@@ -33,6 +33,13 @@ public class CeoController {
     }
 
     // 경비 처리 완료 내역 조회
+    @GetMapping("/done")
+    public ResponseEntity<List<CeoListDto>> getListDone(
+            @RequestParam(value = "period", defaultValue = "1")
+            int period) {
+        List<CeoListDto> list = ceoService.getListDone(period);
+        return ResponseEntity.ok(list);
+    }
 
     // 처리 완료된 항목 이메일 전송
 
