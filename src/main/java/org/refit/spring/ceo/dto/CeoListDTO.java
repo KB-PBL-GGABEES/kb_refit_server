@@ -1,10 +1,14 @@
 package org.refit.spring.ceo.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.refit.spring.ceo.domain.CeoVO;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Data
 @Builder
@@ -14,22 +18,22 @@ public class CeoListDTO {
     private Long receiptId;
     private String companyName; // 상호명
     private Long totalPrice;    // 결제금액
-    private String receiptDate; // 결제일
-    private String receiptTime; // 결제시간
-
-    // 영수처리에 대한 상태 확인이 없음
-    // 현재는 영수증 리스트 그 자체만 가져오고 있음
+    private String receiptDateTime; // 결제 일시
     private String processState; // 영수처리 여부
 
 //    private String storeImage;  // 상호이미지
 
     public static CeoListDTO of(CeoVO vo) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
         CeoListDTO ceo = CeoListDTO.builder()
                 .receiptId(vo.getReceiptId())
                 .companyName(vo.getCompanyName())
                 .totalPrice(vo.getTotalPrice())
-                .receiptDate(vo.getReceiptDate())
-                .receiptTime(vo.getReceiptTime())
+                .receiptDateTime(
+                        vo.getReceiptDateTime() != null
+                                ? vo.getReceiptDateTime().format(formatter)
+                                : null)
 //                .storeImage(vo.getStoreImage())
                 .processState(vo.getProcessState())
                 .build();

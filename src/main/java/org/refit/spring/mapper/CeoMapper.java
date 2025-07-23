@@ -14,8 +14,7 @@ public interface CeoMapper {
     @Select("SELECT\n" +
             "            r.receipt_id,\n" +
             "            c.company_name,\n" +
-            "            DATE_FORMAT(r.created_at, '%Y.%m.%d') AS receipt_date,\n" +
-            "            DATE_FORMAT(r.created_at, '%H:%i') AS receipt_time,\n" +
+            "            r.created_at AS receipt_date_time,\n" +
             "            r.total_price,\n" +
             "            p.process_state\n" +
             "        FROM receipt r\n" +
