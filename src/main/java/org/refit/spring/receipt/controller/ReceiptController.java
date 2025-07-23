@@ -2,6 +2,7 @@ package org.refit.spring.receipt.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.refit.spring.mapper.ReceiptMapper;
+import org.refit.spring.receipt.dto.ReceiptListDto;
 import org.refit.spring.receipt.dto.ReceiptRequestDto;
 import org.refit.spring.receipt.dto.ReceiptResponseDto;
 import org.refit.spring.receipt.entity.Receipt;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 @RestController
@@ -44,6 +46,18 @@ public class ReceiptController {
 
         Receipt receipt = receiptService.create(receiptRequestDto);
         ReceiptResponseDto dto = ReceiptResponseDto.from(receipt, 1L, receiptRequestDto.getReward());
+        return ResponseEntity.ok(dto);
+    }
+
+    @GetMapping("list")
+    public ResponseEntity<?> getList(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+
+        if (!jwtTokenProvider.validateAccessToken(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("invalid token");
+        }
+        List<Receipt> list = receiptService.getList();
+        ReceiptListDto dto = ReceiptListDto.from(list, 1L, 5L);
         return ResponseEntity.ok(dto);
     }
 }
