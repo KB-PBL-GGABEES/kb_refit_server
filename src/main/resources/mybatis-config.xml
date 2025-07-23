@@ -11,3 +11,7 @@
                      javaType="org.refit.spring.auth.enums.UserRole"/>
     </typeHandlers>
 </configuration>
+<!--    <typeAliases>-->
+
+<!--    </typeAliases>-->
+

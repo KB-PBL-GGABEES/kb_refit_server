@@ -81,9 +81,9 @@ jobs:
               TARGET="blue"
               PORT=8081
             fi
-
+            
             echo "🌀 대상 색상: $TARGET (포트: $PORT)"
-
+            
             echo "📦 이미지 pull"
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/refit
 
