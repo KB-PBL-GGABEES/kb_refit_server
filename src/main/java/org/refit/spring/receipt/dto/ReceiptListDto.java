@@ -13,10 +13,10 @@ public class ReceiptListDto {
     private List<Receipt> receiptList;
     private Long nextCursorId;
 
-    public static ReceiptListDto from(List<Receipt> receipt, Long userId, Long nextCursorId) {
+    public static ReceiptListDto from(Long userId, List<Receipt> receipts, Long nextCursorId) {
         return new ReceiptListDto(
                 userId,
-                receipt,
+                receipts,
                 nextCursorId
         );
     }
