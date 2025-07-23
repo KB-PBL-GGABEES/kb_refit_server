@@ -2,7 +2,6 @@ package org.refit.spring.merchandise.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Data

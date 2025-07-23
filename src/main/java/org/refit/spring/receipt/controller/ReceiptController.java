@@ -117,15 +117,13 @@ public class ReceiptController {
     @GetMapping("/total")
     public ResponseEntity<?> getTotal(@RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
-
-        String username = jwtTokenProvider.getUsername(token);
-        User user = userService.findByUsername(username);
-
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-        }
         if (!jwtTokenProvider.validateAccessToken(token)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("invalid token");
+        }
+        String username = jwtTokenProvider.getUsername(token);
+        User user = userService.findByUsername(username);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
         return ResponseEntity.ok(receiptService.getTotal(user.getUserId()));
     }
