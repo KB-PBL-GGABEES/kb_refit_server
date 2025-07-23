@@ -49,7 +49,7 @@ public class ReceiptService {
             list.add(contentDetailDto);
         }
         receipt.setTotalPrice(total);
-        receipt.setSupplyPrice((long) (total * 0.9));
+        receipt.setSupplyPrice((long) (total / 1.1));
         receipt.setSurtax(total - receipt.getSupplyPrice());
         receipt.setContentList(list);
         receiptMapper.update(receipt);
