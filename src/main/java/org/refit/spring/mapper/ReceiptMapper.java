@@ -8,7 +8,7 @@ import java.util.List;
 
 @Mapper
 public interface ReceiptMapper {
-    @Insert("INSERT INTO receipt (total_price, supply_price, surtax, transaction_type, created_at, updated_at) VALUES (#{totalPrice}, #{supplyPrice}, #{surtax}, #{transactionType}, NOW(), NOW())")
+    @Insert("INSERT INTO receipt (total_price, supply_price, surtax, transaction_type, created_at, updated_at, company_id, user_id) VALUES (#{totalPrice}, #{supplyPrice}, #{surtax}, #{transactionType}, NOW(), NOW(), #{companyId}, #{userId})")
     @Options(useGeneratedKeys = true, keyProperty = "receiptId")
     void create(Receipt receipt);
 
@@ -28,7 +28,7 @@ public interface ReceiptMapper {
     @Select("SELECT * FROM receipt WHERE receipt_id = #{receiptId}")
     Receipt get(Long id);
 
-    @Select("SELECT SUM(totalPrice) FROM receipt WHERE created_at BETWEEN DATE_ADD(NOW(), INTERVAL -1 MONTH) AND NOW()")
+    @Select("SELECT SUM(total_price) FROM receipt WHERE created_at BETWEEN DATE_ADD(NOW(), INTERVAL -1 MONTH) AND NOW()")
     Long getTotal();
 
 }

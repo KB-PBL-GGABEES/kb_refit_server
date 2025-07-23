@@ -34,6 +34,8 @@ class ReceiptMapperTest {
         receipt.setSupplyPrice(9091L);
         receipt.setSurtax(909L);
         receipt.setTransactionType("카드결제");
+        receipt.setCompanyId(1L);
+        receipt.setUserId(1L);
 
         receiptMapper.create(receipt);
 
@@ -48,6 +50,8 @@ class ReceiptMapperTest {
         receipt.setSupplyPrice(9091L);
         receipt.setSurtax(909L);
         receipt.setTransactionType("카드결제");
+        receipt.setCompanyId(1L);
+        receipt.setUserId(1L);
         receiptMapper.create(receipt);
         ReceiptContent content = new ReceiptContent();
         content.setReceiptId(receipt.getReceiptId());
@@ -68,6 +72,8 @@ class ReceiptMapperTest {
         receipt.setSupplyPrice(9091L);
         receipt.setSurtax(909L);
         receipt.setTransactionType("CARD");
+        receipt.setCompanyId(1L);
+        receipt.setUserId(1L);
         receiptMapper.create(receipt);
 
         receipt.setTotalPrice(15000L);
@@ -88,6 +94,8 @@ class ReceiptMapperTest {
     void getList() {
         for (int i = 1; i <= 25; i++) {
             Receipt receipt = new Receipt();
+            receipt.setCompanyId(1L);
+            receipt.setUserId(1L);
             receipt.setTotalPrice(10000L + i);
             receipt.setSupplyPrice(9000L + i);
             receipt.setSurtax(1000L + i);
@@ -114,6 +122,8 @@ class ReceiptMapperTest {
         receipt.setSupplyPrice(9000L);
         receipt.setSurtax(1000L);
         receipt.setTransactionType("카드결제");
+        receipt.setCompanyId(1L);
+        receipt.setUserId(1L);
         receiptMapper.create(receipt);
         long merchandiseId = 1L;
         for (int i = 0; i < 3; i++) {
@@ -142,6 +152,8 @@ class ReceiptMapperTest {
         receipt.setSupplyPrice(9000L);
         receipt.setSurtax(1000L);
         receipt.setTransactionType("카드결제");
+        receipt.setCompanyId(1L);
+        receipt.setUserId(1L);
         receiptMapper.create(receipt);
         Receipt result = receiptMapper.get(receipt.getReceiptId());
         assertNotNull(result);
