@@ -1,4 +1,4 @@
-package org.refit.spring.ceo.domain;
+package org.refit.spring.ceo.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReceiptDetailVO {
+public class ReceiptDetail {
     private Long userid;            // 사장님
     private String name;            // 사장님 이름
     private String progressType;    // 경비 처리 항목

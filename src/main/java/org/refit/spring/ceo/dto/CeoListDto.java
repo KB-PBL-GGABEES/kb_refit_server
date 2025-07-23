@@ -1,20 +1,18 @@
 package org.refit.spring.ceo.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.refit.spring.ceo.domain.CeoVO;
+import org.refit.spring.ceo.entity.Ceo;
 
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CeoListDTO {
+public class CeoListDto {
     private Long receiptId;
     private String companyName; // 상호명
     private Long totalPrice;    // 결제금액
@@ -23,10 +21,10 @@ public class CeoListDTO {
 
 //    private String storeImage;  // 상호이미지
 
-    public static CeoListDTO of(CeoVO vo) {
+    public static CeoListDto of(Ceo vo) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-        CeoListDTO ceo = CeoListDTO.builder()
+        CeoListDto ceo = CeoListDto.builder()
                 .receiptId(vo.getReceiptId())
                 .companyName(vo.getCompanyName())
                 .totalPrice(vo.getTotalPrice())

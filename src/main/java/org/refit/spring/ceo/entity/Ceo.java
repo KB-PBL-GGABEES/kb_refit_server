@@ -1,6 +1,5 @@
-package org.refit.spring.ceo.domain;
+package org.refit.spring.ceo.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,7 +11,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CeoVO {
+public class Ceo {
     private Long receiptId;
     private String companyName; // 상호명
     private Long totalPrice;    // 결제금액
