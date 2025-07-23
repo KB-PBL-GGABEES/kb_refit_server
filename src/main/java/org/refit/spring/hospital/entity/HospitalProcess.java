@@ -7,7 +7,7 @@ import java.util.Date;
 @Data
 public class HospitalProcess {
     private Long hospitalProcessId;
-    private Boolean processState;
+    private String processState;
     private Date sickedDate;
     private String visitedReason;
     private Long receiptId;
