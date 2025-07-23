@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import java.util.Date;
 
 @Data
-@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReceiptContent {

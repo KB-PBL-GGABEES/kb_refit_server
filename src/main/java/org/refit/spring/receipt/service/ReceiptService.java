@@ -26,8 +26,10 @@ public class ReceiptService {
 
 
     @Transactional
-    public Receipt create(ReceiptRequestDto dto) {
-        Receipt receipt = initReceipt();
+    public Receipt create(ReceiptRequestDto dto, Long userId) {
+        List<ReceiptContentRequestsDto> requestList = dto.getContentsList();
+        Merchandise firstMerchandise = merchandiseMapper.findByMerchandiseId(requestList.get(0).getMerchandiseId());
+        Receipt receipt = initReceipt(firstMerchandise.getCompanyId(), userId);
         List<ReceiptContentDto> list = makeContents(dto.getContentsList(), receipt);
         updatePrice(receipt);
         receipt.setContentList(list);
@@ -35,13 +37,15 @@ public class ReceiptService {
         return receipt;
     }
 
-    private Receipt initReceipt() {
+    private Receipt initReceipt(Long companyId, Long userId) {
         Receipt receipt = new Receipt();
         receipt.setTotalPrice(0L);
         receipt.setSupplyPrice(0L);
         receipt.setSurtax(0L);
         receipt.setTransactionType("카드 결제");
         receipt.setCreatedAt(new Date());
+        receipt.setUserId(userId);
+        receipt.setCompanyId(companyId);
         receiptMapper.create(receipt);
         return receipt;
     }
