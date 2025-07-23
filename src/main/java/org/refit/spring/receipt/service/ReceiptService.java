@@ -4,10 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.refit.spring.mapper.MerchandiseMapper;
 import org.refit.spring.mapper.ReceiptMapper;
 import org.refit.spring.merchandise.entity.Merchandise;
-import org.refit.spring.receipt.dto.ReceiptContentDto;
-import org.refit.spring.receipt.dto.ReceiptContentRequestsDto;
-import org.refit.spring.receipt.dto.ReceiptListDto;
-import org.refit.spring.receipt.dto.ReceiptRequestDto;
+import org.refit.spring.receipt.dto.*;
 import org.refit.spring.receipt.entity.Receipt;
 import org.refit.spring.receipt.entity.ReceiptContent;
 import org.springframework.stereotype.Service;
@@ -137,7 +134,11 @@ public class ReceiptService {
     }
 
 
-    public Long getTotal() {
-        return receiptMapper.getTotal();
+    @Transactional
+    public ReceiptTotalDto getTotal(Long userId) {
+        ReceiptTotalDto dto = new ReceiptTotalDto();
+        dto.setUserId(userId);
+        dto.setTotal(receiptMapper.getTotal());
+        return dto;
     }
 }
