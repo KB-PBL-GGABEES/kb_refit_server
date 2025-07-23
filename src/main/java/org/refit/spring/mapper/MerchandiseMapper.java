@@ -6,6 +6,6 @@ import org.refit.spring.merchandise.entity.Merchandise;
 
 @Mapper
 public interface MerchandiseMapper {
-    @Select("SELECT * FROM merchandise WHERE merchandise_id = #{merchandiseID}")
+    @Select("SELECT * FROM merchandise WHERE merchandise_id = #{merchandiseId}")
     Merchandise findByMerchandiseId(Long merchandiseId);
 }

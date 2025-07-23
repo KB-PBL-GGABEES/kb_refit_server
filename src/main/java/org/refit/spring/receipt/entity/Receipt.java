@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.List;
 
 @Data
-@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 
@@ -20,4 +19,6 @@ public class Receipt {
     private Date createdAt;
     private Date updatedAt;
     List<ReceiptContentDto> contentList;
+    private Long companyId;
+    private Long userId;
 }
