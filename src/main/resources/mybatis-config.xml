@@ -10,12 +10,14 @@
         <typeHandler handler="org.refit.spring.auth.enums.UserRoleTypeHandler"
                      javaType="org.refit.spring.auth.enums.UserRole"/>
     </typeHandlers>
-<<<<<<< Updated upstream
 </configuration>
-=======
 <!--    <typeAliases>-->
 
 <!--    </typeAliases>-->
 
+<<<<<<< Updated upstream
+</configuration>
+>>>>>>> Stashed changes
+=======
 </configuration>
 >>>>>>> Stashed changes
