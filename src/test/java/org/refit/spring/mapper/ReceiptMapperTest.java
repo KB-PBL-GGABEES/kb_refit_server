@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.refit.spring.config.RootConfig;
 import org.refit.spring.mapper.ReceiptMapper;
+import org.refit.spring.receipt.dto.ReceiptTotalDto;
 import org.refit.spring.receipt.entity.Receipt;
 import org.refit.spring.receipt.entity.ReceiptContent;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -167,9 +168,14 @@ class ReceiptMapperTest {
     @DisplayName("이번 달 사용한 총 금액을 계산합니다.")
     @Test
     void getTotal() {
-        Long userId = 1L;
-        Long total = 100000L;
+        Long total = receiptMapper.getTotal();
+        assertNotNull(total);
+    }
 
-
+    @DisplayName("저번 달 사용한 총 금액을 계산합니다.")
+    @Test
+    void getLastMonthTotal() {
+        Long total = receiptMapper.getLastMonthTotal();
+        assertNotNull(total);
     }
 }
