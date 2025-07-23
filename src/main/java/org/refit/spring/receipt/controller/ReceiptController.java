@@ -43,7 +43,27 @@ public class ReceiptController {
         }
 
         Receipt receipt = receiptService.create(receiptRequestDto, user.getUserId());
-        ReceiptResponseDto dto = ReceiptResponseDto.from(receipt, user.getUserId(), receiptRequestDto.getReward());
+        ReceiptResponseDto dto = ReceiptResponseDto.from(receipt, user.getUserId());
+        return ResponseEntity.ok(dto);
+    }
+
+    @PostMapping("/refund")
+    public ResponseEntity<?> refund(@RequestHeader("Authorization") String authHeader, @RequestParam("receiptId") Long receiptId) {
+        String token = authHeader.replace("Bearer ", "");
+
+        if (!jwtTokenProvider.validateAccessToken(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("invalid token");
+        }
+
+        String username = jwtTokenProvider.getUsername(token);
+        User user = userService.findByUsername(username);
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+
+        Receipt receipt = receiptService.refund(user.getUserId(), receiptId);
+        ReceiptResponseDto dto = ReceiptResponseDto.from(receipt, user.getUserId());
         return ResponseEntity.ok(dto);
     }
 

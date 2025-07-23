@@ -37,6 +37,23 @@ public class ReceiptService {
         return receipt;
     }
 
+    @Transactional
+    public Receipt refund(Long userId, Long receiptId) {
+        Receipt nowReceipt = receiptMapper.get(receiptId);
+        if (nowReceipt == null) throw new IllegalArgumentException("존재하지 않는 영수증입니다.");
+        Receipt refundReceipt = new Receipt();
+        refundReceipt.setTotalPrice(-nowReceipt.getTotalPrice());
+        refundReceipt.setSupplyPrice(-nowReceipt.getSupplyPrice());
+        refundReceipt.setSurtax(-nowReceipt.getSurtax());
+        refundReceipt.setTransactionType("환불");
+        refundReceipt.setCreatedAt(new Date());
+        refundReceipt.setCompanyId(nowReceipt.getCompanyId());
+        refundReceipt.setUserId(userId);
+        receiptMapper.create(refundReceipt);
+
+        return refundReceipt;
+    }
+
     private Receipt initReceipt(Long companyId, Long userId) {
         Receipt receipt = new Receipt();
         receipt.setTotalPrice(0L);

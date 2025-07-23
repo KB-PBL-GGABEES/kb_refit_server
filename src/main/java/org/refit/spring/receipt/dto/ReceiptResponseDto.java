@@ -23,7 +23,7 @@ public class ReceiptResponseDto {
     private Long reward;
     private Date createdAt;
 
-    public static ReceiptResponseDto from(Receipt receipt, Long userId, Long reward) {
+    public static ReceiptResponseDto from(Receipt receipt, Long userId) {
         return new ReceiptResponseDto(
                 userId,
                 receipt.getReceiptId(),
@@ -32,7 +32,7 @@ public class ReceiptResponseDto {
                 receipt.getSupplyPrice(),
                 receipt.getSurtax(),
                 100L,
-                reward,
+                (long) (receipt.getTotalPrice() * 0.05),
                 receipt.getCreatedAt()
         );
     }
