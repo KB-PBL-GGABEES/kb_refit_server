@@ -27,7 +27,7 @@ public interface HospitalMapper {
     // 의료비 납입 내역 상세 조회
      @Select("SELECT c.company_name AS hospitalName, " +
         "c.company_id AS companyId, " +
-        "c.boss_name AS bossName, " +
+        "c.ceo_name AS ceoName, " +
         "c.address AS address, " +
         "r.supply_price AS supplyPrice, " +
         "r.surtax AS surtax, " +
