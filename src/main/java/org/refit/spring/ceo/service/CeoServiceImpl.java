@@ -1,8 +1,8 @@
 package org.refit.spring.ceo.service;
 
 import lombok.RequiredArgsConstructor;
-import org.refit.spring.ceo.dto.CeoListDTO;
-import org.refit.spring.ceo.dto.ReceiptDetailDTO;
+import org.refit.spring.ceo.dto.CeoListDto;
+import org.refit.spring.ceo.dto.ReceiptDetailDto;
 import org.refit.spring.mapper.CeoMapper;
 import org.springframework.stereotype.Service;
 
@@ -16,16 +16,16 @@ public class CeoServiceImpl implements CeoService {
 
     // 경비 처리가 필요한 내역 조회
     @Override
-    public List<CeoListDTO> getListUndone() {
+    public List<CeoListDto> getListUndone() {
         return ceoMapper.getListUndone()
                 .stream()
-                .map(CeoListDTO::of)
+                .map(CeoListDto::of)
                 .collect(Collectors.toList());
     }
 
     // 경비 청구 항목 상세 조회
     @Override
-    public ReceiptDetailDTO getReceiptDetail(Long receipted) {
+    public ReceiptDetailDto getReceiptDetail(Long receipted) {
         return ceoMapper.getReceiptDetail(receipted);
     }
 

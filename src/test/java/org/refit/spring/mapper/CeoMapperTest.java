@@ -4,7 +4,7 @@ import lombok.extern.log4j.Log4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.refit.spring.ceo.domain.CeoVO;
+import org.refit.spring.ceo.entity.Ceo;
 import org.refit.spring.config.RootConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -23,7 +23,7 @@ class CeoMapperTest {
     @Test
     @DisplayName("경비 처리가 필요한 내역 조회")
     void getListUndone() {
-        List<CeoVO> list = ceoMapper.getListUndone();
+        List<Ceo> list = ceoMapper.getListUndone();
 
         if (list.isEmpty()) {
             log.info("경비 처리가 필요한 내역 조회 테스트 (리스트는 비어 있음)");

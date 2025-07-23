@@ -1,8 +1,8 @@
 package org.refit.spring.ceo.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.refit.spring.ceo.dto.CeoListDTO;
-import org.refit.spring.ceo.dto.ReceiptDetailDTO;
+import org.refit.spring.ceo.dto.CeoListDto;
+import org.refit.spring.ceo.dto.ReceiptDetailDto;
 import org.refit.spring.ceo.service.CeoService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,14 +20,14 @@ public class CeoController {
 
     // 경비 처리가 필요한 내역 조회
     @GetMapping("/undone")
-    public ResponseEntity<List<CeoListDTO>> getListUndone() {
-        List<CeoListDTO> list = ceoService.getListUndone();
+    public ResponseEntity<List<CeoListDto>> getListUndone() {
+        List<CeoListDto> list = ceoService.getListUndone();
         return ResponseEntity.ok(list);
     }
 
     // 경비 청구 항목 상세 조회
     @GetMapping("/detail")
-    public ResponseEntity<ReceiptDetailDTO> getReceiptDetail(
+    public ResponseEntity<ReceiptDetailDto> getReceiptDetail(
             @RequestParam("id") Long receipted) {
         return ResponseEntity.ok(ceoService.getReceiptDetail(receipted));
     }
