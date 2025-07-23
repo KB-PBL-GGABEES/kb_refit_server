@@ -45,6 +45,7 @@ bin/
 .env
 .env.*
 src/main/resources/application.properties
+src/test/resources/application.properties
 application.yml
 application-*.properties
 application-*.yml
