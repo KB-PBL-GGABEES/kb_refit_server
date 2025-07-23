@@ -3,6 +3,7 @@ package org.refit.spring.mapper;
 import org.apache.ibatis.annotations.*;
 import org.refit.spring.receipt.entity.Receipt;
 import org.refit.spring.receipt.entity.ReceiptContent;
+import org.springframework.security.core.parameters.P;
 
 import java.util.List;
 
@@ -19,8 +20,11 @@ public interface ReceiptMapper {
     @Update("UPDATE receipt SET total_price = #{totalPrice}, supply_price = #{supplyPrice}, surtax = #{surtax} WHERE receipt_id = #{receiptId}")
     void update(Receipt receipt);
 
-    @Select("SELECT * FROM receipt WHERE user_id = #{userId} AND receipt_id < #{cursorId} ORDER BY receipt_id DESC LIMIT 20")
-    List<Receipt> getList(Long userId, Long cursorId);
+    @Select("SELECT * FROM receipt WHERE receipt_id < #{cursorId} ORDER BY receipt_id DESC LIMIT 20")
+    List<Receipt> getList(@Param("userId") Long userId, @Param("cursorId") Long cursorId);
+
+    @Select("SELECT * FROM receiptContent WHERE receipt_id = #{receiptId}")
+    List<ReceiptContent> findContentsByReceiptId(@Param("receiptId") Long receiptId);
 
     @Select("SELECT * FROM receipt WHERE receipt_id = #{receiptId}")
     Receipt get(Long id);
