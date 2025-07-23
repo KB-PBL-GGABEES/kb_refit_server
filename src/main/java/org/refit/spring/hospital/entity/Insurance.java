@@ -10,6 +10,4 @@ public class Insurance {
     private String insuranceName;
     private Date joinedDate;
     private Long userId;
-
-
 }
