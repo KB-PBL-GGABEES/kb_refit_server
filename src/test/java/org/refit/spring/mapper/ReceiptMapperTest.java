@@ -164,8 +164,12 @@ class ReceiptMapperTest {
         assertEquals("카드결제", result.getTransactionType());
     }
 
-    @DisplayName("최근 한 달간 사용한 총 금액을 계산합니다.")
+    @DisplayName("이번 달 사용한 총 금액을 계산합니다.")
     @Test
     void getTotal() {
+        Long userId = 1L;
+        Long total = 100000L;
+
+
     }
 }
