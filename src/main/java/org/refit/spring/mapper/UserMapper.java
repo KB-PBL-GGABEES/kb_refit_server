@@ -20,5 +20,4 @@ public interface UserMapper {
     void updateRefreshToken(@Param("username") String username,
                             @Param("refreshToken") String refreshToken);
 
-
 }
