@@ -17,7 +17,6 @@ public class Receipt {
     private Long supplyPrice;
     private Long surtax;
     private String transactionType;
-    private boolean isRefund;
     private Date createdAt;
     private Date updatedAt;
     List<ReceiptContentDto> contentList;
