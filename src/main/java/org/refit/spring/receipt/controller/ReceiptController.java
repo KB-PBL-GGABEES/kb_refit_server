@@ -42,7 +42,7 @@ public class ReceiptController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
 
-        Receipt receipt = receiptService.create(receiptRequestDto);
+        Receipt receipt = receiptService.create(receiptRequestDto, user.getUserId());
         ReceiptResponseDto dto = ReceiptResponseDto.from(receipt, user.getUserId(), receiptRequestDto.getReward());
         return ResponseEntity.ok(dto);
     }

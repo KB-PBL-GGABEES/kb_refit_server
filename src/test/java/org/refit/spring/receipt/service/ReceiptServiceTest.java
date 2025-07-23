@@ -1,7 +1,6 @@
 package org.refit.spring.receipt.service;
 
 import lombok.extern.log4j.Log4j;
-import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,8 +12,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {RootConfig.class})
@@ -33,7 +30,7 @@ class ReceiptServiceTest {
         content.setAmount(3L);
         dto.setContentsList(List.of(content));
 
-        Receipt receipt = service.create(dto);
+        Receipt receipt = service.create(dto, 1L);
         log.info(receipt);
     }
 
@@ -50,7 +47,7 @@ class ReceiptServiceTest {
     @DisplayName("구매 영수증 상세 조회 테스트")
     @Test
     void get() {
-        Long receiptId = 197L;
+        Long receiptId = 8L;
         Long cursorId = null;
         Receipt receipt = service.get(cursorId, receiptId);
         log.info(receipt.getReceiptId());
