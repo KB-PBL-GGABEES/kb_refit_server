@@ -31,4 +31,6 @@ public interface ReceiptMapper {
     @Select("SELECT SUM(total_price) FROM receipt WHERE MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE())")
     Long getTotal();
 
+    @Select("SELECT SUM(total_price) FROM receipt WHERE MONTH(created_at) = MONTH(DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH)) AND YEAR(created_at) = YEAR(DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH))")
+    Long getLastMonthTotal();
 }
