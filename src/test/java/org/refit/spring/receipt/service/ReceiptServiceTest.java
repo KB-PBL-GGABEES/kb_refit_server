@@ -58,4 +58,13 @@ class ReceiptServiceTest {
             log.info(contentDto.getAmount());
         }
     }
+
+    @DisplayName("이번 달, 저번 달 총 사용 금액 조회 테스트")
+    @Test
+    void getTotal() {
+        Long userId = 1L;
+        ReceiptTotalDto dto = service.getTotal(userId);
+        log.info(dto.getTotal());
+        log.info(dto.getLastMonth());
+    }
 }
