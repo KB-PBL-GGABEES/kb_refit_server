@@ -19,9 +19,12 @@ public interface ReceiptMapper {
     @Update("UPDATE receipt SET total_price = #{totalPrice}, supply_price = #{supplyPrice}, surtax = #{surtax} WHERE receipt_id = #{receiptId}")
     void update(Receipt receipt);
 
-    @Select("SELECT * FROM receipt ORDER BY receipt_id DESC")
-    List<Receipt> getList();
+    @Select("SELECT * FROM receipt WHERE user_id = #{userId} AND receipt_id < #{cursorId} ORDER BY receipt_id DESC LIMIT 20")
+    List<Receipt> getList(Long userId, Long cursorId);
 
     @Select("SELECT * FROM receipt WHERE receipt_id = #{receiptId}")
     Receipt get(Long id);
+
+    @Select("SELECT SUM(totalPrice) FROM receipt WHERE (is_refund = 0) AND (created_at BETWEEN DATE_ADD(NOW(), INTERVAL -1 MONTH) AND NOW())")
+    Long getTotal();
 }
