@@ -9,7 +9,7 @@ import java.util.Date;
 public class HospitalExpenseDetailResponseDto {
     private String hospitalName;
     private Long companyId;
-    private String bossName;
+    private String ceoName;
     private String address;
     private Long supplyPrice;
     private Long surtax;
