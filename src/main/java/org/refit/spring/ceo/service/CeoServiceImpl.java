@@ -6,6 +6,7 @@ import org.refit.spring.ceo.dto.ReceiptDetailDto;
 import org.refit.spring.mapper.CeoMapper;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,6 +31,14 @@ public class CeoServiceImpl implements CeoService {
     }
 
     // 경비 처리 완료 내역 조회
+    @Override
+    public List<CeoListDto> getListDone(int period) {
+        LocalDateTime fromDate = LocalDateTime.now().minusMonths(period);
+        return ceoMapper.getListDone(fromDate)
+                .stream()
+                .map(CeoListDto::of)
+                .collect(Collectors.toList());
+    }
 
     // 처리 완료된 항목 이메일 전송
 

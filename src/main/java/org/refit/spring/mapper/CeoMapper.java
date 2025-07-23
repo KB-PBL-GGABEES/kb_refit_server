@@ -1,10 +1,12 @@
 package org.refit.spring.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.refit.spring.ceo.entity.Ceo;
 import org.refit.spring.ceo.dto.ReceiptDetailDto;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
@@ -39,6 +41,25 @@ public interface CeoMapper {
     ReceiptDetailDto getReceiptDetail(Long receiptId);
 
     // 경비 처리 완료 내역 조회
+    @Select("SELECT\n" +
+            "    r.receipt_id,\n" +
+            "    c.company_name,\n" +
+            "    r.created_at AS receipt_date_time,\n" +
+            "    r.total_price,\n" +
+            "    CASE\n" +
+            "        WHEN p.process_state = 'accepted' THEN '승인'\n" +
+            "        WHEN p.process_state = 'rejected' THEN '거절'\n" +
+            "        ELSE p.process_state\n" +
+            "    END AS process_state\n" +
+            "FROM receipt r\n" +
+            "    JOIN company c ON r.company_id = c.company_id\n" +
+            "    JOIN receipt_process p ON r.receipt_id = p.receipt_id\n" +
+            "WHERE p.process_state IN ('accepted', 'rejected')\n" +
+            "  AND r.created_at >= #{fromDate}\n" +
+            "ORDER BY r.created_at DESC")
+    List<Ceo> getListDone(@Param("fromDate") LocalDateTime fromDate);
+
+
 
     // 처리 완료된 항목 이메일 전송
 
