@@ -27,6 +27,7 @@ public class ReceiptController {
 
     private final UserService userService;
 
+
     @PostMapping("/create")
     public ResponseEntity<?> create(@RequestHeader("Authorization") String authHeader, @RequestBody ReceiptRequestDto receiptRequestDto) {
         String token = authHeader.replace("Bearer ", "");
@@ -113,15 +114,20 @@ public class ReceiptController {
         return ResponseEntity.ok(receipt);
     }
 
-//    @GetMapping("/total")
-//    public ResponseEntity<?> getTotal(@RequestHeader("Authorization") String authHeader) {
-//        String token = authHeader.replace("Bearer ", "");
-//
-//        if (!jwtTokenProvider.validateAccessToken(token)) {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("invalid token");
-//        }
-//        return ResponseEntity.ok();
-//
-//    }
+    @GetMapping("/total")
+    public ResponseEntity<?> getTotal(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+
+        String username = jwtTokenProvider.getUsername(token);
+        User user = userService.findByUsername(username);
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+        if (!jwtTokenProvider.validateAccessToken(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("invalid token");
+        }
+        return ResponseEntity.ok(receiptService.getTotal(user.getUserId()));
+    }
 
 }

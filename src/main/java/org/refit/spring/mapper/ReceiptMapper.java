@@ -28,7 +28,7 @@ public interface ReceiptMapper {
     @Select("SELECT * FROM receipt WHERE receipt_id = #{receiptId}")
     Receipt get(Long id);
 
-    @Select("SELECT SUM(total_price) FROM receipt WHERE created_at BETWEEN DATE_ADD(NOW(), INTERVAL -1 MONTH) AND NOW()")
+    @Select("SELECT SUM(total_price) FROM receipt WHERE MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE())")
     Long getTotal();
 
 }
