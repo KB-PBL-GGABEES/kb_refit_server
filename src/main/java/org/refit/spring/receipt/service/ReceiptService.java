@@ -10,10 +10,12 @@ import org.refit.spring.receipt.dto.ReceiptRequestDto;
 import org.refit.spring.receipt.entity.Receipt;
 import org.refit.spring.receipt.entity.ReceiptContent;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -53,6 +55,18 @@ public class ReceiptService {
         receipt.setSurtax(total - receipt.getSupplyPrice());
         receipt.setContentList(list);
         receiptMapper.update(receipt);
+        return receipt;
+    }
+
+    public List<Receipt> getList() {
+        return receiptMapper.getList();
+    }
+
+    public Receipt get(Long id) {
+        Receipt receipt = receiptMapper.get(id);
+        if (receipt == null) {
+            throw new NoSuchElementException();
+        }
         return receipt;
     }
 }
