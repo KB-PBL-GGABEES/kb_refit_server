@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.refit.spring.ceo.entity.Ceo;
 import org.refit.spring.ceo.dto.ReceiptDetailDto;
+import org.refit.spring.receipt.entity.Receipt;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,8 +24,9 @@ public interface CeoMapper {
             "            JOIN company c ON r.company_id = c.company_id\n" +
             "            JOIN receipt_process p ON r.receipt_id = p.receipt_id\n" +
             "        WHERE p.process_state = 'none'\n" +
-            "        ORDER BY r.created_at DESC")
-    List<Ceo> getListUndone();
+            "             AND r.receipt_id < #{cursorId}\n" +
+            "        ORDER BY r.receipt_id DESC LIMIT 20")
+    List<Ceo> getListUndone(@Param("cursorId") Long cursorId);
 
     // 경비 청구 항목 상세 조회
     @Select("SELECT \n" +
@@ -56,8 +58,9 @@ public interface CeoMapper {
             "    JOIN receipt_process p ON r.receipt_id = p.receipt_id\n" +
             "WHERE p.process_state IN ('accepted', 'rejected')\n" +
             "  AND r.created_at >= #{fromDate}\n" +
-            "ORDER BY r.created_at DESC")
-    List<Ceo> getListDone(@Param("fromDate") LocalDateTime fromDate);
+            "  AND r.created_at  < #{cursor}\n" +
+            "ORDER BY r.created_at DESC LIMIT 20")
+    List<Ceo> getListDone(@Param("fromDate") LocalDateTime fromDate, @Param("cursor") LocalDateTime cursor);
 
     // 처리 완료된 항목 이메일 전송
     @Select("SELECT COUNT(*) " +
@@ -73,6 +76,4 @@ public interface CeoMapper {
     // 한달 법카 금액 조회
 
     // 법카 내역 조회
-
-    // 페이지네이션
 }

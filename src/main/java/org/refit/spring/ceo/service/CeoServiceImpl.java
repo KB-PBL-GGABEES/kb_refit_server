@@ -19,8 +19,10 @@ public class CeoServiceImpl implements CeoService {
 
     // 경비 처리가 필요한 내역 조회
     @Override
-    public List<CeoListDto> getListUndone() {
-        return ceoMapper.getListUndone()
+    public List<CeoListDto> getListUndone(Long cursorId) {
+        if(cursorId == null) { cursorId = Long.MAX_VALUE; }
+
+        return ceoMapper.getListUndone(cursorId)
                 .stream()
                 .map(CeoListDto::of)
                 .collect(Collectors.toList());
@@ -34,9 +36,13 @@ public class CeoServiceImpl implements CeoService {
 
     // 경비 처리 완료 내역 조회
     @Override
-    public List<CeoListDto> getListDone(int period) {
+    public List<CeoListDto> getListDone(int period, String cursorDateTime) {
         LocalDateTime fromDate = LocalDateTime.now().minusMonths(period);
-        return ceoMapper.getListDone(fromDate)
+        LocalDateTime cursor = (cursorDateTime == null)
+                ? LocalDateTime.now().plusDays(1)
+                : LocalDateTime.parse(cursorDateTime);
+
+        return ceoMapper.getListDone(fromDate, cursor)
                 .stream()
                 .map(CeoListDto::of)
                 .collect(Collectors.toList());
@@ -60,6 +66,4 @@ public class CeoServiceImpl implements CeoService {
     // 한달 법카 금액 조회
 
     // 법카 내역 조회
-
-    // 페이지네이션
 }
