@@ -12,7 +12,7 @@ public interface ReceiptMapper {
     @Options(useGeneratedKeys = true, keyProperty = "receiptId")
     void create(Receipt receipt);
 
-    @Insert("INSERT INTO receiptContent (amount, receipt_id, merchandise_id, created_at) VALUES (#{amount}, #{receiptId}, #{merchandiseId}, #{createdAt})")
+    @Insert("INSERT INTO receipt_content (amount, receipt_id, merchandise_id, created_at) VALUES (#{amount}, #{receiptId}, #{merchandiseId}, #{createdAt})")
     @Options(useGeneratedKeys = true, keyProperty = "receiptContentId")
     void createReceiptContent(ReceiptContent receiptContent);
 
@@ -22,7 +22,7 @@ public interface ReceiptMapper {
     @Select("SELECT * FROM receipt WHERE receipt_id < #{cursorId} ORDER BY receipt_id DESC LIMIT 20")
     List<Receipt> getList(@Param("cursorId") Long cursorId);
 
-    @Select("SELECT * FROM receiptContent WHERE receipt_id = #{receiptId}")
+    @Select("SELECT * FROM receipt_content WHERE receipt_id = #{receiptId}")
     List<ReceiptContent> findContentsByReceiptId(@Param("receiptId") Long receiptId);
 
     @Select("SELECT * FROM receipt WHERE receipt_id = #{receiptId}")
