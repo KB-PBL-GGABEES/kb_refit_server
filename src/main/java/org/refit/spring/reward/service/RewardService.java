@@ -20,8 +20,5 @@ public class RewardService {
         List<Reward> rewards = rewardMapper.getList(cursorId);
         Long nextCursorId = rewards.size() < 20 ? null : rewards.get(rewards.size() - 1).getRewardId();
         return RewardListDto.from(userId, rewards, nextCursorId);
-
-
-
     }
  }

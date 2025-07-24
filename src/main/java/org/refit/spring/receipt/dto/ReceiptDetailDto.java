@@ -3,7 +3,6 @@ package org.refit.spring.receipt.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.Date;
 import java.util.List;
 
 @Data
@@ -19,6 +18,6 @@ public class ReceiptDetailDto {
     private Long supplyPrice;
     private Long surtax;
     private String transactionType;
-    private Date createdAt;
+    private String createdAt;
     private String processState;
 }
