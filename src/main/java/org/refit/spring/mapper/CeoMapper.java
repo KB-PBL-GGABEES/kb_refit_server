@@ -59,9 +59,12 @@ public interface CeoMapper {
             "ORDER BY r.created_at DESC")
     List<Ceo> getListDone(@Param("fromDate") LocalDateTime fromDate);
 
-
-
     // 처리 완료된 항목 이메일 전송
+    @Select("SELECT COUNT(*) " +
+            "FROM receipt r " +
+            "JOIN receipt_process p ON r.receipt_id = p.receipt_id " +
+            "WHERE p.process_state IN ('accepted', 'rejected')")
+    int countDone();
 
     // 영수 처리 승인
 

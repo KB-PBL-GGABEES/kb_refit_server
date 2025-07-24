@@ -17,6 +17,8 @@ public interface CeoService {
     List<CeoListDto> getListDone(int period);
 
     // 처리 완료된 항목 이메일 전송
+    int countDoneReceipt();
+    void sendEmail(String email);
 
     // 영수 처리 승인
     
