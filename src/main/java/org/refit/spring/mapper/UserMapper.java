@@ -20,5 +20,7 @@ public interface UserMapper {
     void updateRefreshToken(@Param("username") String username,
                             @Param("refreshToken") String refreshToken);
 
+    @Select("SELECT user_id FROM user WHERE username = #{username}")
+    Long findUserIdByUsername(String username);
 
 }
