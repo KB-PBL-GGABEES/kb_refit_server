@@ -11,7 +11,7 @@ import java.util.List;
 @Mapper
 public interface RewardMapper {
 
-    @Insert("INSERT INTO reward (carbon_point, reward, created_at, user_id) VALUES (100, #{reward}, #{createdAt}, #{userId})")
+    @Insert("INSERT INTO reward (carbon_point, reward, created_at, user_id) VALUES (#{carbonPoint}, #{reward}, #{createdAt}, #{userId})")
     @Options(useGeneratedKeys = true, keyProperty = "rewardId")
     void create(Reward reward);
 

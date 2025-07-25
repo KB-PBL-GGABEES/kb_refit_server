@@ -47,9 +47,9 @@ public class ReceiptController {
         }
 
         Receipt receipt = receiptService.create(receiptRequestDto, user.getUserId());
-        Reward reward = rewardService.create(receipt.getTotalPrice(), user.getUserId());
-        userService.updatePoint(user, user.getTotalCarbonPoint() + reward.getCarbonPoint(), user.getTotalStarPoint() + reward.getReward());
-        ReceiptResponseDto dto = ReceiptResponseDto.from(receipt, user.getUserId());
+        Reward reward = rewardService.create(100L, receipt.getTotalPrice(), user.getUserId());
+        userService.updatePoint(user, reward.getCarbonPoint(), reward.getReward());
+        ReceiptResponseDto dto = ReceiptResponseDto.from(receipt, user.getUserId(), reward.getCarbonPoint(), reward.getReward());
         return ResponseEntity.ok(dto);
     }
 
@@ -69,7 +69,9 @@ public class ReceiptController {
         }
 
         Receipt receipt = receiptService.refund(user.getUserId(), receiptId);
-        ReceiptResponseDto dto = ReceiptResponseDto.from(receipt, user.getUserId());
+        Reward reward = rewardService.create(-100L, receipt.getTotalPrice(), user.getUserId());
+        userService.updatePoint(user, reward.getCarbonPoint(), reward.getReward());
+        ReceiptResponseDto dto = ReceiptResponseDto.from(receipt, user.getUserId(), reward.getCarbonPoint(), reward.getReward());
         return ResponseEntity.ok(dto);
     }
 
