@@ -21,7 +21,7 @@ public class ReceiptResponseDto {
     private Long reward;
     private String createdAt;
 
-    public static ReceiptResponseDto from(Receipt receipt, Long userId) {
+    public static ReceiptResponseDto from(Receipt receipt, Long userId, Long carbon, Long price) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return new ReceiptResponseDto(
                 userId,
@@ -30,8 +30,8 @@ public class ReceiptResponseDto {
                 receipt.getTotalPrice(),
                 receipt.getSupplyPrice(),
                 receipt.getSurtax(),
-                100L,
-                (long) (receipt.getTotalPrice() * 0.05),
+                carbon,
+                price,
                 sdf.format(receipt.getCreatedAt())
         );
     }

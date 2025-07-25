@@ -15,9 +15,9 @@ import java.util.List;
 public class RewardService {
     private final RewardMapper rewardMapper;
 
-    public Reward create(Long totalPrice, Long userId) {
+    public Reward create(Long carbon, Long totalPrice, Long userId) {
         Reward reward = new Reward();
-        reward.setCarbonPoint(100L);
+        reward.setCarbonPoint(carbon);
         reward.setReward((long) Math.floor(totalPrice * 0.05));
         reward.setCreatedAt(new Date());
         reward.setUserId(userId);
