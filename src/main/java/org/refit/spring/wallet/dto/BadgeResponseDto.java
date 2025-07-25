@@ -79,5 +79,29 @@ public class BadgeResponseDto {
                     .build();
         }
     }
+
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    @Builder
+    public static class specificBadgeDetailDto {
+        private Long badgeId;
+        private String badgeImage;
+        private String badgeTitle;
+        private String badgeCondition;
+        private String badgeBenefit;
+        private boolean isOwned;
+
+        public static specificBadgeDetailDto from(Badge badge, boolean isOwned) {
+            return specificBadgeDetailDto.builder()
+                    .badgeId(badge.getBadgeId())
+                    .badgeImage(badge.getBadgeImage())
+                    .badgeTitle(badge.getBadgeTitle())
+                    .badgeCondition(badge.getBadgeCondition())
+                    .badgeBenefit(badge.getBadgeBenefit())
+                    .isOwned(isOwned)
+                    .build();
+        }
+    }
 }
 

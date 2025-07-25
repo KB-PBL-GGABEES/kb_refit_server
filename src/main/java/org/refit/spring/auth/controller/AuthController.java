@@ -27,7 +27,7 @@ public class AuthController {
     //security에서 제공하는 login 사용할 예정
     @GetMapping("/test")
     public String test() {
-        return new BCryptPasswordEncoder().encode("1234");
+        return new BCryptPasswordEncoder().encode("050505");
     }
 
     @GetMapping("/me")

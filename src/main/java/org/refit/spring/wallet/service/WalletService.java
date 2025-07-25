@@ -45,4 +45,16 @@ public class WalletService {
         return BadgeResponseDto.wornBadgeListAndBenefitDto.from(badgeDetailDtoList);
     }
 
+    public BadgeResponseDto.specificBadgeDetailDto getSpecificBadgeDetail(Long badgeId, Long userId) {
+        //1. 뱃지 정보 조회
+        Badge badge = badgeMapper.findById(badgeId);
+        //2. 유저가 해당 뱃지를 소유 중인지 확인
+        if (badge == null) {
+            throw new RuntimeException("해당 id의 뱃지를 찾을 수 없습니다.");
+        }
+        boolean isOwned = personalBadgeMapper.existsByUserIdAndBadgeId(userId, badgeId);
+
+        //3. DTO 반환
+        return BadgeResponseDto.specificBadgeDetailDto.from(badge, isOwned);
+    }
 }

@@ -9,6 +9,7 @@ import org.refit.spring.wallet.entity.Badge;
 import org.refit.spring.wallet.service.WalletService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -35,6 +36,13 @@ public class WalletController {
         if (result.getMyBadgeList() == null || result.getMyBadgeList().isEmpty()) {
             return ResponseEntity.ok("현재 착용 중인 뱃지가 없습니다.");
         }
+        return ResponseEntity.ok(result);
+    }
+
+    @ApiOperation(value = "특정 뱃지 정보 조회", notes = "특정한 뱃지의 상세 정보를 조회할 수 있습니다.")
+    @GetMapping("/badge/detail/{badgeId}")
+    public ResponseEntity<?> getBadgeDetail(@UserId Long userId, @PathVariable("badgeId") Long badgeId) {
+        BadgeResponseDto.specificBadgeDetailDto result = walletService.getSpecificBadgeDetail(badgeId, userId);
         return ResponseEntity.ok(result);
     }
 }
