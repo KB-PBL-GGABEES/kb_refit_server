@@ -7,6 +7,7 @@ import org.refit.spring.hospital.dto.InsuranceSubscribedResponseDto;
 import org.refit.spring.mapper.HospitalMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -14,8 +15,17 @@ import java.util.List;
 public class HospitalService {
     private final HospitalMapper hospitalMapper;
 
-    public List<HospitalExpenseResponseDto>  findHospitalExpenseById(Long userId) {
-        return hospitalMapper.findByAllHospitalExpenseByUserId(userId);
+
+//    public List<HospitalExpenseResponseDto>  findHospitalExpenseById(Long userId) {
+//        return hospitalMapper.findByAllHospitalExpenseByUserId(userId);
+//    }
+
+
+    public List<HospitalExpenseResponseDto> getHospitalExpenses(Long userId, Date cursorDate) {
+        if (cursorDate == null) {
+            return hospitalMapper.findFirstPage(userId);
+        }
+        return hospitalMapper.findByCursorDate(userId, cursorDate);
     }
 
     public HospitalExpenseDetailResponseDto findHospitalExpenseDetailById(Long receiptId) {
