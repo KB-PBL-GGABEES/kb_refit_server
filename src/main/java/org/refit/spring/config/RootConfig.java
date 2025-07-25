@@ -28,7 +28,8 @@ import javax.sql.DataSource;
         "org.refit.spring.mapper",
         "org.refit.spring.test",
         "org.refit.spring.security",
-        "org.refit.spring.ceo"
+        "org.refit.spring.ceo",
+        "org.refit.spring.reward"
 })
 @MapperScan(basePackages = {"org.refit.spring.mapper"})
 public class RootConfig {
