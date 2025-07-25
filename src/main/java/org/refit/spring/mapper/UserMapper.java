@@ -22,5 +22,7 @@ public interface UserMapper {
 
     @Select("SELECT user_id FROM user WHERE username = #{username}")
     Long findUserIdByUsername(String username);
+    @Update("UPDATE user SET total_carbon_point = #{totalCarbonPoint}, total_star_point = #{totalStarPoint}")
+    void updateReward(@Param("totalCarbonPoint") Long carbon, @Param("totalStarPoint") Long star);
 
 }
