@@ -9,6 +9,8 @@ import org.refit.spring.receipt.dto.ReceiptRequestDto;
 import org.refit.spring.receipt.dto.ReceiptResponseDto;
 import org.refit.spring.receipt.entity.Receipt;
 import org.refit.spring.receipt.service.ReceiptService;
+import org.refit.spring.reward.entity.Reward;
+import org.refit.spring.reward.service.RewardService;
 import org.refit.spring.security.jwt.JwtTokenProvider;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +26,7 @@ import java.util.List;
 public class ReceiptController {
     private final JwtTokenProvider jwtTokenProvider;
     private final ReceiptService receiptService;
+    private final RewardService rewardService;
 
     private final UserService userService;
 
@@ -44,6 +47,8 @@ public class ReceiptController {
         }
 
         Receipt receipt = receiptService.create(receiptRequestDto, user.getUserId());
+        Reward reward = rewardService.create(receipt.getTotalPrice(), user.getUserId());
+        userService.updatePoint(user, user.getTotalCarbonPoint() + reward.getCarbonPoint(), user.getTotalStarPoint() + reward.getReward());
         ReceiptResponseDto dto = ReceiptResponseDto.from(receipt, user.getUserId());
         return ResponseEntity.ok(dto);
     }
@@ -114,7 +119,7 @@ public class ReceiptController {
         return ResponseEntity.ok(receipt);
     }
 
-    @GetMapping("/total")
+    @GetMapping("/monthlyReport")
     public ResponseEntity<?> getTotal(@RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
         if (!jwtTokenProvider.validateAccessToken(token)) {
