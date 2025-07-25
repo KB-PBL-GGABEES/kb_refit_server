@@ -43,7 +43,11 @@ public class WebConfig extends AbstractAnnotationConfigDispatcherServletInitiali
         CharacterEncodingFilter characterEncodingFilter = new CharacterEncodingFilter();
         characterEncodingFilter.setEncoding("UTF-8");
         characterEncodingFilter.setForceEncoding(true);
-        return new Filter[]{characterEncodingFilter};
+
+        //CORS 필터 추가
+        CorsFilter corsFilter = new CorsFilter();
+
+        return new Filter[]{characterEncodingFilter, corsFilter};
     }
 
     // Spring 이 직접 404을 발생 시키도록 설정을 추가
