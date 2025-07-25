@@ -3,6 +3,7 @@ package org.refit.spring.mapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 import org.refit.spring.ceo.entity.Ceo;
 import org.refit.spring.ceo.dto.ReceiptDetailDto;
 import org.refit.spring.receipt.entity.Receipt;
@@ -60,18 +61,25 @@ public interface CeoMapper {
             "  AND r.created_at >= #{fromDate}\n" +
             "  AND r.created_at  < #{cursor}\n" +
             "ORDER BY r.created_at DESC LIMIT 20")
-    List<Ceo> getListDone(@Param("fromDate") LocalDateTime fromDate, @Param("cursor") LocalDateTime cursor);
+    List<Ceo> getListDone(@Param("fromDate") LocalDateTime fromDate,
+                          @Param("cursor") LocalDateTime cursor);
 
     // 처리 완료된 항목 이메일 전송
-    @Select("SELECT COUNT(*) " +
-            "FROM receipt r " +
-            "JOIN receipt_process p ON r.receipt_id = p.receipt_id " +
+    @Select("SELECT COUNT(*)\n" +
+            "FROM receipt r\n" +
+            "JOIN receipt_process p ON r.receipt_id = p.receipt_id\n" +
             "WHERE p.process_state IN ('accepted', 'rejected')")
     int countDone();
 
-    // 영수 처리 승인
-
-    // 영수 처리 반려
+    // 영수 처리 승인 및 반려
+    @Update("UPDATE receipt_process\n" +
+            "SET process_state = #{progressState},\n" +
+            "rejected_reason = #{rejectedReason},\n" +
+            "updated_at = NOW()\n" +
+            "WHERE receipt_process_id = #{receiptProcessId}")
+    void updateProcessState(@Param("receiptProcessId") Long receiptProcessId,
+                            @Param("progressState") String progressState,
+                            @Param("rejectedReason") String rejectedReason);
 
     // 한달 법카 금액 조회
 

@@ -94,9 +94,25 @@ public class CeoController {
                 "경비 처리 수", countDoneReceipt));
     }
 
-    // 영수 처리 승인
+    // 영수 처리 승인 및 반려
+    @PatchMapping("/processed")
+    public ResponseEntity<Map<String, Object>> processedReceipt(
+            @RequestBody Map<String, Object> requestBody) {
 
-    // 영수 처리 반려
+        Long receiptProcessId = Long.valueOf(requestBody.get("receiptProcessId").toString());
+        String progressState = requestBody.get("progressState").toString();
+
+        String rejectedReason = (requestBody.get("rejectedReason") != null)
+                ? requestBody.get("rejectedReason").toString()
+                : null;
+
+        ceoService.processReceipt(receiptProcessId, progressState, rejectedReason);
+
+        return ResponseEntity.ok(Map.of(
+                "message", "영수 처리 완료",
+                "processStatus", progressState
+        ));
+    }
 
     // 한달 법카 금액 조회
 

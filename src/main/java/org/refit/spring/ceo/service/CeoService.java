@@ -20,9 +20,8 @@ public interface CeoService {
     int countDoneReceipt();
     void sendEmail(String email);
 
-    // 영수 처리 승인
-    
-    // 영수 처리 반려
+    // 영수 처리 승인 및 반려
+    void processReceipt(Long receiptProcessId, String progressState, String rejectedReason);
     
     // 한달 법카 금액 조회
     
