@@ -2,9 +2,12 @@ package org.refit.spring.wallet.dto;
 
 import lombok.*;
 import org.refit.spring.wallet.entity.Badge;
+import org.refit.spring.wallet.entity.PersonalBadge;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static io.swagger.models.properties.PropertyBuilder.build;
 
 public class BadgeResponseDto {
     @Getter
@@ -38,4 +41,43 @@ public class BadgeResponseDto {
                     .build();
         }
     }
+
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    @Builder
+    public static class BadgeDetailDto {
+        private Long badgeId;
+        private Long personalBadgeId;
+        private String badgeImage;
+        private String badgeTitle;
+        private String badgeBenefit;
+        private boolean isWorn;
+
+        public static BadgeDetailDto from(Badge badge, PersonalBadge personalBadge) {
+            return BadgeDetailDto.builder()
+                    .badgeId(badge.getBadgeId())
+                    .personalBadgeId(personalBadge.getPersonalBadgeId())
+                    .badgeImage(badge.getBadgeImage())
+                    .badgeTitle(badge.getBadgeTitle())
+                    .badgeBenefit(badge.getBadgeBenefit())
+                    .isWorn(personalBadge.isWorn())
+                    .build();
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    @Builder
+    public static class wornBadgeListAndBenefitDto {
+        private List<BadgeDetailDto> myBadgeList;
+
+        public static wornBadgeListAndBenefitDto from(List<BadgeDetailDto> myBadgeList) {
+            return wornBadgeListAndBenefitDto.builder()
+                    .myBadgeList(myBadgeList)
+                    .build();
+        }
+    }
 }
+

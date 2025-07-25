@@ -10,4 +10,7 @@ import java.util.List;
 public interface BadgeMapper {
     @Select("SELECT * FROM badge")
     List<Badge> findAll();
+
+    @Select("SELECT * FROM badge WHERE badge_id = #{badgeId}")
+    Badge findById(Long badgeId);
 }

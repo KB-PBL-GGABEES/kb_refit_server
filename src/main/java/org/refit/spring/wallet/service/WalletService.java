@@ -5,6 +5,7 @@ import org.refit.spring.mapper.BadgeMapper;
 import org.refit.spring.mapper.PersonalBadgeMapper;
 import org.refit.spring.wallet.dto.BadgeResponseDto;
 import org.refit.spring.wallet.entity.Badge;
+import org.refit.spring.wallet.entity.PersonalBadge;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,4 +30,19 @@ public class WalletService {
 
         return BadgeResponseDto.BadgeListDto.from(badgeList);
     }
+
+
+    public BadgeResponseDto.wornBadgeListAndBenefitDto getWornBadgeListAndBenefit(Long userId) {
+        List<PersonalBadge> wornBadges = personalBadgeMapper.findWornBadgesByUserId(userId);
+
+        List<BadgeResponseDto.BadgeDetailDto> badgeDetailDtoList = wornBadges.stream()
+                .map(pb -> {
+                    Badge badge = badgeMapper.findById(pb.getBadgeId());
+                    return BadgeResponseDto.BadgeDetailDto.from(badge, pb);
+                })
+                .collect(Collectors.toList());
+
+        return BadgeResponseDto.wornBadgeListAndBenefitDto.from(badgeDetailDtoList);
+    }
+
 }
