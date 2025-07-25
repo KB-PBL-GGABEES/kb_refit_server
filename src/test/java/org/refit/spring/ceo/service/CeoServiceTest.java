@@ -20,8 +20,8 @@ class CeoServiceTest {
     CeoService ceoService;
 
     @Test
-    void getListUndone() {
-        List<CeoListDto> list = ceoService.getListUndone(null);
+    void getPendingReceipts() {
+        List<CeoListDto> list = ceoService.getPendingReceipts(null);
 
         if (list.isEmpty()) {
             log.info("경비 처리가 필요한 내역 조회 테스트 (리스트는 비어 있음)");

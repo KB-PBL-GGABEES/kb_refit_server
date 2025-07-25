@@ -39,9 +39,9 @@ class CeoControllerTest {
     }
 
     @Test
-    void getListUndone() throws Exception {
+    void getPendingReceipts() throws Exception {
         String response = mockMvc.perform(
-                        MockMvcRequestBuilders.get("/api/ceo/undone")
+                        MockMvcRequestBuilders.get("/api/ceo/pending")
                                 .accept("application/json")
                 )
                 .andReturn()
