@@ -2,11 +2,9 @@ package org.refit.spring.receipt.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.refit.spring.receipt.entity.Receipt;
-import org.refit.spring.receipt.entity.ReceiptContent;
 
-import java.util.ArrayList;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -21,9 +19,10 @@ public class ReceiptResponseDto {
     private Long surtax;
     private Long carbonPoint;
     private Long reward;
-    private Date createdAt;
+    private String createdAt;
 
     public static ReceiptResponseDto from(Receipt receipt, Long userId) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return new ReceiptResponseDto(
                 userId,
                 receipt.getReceiptId(),
@@ -33,7 +32,7 @@ public class ReceiptResponseDto {
                 receipt.getSurtax(),
                 100L,
                 (long) (receipt.getTotalPrice() * 0.05),
-                receipt.getCreatedAt()
+                sdf.format(receipt.getCreatedAt())
         );
     }
 }
