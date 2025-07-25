@@ -59,9 +59,11 @@ public class CeoServiceImpl implements CeoService {
         // 추후 실제 전송하는 로직 구현
     }
 
-    // 영수 처리 승인
-
-    // 영수 처리 반려
+    // 영수 처리 승인 및 반려
+    @Override
+    public void processReceipt(Long receiptProcessId, String progressState, String rejectedReason) {
+        ceoMapper.updateProcessState(receiptProcessId, progressState, rejectedReason);
+    }
 
     // 한달 법카 금액 조회
 
