@@ -1,6 +1,7 @@
 package org.refit.spring.receipt.service;
 
 import lombok.RequiredArgsConstructor;
+import org.refit.spring.auth.entity.User;
 import org.refit.spring.mapper.MerchandiseMapper;
 import org.refit.spring.mapper.ReceiptMapper;
 import org.refit.spring.merchandise.entity.Merchandise;
@@ -29,13 +30,13 @@ public class ReceiptService {
         List<ReceiptContentDto> list = makeContents(dto.getContentsList(), receipt);
         updatePrice(receipt);
         receipt.setContentList(list);
-        receiptMapper.update(receipt);
+        receiptMapper.update(userId, receipt);
         return receipt;
     }
 
     @Transactional
     public Receipt refund(Long userId, Long receiptId) {
-        Receipt nowReceipt = receiptMapper.get(receiptId);
+        Receipt nowReceipt = receiptMapper.get(userId, receiptId);
         if (nowReceipt == null) throw new IllegalArgumentException("존재하지 않는 영수증입니다.");
         Receipt refundReceipt = new Receipt();
         refundReceipt.setTotalPrice(-nowReceipt.getTotalPrice());
@@ -104,20 +105,20 @@ public class ReceiptService {
     @Transactional(readOnly = true)
     public ReceiptListDto getList(Long userId, Long cursorId) {
         if (cursorId == null) cursorId = Long.MAX_VALUE;
-        List<Receipt> receipts = receiptMapper.getList(cursorId);
+        List<Receipt> receipts = receiptMapper.getList(userId, cursorId);
         Long nextCursorId = receipts.size() < 20 ? null : receipts.get(receipts.size() - 1).getReceiptId();
         return ReceiptListDto.from(userId, receipts, nextCursorId);
     }
 
     @Transactional(readOnly = true)
-    public Receipt get(Long cursorId, Long receiptId) {
+    public Receipt get(Long userId, Long cursorId, Long receiptId) {
         if (cursorId == null) cursorId = Long.MAX_VALUE;
 
-        Receipt receipt = receiptMapper.get(receiptId);
+        Receipt receipt = receiptMapper.get(userId, receiptId);
         if (receipt == null) {
             throw new NoSuchElementException();
         }
-        List<ReceiptContent> contents = receiptMapper.findContentsByReceiptId(receiptId);
+        List<ReceiptContent> contents = receiptMapper.findContentsByReceiptId(userId, receiptId);
         List<ReceiptContentDto> contentDtoList = new ArrayList<>();
         for (ReceiptContent content: contents) {
             Merchandise merchandise = merchandiseMapper.findByMerchandiseId(content.getMerchandiseId());
@@ -137,8 +138,8 @@ public class ReceiptService {
     public ReceiptTotalDto getTotal(Long userId) {
         ReceiptTotalDto dto = new ReceiptTotalDto();
         dto.setUserId(userId);
-        dto.setTotal(receiptMapper.getTotal());
-        dto.setLastMonth(receiptMapper.getLastMonthTotal());
+        dto.setTotal(receiptMapper.getTotal(userId));
+        dto.setLastMonth(receiptMapper.getLastMonthTotal(userId));
         return dto;
     }
 }

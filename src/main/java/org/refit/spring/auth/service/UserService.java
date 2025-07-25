@@ -14,7 +14,8 @@ public class UserService {
         return userMapper.findByUsername(username);
     }
 
-    public void updatePoint(User user, Long carbon, Long star) {
+    public void updatePoint(Long userId, Long carbon, Long star) {
+        User user = userMapper.findByUserId(userId);
         Long updatedCarbon = user.getTotalCarbonPoint() + carbon;
         Long updatedStar = user.getTotalStarPoint() + star;
         user.setTotalCarbonPoint(updatedCarbon);

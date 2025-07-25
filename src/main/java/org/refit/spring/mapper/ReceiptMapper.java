@@ -16,21 +16,21 @@ public interface ReceiptMapper {
     @Options(useGeneratedKeys = true, keyProperty = "receiptContentId")
     void createReceiptContent(ReceiptContent receiptContent);
 
-    @Update("UPDATE receipt SET total_price = #{totalPrice}, supply_price = #{supplyPrice}, surtax = #{surtax} WHERE receipt_id = #{receiptId}")
-    void update(Receipt receipt);
+    @Update("UPDATE receipt SET total_price = #{receipt.totalPrice}, supply_price = #{receipt.supplyPrice}, surtax = #{receipt.surtax} WHERE user_id = #{userId} AND receipt_id = #{receipt.receiptId}")
+    void update(@Param("userId") Long userId, @Param("receipt") Receipt receipt);
 
-    @Select("SELECT * FROM receipt WHERE receipt_id < #{cursorId} ORDER BY receipt_id DESC LIMIT 20")
-    List<Receipt> getList(@Param("cursorId") Long cursorId);
+    @Select("SELECT * FROM receipt WHERE user_id = #{userId} AND receipt_id < #{cursorId} ORDER BY receipt_id DESC LIMIT 20")
+    List<Receipt> getList(@Param("userId") Long userId, @Param("cursorId") Long cursorId);
 
-    @Select("SELECT * FROM receipt_content WHERE receipt_id = #{receiptId}")
-    List<ReceiptContent> findContentsByReceiptId(@Param("receiptId") Long receiptId);
+    @Select("SELECT * FROM receipt_content rc JOIN receipt r ON rc.receipt_id = r.receipt_id WHERE r.user_id = #{userId} AND rc.receipt_id = #{receiptId}")
+    List<ReceiptContent> findContentsByReceiptId(@Param("userId") Long userId, @Param("receiptId") Long receiptId);
 
-    @Select("SELECT * FROM receipt WHERE receipt_id = #{receiptId}")
-    Receipt get(Long id);
+    @Select("SELECT * FROM receipt WHERE user_id = #{userId} AND receipt_id = #{receiptId}")
+    Receipt get(@Param("userId") Long userId, @Param("receiptId") Long receiptId);
 
-    @Select("SELECT SUM(total_price) FROM receipt WHERE MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE())")
-    Long getTotal();
+    @Select("SELECT SUM(total_price) FROM receipt WHERE user_id = #{userId} AND MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE())")
+    Long getTotal(@Param("userId") Long userId);
 
-    @Select("SELECT SUM(total_price) FROM receipt WHERE MONTH(created_at) = MONTH(DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH)) AND YEAR(created_at) = YEAR(DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH))")
-    Long getLastMonthTotal();
+    @Select("SELECT SUM(total_price) FROM receipt WHERE user_id = #{userId} AND MONTH(created_at) = MONTH(DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH)) AND YEAR(created_at) = YEAR(DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH))")
+    Long getLastMonthTotal(@Param("userId") Long userId);
 }
