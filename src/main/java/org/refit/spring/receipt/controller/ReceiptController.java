@@ -1,6 +1,8 @@
 package org.refit.spring.receipt.controller;
 
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import org.refit.spring.auth.annotation.UserId;
 import org.refit.spring.auth.entity.User;
 import org.refit.spring.auth.service.UserService;
 import org.refit.spring.mapper.ReceiptMapper;
@@ -24,115 +26,55 @@ import java.util.List;
 @RequestMapping("/api/receipt")
 @RequiredArgsConstructor
 public class ReceiptController {
-    private final JwtTokenProvider jwtTokenProvider;
     private final ReceiptService receiptService;
     private final RewardService rewardService;
 
     private final UserService userService;
 
-
+    @ApiOperation(value = "영수증 등록", notes = "결제 시 영수증이 생성됩니다.")
     @PostMapping("/create")
-    public ResponseEntity<?> create(@RequestHeader("Authorization") String authHeader, @RequestBody ReceiptRequestDto receiptRequestDto) {
-        String token = authHeader.replace("Bearer ", "");
-
-        if (!jwtTokenProvider.validateAccessToken(token)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("invalid token");
-        }
-
-        String username = jwtTokenProvider.getUsername(token);
-        User user = userService.findByUsername(username);
-
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-        }
-
-        Receipt receipt = receiptService.create(receiptRequestDto, user.getUserId());
-        Reward reward = rewardService.create(100L, receipt.getTotalPrice(), user.getUserId());
-        userService.updatePoint(user, reward.getCarbonPoint(), reward.getReward());
-        ReceiptResponseDto dto = ReceiptResponseDto.from(receipt, user.getUserId(), reward.getCarbonPoint(), reward.getReward());
+    public ResponseEntity<?> create(@UserId Long userId, @RequestBody ReceiptRequestDto receiptRequestDto) {
+        Receipt receipt = receiptService.create(receiptRequestDto, userId);
+        Reward reward = rewardService.create(100L, receipt.getTotalPrice(), userId);
+        userService.updatePoint(userId, reward.getCarbonPoint(), reward.getReward());
+        ReceiptResponseDto dto = ReceiptResponseDto.from(receipt, userId, reward.getCarbonPoint(), reward.getReward());
         return ResponseEntity.ok(dto);
     }
 
+    @ApiOperation(value = "환불 영수증 등록", notes = "결제 시 생성된 영수증 아이디를 이용해 환불 영수증을 생성합니다.")
     @PostMapping("/refund")
-    public ResponseEntity<?> refund(@RequestHeader("Authorization") String authHeader, @RequestParam("receiptId") Long receiptId) {
-        String token = authHeader.replace("Bearer ", "");
-
-        if (!jwtTokenProvider.validateAccessToken(token)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("invalid token");
-        }
-
-        String username = jwtTokenProvider.getUsername(token);
-        User user = userService.findByUsername(username);
-
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-        }
-
-        Receipt receipt = receiptService.refund(user.getUserId(), receiptId);
-        Reward reward = rewardService.create(-100L, receipt.getTotalPrice(), user.getUserId());
-        userService.updatePoint(user, reward.getCarbonPoint(), reward.getReward());
-        ReceiptResponseDto dto = ReceiptResponseDto.from(receipt, user.getUserId(), reward.getCarbonPoint(), reward.getReward());
+    public ResponseEntity<?> refund(@UserId Long userId, @RequestParam("receiptId") Long receiptId) {
+        Receipt receipt = receiptService.refund(userId, receiptId);
+        Reward reward = rewardService.create(-100L, receipt.getTotalPrice(), userId);
+        userService.updatePoint(userId, reward.getCarbonPoint(), reward.getReward());
+        ReceiptResponseDto dto = ReceiptResponseDto.from(receipt, userId, reward.getCarbonPoint(), reward.getReward());
         return ResponseEntity.ok(dto);
     }
 
+    @ApiOperation(value = "영수증 목록 조회", notes = "전체 영수증을 조회합니다.")
     @GetMapping("/list")
     public ResponseEntity<?> getList(
-            @RequestHeader("Authorization") String authHeader,
+            @UserId Long userId,
             @RequestParam(required = false) Long cursorId) {
-
-        String token = authHeader.replace("Bearer ", "");
-
-        if (!jwtTokenProvider.validateAccessToken(token)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("invalid token");
-        }
-
-        String username = jwtTokenProvider.getUsername(token);
-        User user = userService.findByUsername(username);
-
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-        }
-
-        ReceiptListDto dto = receiptService.getList(user.getUserId(), cursorId);
-
+        ReceiptListDto dto = receiptService.getList(userId, cursorId);
         return ResponseEntity.ok(dto);
     }
 
 
+    @ApiOperation(value = "영수증 상세 조회", notes = "영수증 아이디를 활용해 영수증에 기록된 모든 정보를 확인합니다.")
     @GetMapping("/get")
     public ResponseEntity<?> get(
-            @RequestHeader("Authorization") String authHeader,
+            @UserId Long userId,
             @RequestParam(required = false) Long cursorId,
             @RequestParam("receiptId") Long receiptId) {
-        String token = authHeader.replace("Bearer ", "");
-
-        if (!jwtTokenProvider.validateAccessToken(token)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("invalid token");
-        }
-
-        String username = jwtTokenProvider.getUsername(token);
-        User user = userService.findByUsername(username);
-
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-        }
-
-        Receipt receipt = receiptService.get(cursorId, receiptId);
+        Receipt receipt = receiptService.get(userId, cursorId, receiptId);
         return ResponseEntity.ok(receipt);
     }
 
+    @ApiOperation(value = "한 달 비용 조회", notes = "이번 달과 지난 달의 사용 내역 합계를 확인합니다.")
     @GetMapping("/monthlyReport")
-    public ResponseEntity<?> getTotal(@RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.replace("Bearer ", "");
-        if (!jwtTokenProvider.validateAccessToken(token)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("invalid token");
-        }
-        String username = jwtTokenProvider.getUsername(token);
-        User user = userService.findByUsername(username);
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-        }
-        return ResponseEntity.ok(receiptService.getTotal(user.getUserId()));
+    public ResponseEntity<?> getTotal(@UserId Long userId) {
+        return ResponseEntity.ok(receiptService.getTotal(userId));
     }
 
 }

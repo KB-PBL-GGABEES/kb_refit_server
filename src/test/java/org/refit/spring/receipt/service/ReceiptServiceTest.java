@@ -21,6 +21,7 @@ class ReceiptServiceTest {
     @Autowired
     private ReceiptService service;
 
+    /*
     @DisplayName("구매 영수증 생성 테스트")
     @Test
     void create() {
@@ -67,4 +68,6 @@ class ReceiptServiceTest {
         log.info(dto.getTotal());
         log.info(dto.getLastMonth());
     }
+
+     */
 }

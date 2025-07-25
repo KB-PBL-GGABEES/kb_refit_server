@@ -1,9 +1,6 @@
 package org.refit.spring.mapper;
 
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Options;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 import org.refit.spring.reward.entity.Reward;
 
 import java.util.List;
@@ -15,6 +12,6 @@ public interface RewardMapper {
     @Options(useGeneratedKeys = true, keyProperty = "rewardId")
     void create(Reward reward);
 
-    @Select("SELECT * FROM reward WHERE reward_id < #{cursorId} ORDER BY reward_id DESC LIMIT 20")
-    List<Reward> getList(Long cursorId);
+    @Select("SELECT * FROM reward WHERE user_id = #{userId} AND reward_id < #{cursorId} ORDER BY reward_id DESC LIMIT 20")
+    List<Reward> getList(@Param("userId") Long userId, @Param("cursorId") Long cursorId);
 }

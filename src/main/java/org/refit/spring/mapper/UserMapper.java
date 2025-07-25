@@ -25,4 +25,6 @@ public interface UserMapper {
     @Update("UPDATE user SET total_carbon_point = #{totalCarbonPoint}, total_star_point = #{totalStarPoint}")
     void updateReward(@Param("totalCarbonPoint") Long carbon, @Param("totalStarPoint") Long star);
 
+    @Select("SELECT * FROM user WHERE user_id = #{userId}")
+    User findByUserId(@Param("userId") Long userId);
 }

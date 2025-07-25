@@ -28,7 +28,7 @@ public class RewardService {
     @Transactional(readOnly = true)
     public RewardListDto getList(Long userId, Long cursorId) {
         if (cursorId == null) cursorId = Long.MAX_VALUE;
-        List<Reward> rewards = rewardMapper.getList(cursorId);
+        List<Reward> rewards = rewardMapper.getList(userId, cursorId);
         Long nextCursorId = rewards.size() < 20 ? null : rewards.get(rewards.size() - 1).getRewardId();
         return RewardListDto.from(userId, rewards, nextCursorId);
     }
