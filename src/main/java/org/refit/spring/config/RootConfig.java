@@ -67,4 +67,8 @@ public class RootConfig {
         DataSourceTransactionManager manager = new DataSourceTransactionManager(dataSource());
         return manager;
     }
+    @Bean
+    public org.springframework.web.servlet.handler.HandlerMappingIntrospector mvcHandlerMappingIntrospector() {
+        return new org.springframework.web.servlet.handler.HandlerMappingIntrospector();
+    }
 }
