@@ -19,8 +19,6 @@ public class CeoListDto {
     private String receiptDateTime; // 결제 일시
     private String processState; // 영수처리 여부
 
-//    private String storeImage;  // 상호이미지
-
     public static CeoListDto of(Ceo vo) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -32,7 +30,6 @@ public class CeoListDto {
                         vo.getReceiptDateTime() != null
                                 ? vo.getReceiptDateTime().format(formatter)
                                 : null)
-//                .storeImage(vo.getStoreImage())
                 .processState(vo.getProcessState())
                 .build();
 

@@ -1,14 +1,12 @@
 package org.refit.spring.ceo.controller;
 
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import org.refit.spring.auth.entity.User;
-import org.refit.spring.auth.service.UserService;
+import org.refit.spring.auth.annotation.UserId;
 import org.refit.spring.ceo.dto.CeoListDto;
 import org.refit.spring.ceo.dto.EmailRequestDto;
 import org.refit.spring.ceo.dto.ReceiptDetailDto;
 import org.refit.spring.ceo.service.CeoService;
-import org.refit.spring.security.jwt.JwtTokenProvider;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,39 +19,39 @@ import java.util.Map;
 @RequestMapping("/api/ceo")
 public class CeoController {
     final CeoService ceoService;
-    private final JwtTokenProvider jwtTokenProvider;
-    private final UserService userService;
 
-    // 경비 처리가 필요한 내역 조회
-    @GetMapping("/undone")
-    public ResponseEntity<List<Object>> getListUndone(
-            @RequestParam(required = false) Long cursorId) {
+    @ApiOperation(value = "경비 처리가 필요한 내역 조회", notes = "경비 처리가 필요한 내역을 최신순으로 다 가져옵니다.")
+    @GetMapping("/pending")
+    public ResponseEntity<Map<String, Object>> getPendingReceipts(
+            @UserId Long userId) {
+        List<CeoListDto> list = ceoService.getPendingReceipts(userId);
+        int countPendingReceipts = ceoService.countPendingReceipts(userId);
+        int countCompletedReceiptsThisMonth = ceoService.countCompletedReceiptsThisMonth(userId);
 
-        List<CeoListDto> list = ceoService.getListUndone(cursorId);
-        Long nextCursorId = list.size() < 20 ? null : list.get(list.size() - 1).getReceiptId();
-
-        List<Object> response = new ArrayList<>(list);
-
-        Map<String, Object> cursorMap = new java.util.HashMap<>();
-        cursorMap.put("cursorId", nextCursorId);
-        response.add(cursorMap);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(Map.of(
+                "경비 처리가 필요한 내역 개수", countPendingReceipts,
+                "이번 달 경비 처리 완료 내역 개수", countCompletedReceiptsThisMonth,
+                "pendingReceipts", list
+        ));
     }
 
-    // 경비 청구 항목 상세 조회
-    @GetMapping("/detail")
+    @ApiOperation(value = "경비 청구 항목 상세 조회", notes = "경비 청구 항목의 상세 정보를 보여줍니다.")
+    @GetMapping("/receiptDetail")
     public ResponseEntity<ReceiptDetailDto> getReceiptDetail(
-            @RequestParam("id") Long receipted) {
-        return ResponseEntity.ok(ceoService.getReceiptDetail(receipted));
+            @RequestParam("id") Long receipted,
+            @UserId Long userId) {
+
+        return ResponseEntity.ok(ceoService.getReceiptDetail(receipted, userId));
     }
 
-    // 경비 처리 완료 내역 조회
-    @GetMapping("/done")
-    public ResponseEntity<List<Object>> getListDone(
+    @ApiOperation(value = "경비 처리 완료 내역 조회", notes = "경비 처리가 완료된(승인/반려) 내역을 20개씩 가져옵니다.")
+    @GetMapping("/completed")
+    public ResponseEntity<List<Object>> getCompletedReceipts(
             @RequestParam(value = "period", defaultValue = "1") int period,
-            @RequestParam(required = false) String cursorDateTime) {
-        List<CeoListDto> list = ceoService.getListDone(period, cursorDateTime);
+            @RequestParam(required = false) String cursorDateTime,
+            @UserId Long userId) {
+
+        List<CeoListDto> list = ceoService.getCompletedReceipts(period, cursorDateTime, userId);
 
         String nextCursorDateTime = list.size() < 20 ? null :
                 list.get(list.size() - 1).getReceiptDateTime().toString();
@@ -67,37 +65,25 @@ public class CeoController {
         return ResponseEntity.ok(response);
     }
 
-    // 처리 완료된 항목 이메일 전송
+    @ApiOperation(value = "처리 완료된 항목 이메일 전송", notes = "경비 처리가 완료된(승인/반려) 항목을 특정 이메일로 보냅니다.")
     @PostMapping("/sendEmail")
-    public ResponseEntity<?> sendEmail(@RequestHeader("Authorization") String authHeader,
-                                       @RequestBody EmailRequestDto request) {
-        String token = authHeader.replace("Bearer ", "");
+    public ResponseEntity<?> sendEmail(
+            @RequestBody EmailRequestDto request,
+            @UserId Long userId) {
 
-        if (!jwtTokenProvider.validateAccessToken(token)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("invalid token");
-        }
+        int countCompletedReceiptsReceipt = ceoService.countCompletedReceipts();
 
-        String username = jwtTokenProvider.getUsername(token);
-        User user = userService.findByUsername(username);
-
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-        }
-
-        // 처리 완료된 항목 개수
-        int countDoneReceipt = ceoService.countDoneReceipt();
-
-        // 처리 완료된 항목 이메일 전송
-        ceoService.sendEmail(request.getEmail());
+        ceoService.sendEmail(request.getEmail(), userId);
         return ResponseEntity.ok(Map.of(
                 "message", "경비 처리 항목을 보냈습니다.",
-                "경비 처리 수", countDoneReceipt));
+                "경비 처리 수", countCompletedReceiptsReceipt));
     }
 
-    // 영수 처리 승인 및 반려
-    @PatchMapping("/processed")
-    public ResponseEntity<Map<String, Object>> processedReceipt(
-            @RequestBody Map<String, Object> requestBody) {
+    @ApiOperation(value = "영수 처리 승인 및 반려", notes = "process_state를 승인(accepted) 또는 반려(rejected)로 반영(Update)합니다.")
+    @PatchMapping("/receiptProcessing")
+    public ResponseEntity<Map<String, Object>> receiptProcessing(
+            @RequestBody Map<String, Object> requestBody,
+            @UserId Long userId) {
 
         Long receiptProcessId = Long.valueOf(requestBody.get("receiptProcessId").toString());
         String progressState = requestBody.get("progressState").toString();
@@ -106,7 +92,7 @@ public class CeoController {
                 ? requestBody.get("rejectedReason").toString()
                 : null;
 
-        ceoService.processReceipt(receiptProcessId, progressState, rejectedReason);
+        ceoService.receiptProcessing(receiptProcessId, progressState, rejectedReason, userId);
 
         return ResponseEntity.ok(Map.of(
                 "message", "영수 처리 완료",
