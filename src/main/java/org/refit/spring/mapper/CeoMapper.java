@@ -26,7 +26,7 @@ public interface CeoMapper {
             "            JOIN receipt_process p ON r.receipt_id = p.receipt_id\n" +
             "        WHERE p.process_state = 'none'\n" +
             "        ORDER BY r.receipt_id DESC")
-    List<Ceo> getPendingReceipts();
+    List<Ceo> getPendingReceipts(@Param("userId") Long userId);
 
     // 경비 처리가 필요한 내역 개수
     @Select("SELECT COUNT(*) " +
@@ -58,7 +58,9 @@ public interface CeoMapper {
             "    JOIN receipt_process p ON r.receipt_id = p.receipt_id\n" +
             "    WHERE r.receipt_id = #{receiptId}\n" +
             "    LIMIT 1")
-    ReceiptDetailDto getReceiptDetail(Long receiptId);
+    ReceiptDetailDto getReceiptDetail(
+            @Param("userId") Long userId,
+            Long receiptId);
 
     // 경비 처리 완료 내역 조회
     @Select("SELECT\n" +
@@ -78,15 +80,18 @@ public interface CeoMapper {
             "  AND r.created_at >= #{fromDate}\n" +
             "  AND r.created_at  < #{cursor}\n" +
             "ORDER BY r.created_at DESC LIMIT 20")
-    List<Ceo> getCompletedReceipts(@Param("fromDate") LocalDateTime fromDate,
-                          @Param("cursor") LocalDateTime cursor);
+    List<Ceo> getCompletedReceipts(
+            @Param("fromDate") LocalDateTime fromDate,
+            @Param("cursor") LocalDateTime cursor,
+            @Param("userId") Long userId);
 
     // 처리 완료된 항목 이메일 전송
     @Select("SELECT COUNT(*)\n" +
             "FROM receipt r\n" +
             "JOIN receipt_process p ON r.receipt_id = p.receipt_id\n" +
             "WHERE p.process_state IN ('accepted', 'rejected')")
-    int countCompletedReceipts();
+    int countCompletedReceipts(@Param("userId") Long userId
+    );
 
     // 영수 처리 승인 및 반려
     @Update("UPDATE receipt_process\n" +
@@ -96,7 +101,8 @@ public interface CeoMapper {
             "WHERE receipt_process_id = #{receiptProcessId}")
     void updateProcessState(@Param("receiptProcessId") Long receiptProcessId,
                             @Param("progressState") String progressState,
-                            @Param("rejectedReason") String rejectedReason);
+                            @Param("rejectedReason") String rejectedReason,
+                            @Param("userId") Long userId);
 
     // 한달 법카 금액 조회
 

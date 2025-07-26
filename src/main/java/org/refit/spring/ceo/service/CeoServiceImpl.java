@@ -19,7 +19,7 @@ public class CeoServiceImpl implements CeoService {
     @Override
     public List<CeoListDto> getPendingReceipts(Long userId) {
 
-        return ceoMapper.getPendingReceipts()
+        return ceoMapper.getPendingReceipts(userId)
                 .stream()
                 .map(CeoListDto::of)
                 .collect(Collectors.toList());
@@ -38,7 +38,7 @@ public class CeoServiceImpl implements CeoService {
     // 경비 청구 항목 상세 조회
     @Override
     public ReceiptDetailDto getReceiptDetail(Long receipted, Long userId) {
-        return ceoMapper.getReceiptDetail(receipted);
+        return ceoMapper.getReceiptDetail(receipted, userId);
     }
 
     // 경비 처리 완료 내역 조회
@@ -49,7 +49,7 @@ public class CeoServiceImpl implements CeoService {
                 ? LocalDateTime.now().plusDays(1)
                 : LocalDateTime.parse(cursorDateTime);
 
-        return ceoMapper.getCompletedReceipts(fromDate, cursor)
+        return ceoMapper.getCompletedReceipts(fromDate, cursor, userId)
                 .stream()
                 .map(CeoListDto::of)
                 .collect(Collectors.toList());
@@ -57,8 +57,8 @@ public class CeoServiceImpl implements CeoService {
 
     // 처리 완료된 항목 이메일 전송
     @Override
-    public int countCompletedReceipts() {
-        return ceoMapper.countCompletedReceipts();
+    public int countCompletedReceipts(Long userId) {
+        return ceoMapper.countCompletedReceipts(userId);
     }
 
     @Override
@@ -69,7 +69,7 @@ public class CeoServiceImpl implements CeoService {
     // 영수 처리 승인 및 반려
     @Override
     public void receiptProcessing(Long receiptProcessId, String progressState, String rejectedReason, Long userId) {
-        ceoMapper.updateProcessState(receiptProcessId, progressState, rejectedReason);
+        ceoMapper.updateProcessState(receiptProcessId, progressState, rejectedReason, userId);
     }
 
     // 한달 법카 금액 조회

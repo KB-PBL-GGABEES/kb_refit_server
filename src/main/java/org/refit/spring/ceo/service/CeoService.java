@@ -19,7 +19,7 @@ public interface CeoService {
     List<CeoListDto> getCompletedReceipts(int period, String cursorDateTime, Long userId);
 
     // 처리 완료된 항목 이메일 전송
-    int countCompletedReceipts();
+    int countCompletedReceipts(Long userId);
     void sendEmail(String email, Long userId);
 
     // 영수 처리 승인 및 반려
