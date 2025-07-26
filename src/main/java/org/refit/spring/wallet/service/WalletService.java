@@ -1,11 +1,16 @@
 package org.refit.spring.wallet.service;
 
 import lombok.RequiredArgsConstructor;
+import org.refit.spring.auth.entity.User;
 import org.refit.spring.mapper.BadgeMapper;
 import org.refit.spring.mapper.PersonalBadgeMapper;
+import org.refit.spring.mapper.UserMapper;
+import org.refit.spring.mapper.WalletBrandMapper;
 import org.refit.spring.wallet.dto.BadgeResponseDto;
+import org.refit.spring.wallet.dto.WalletResponseDto;
 import org.refit.spring.wallet.entity.Badge;
 import org.refit.spring.wallet.entity.PersonalBadge;
+import org.refit.spring.wallet.entity.WalletBrand;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,6 +22,8 @@ import java.util.stream.Collectors;
 public class WalletService {
     private final BadgeMapper badgeMapper;
     private final PersonalBadgeMapper personalBadgeMapper;
+    private final UserMapper userMapper;
+    private final WalletBrandMapper walletBrandMapper;
 
     public BadgeResponseDto.BadgeListDto getBadgeList(Long userId) {
         List<Badge> allBadges = badgeMapper.findAll(); // 전체 뱃지 목록
@@ -69,5 +76,23 @@ public class WalletService {
         personalBadge.setWorn(newState);
 
         return BadgeResponseDto.toggleWornBadgeDto.from(personalBadge);
+    }
+
+    public WalletResponseDto.WalletBrandListDto getWalletList(Long userId) {
+        // 1. 유저 정보 가져오기
+        User user = userMapper.findByUserId(userId);
+
+        // 2. 전체 브랜드 리스트
+        List<WalletBrand> walletBrandList = walletBrandMapper.findAllWalletBrands();
+
+        // 3. 유저가 보유한 walletId 리스트
+        List<Long> ownedWalletIds = walletBrandMapper.findOwnedWalletIdsByUserId(userId);
+
+        // 4. DTO로 변환
+        List<WalletResponseDto.WalletBrandDto> walletBrandDtos = walletBrandList.stream()
+                .map(wallet -> WalletResponseDto.WalletBrandDto.from(wallet, ownedWalletIds.contains(wallet.getWalletId())))
+                .collect(Collectors.toList());
+
+        return WalletResponseDto.WalletBrandListDto.from(walletBrandDtos, user);
     }
 }
