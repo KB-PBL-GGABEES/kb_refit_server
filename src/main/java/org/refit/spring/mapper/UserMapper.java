@@ -19,5 +19,4 @@ public interface UserMapper {
     @Update("UPDATE user SET refresh_token = #{refreshToken} WHERE username = #{username}")
     void updateRefreshToken(@Param("username") String username,
                             @Param("refreshToken") String refreshToken);
-
 }
