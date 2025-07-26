@@ -23,7 +23,7 @@ class CeoMapperTest {
     @Test
     @DisplayName("경비 처리가 필요한 내역 조회")
     void getPendingReceipts() {
-        List<Ceo> list = ceoMapper.getPendingReceipts();
+        List<Ceo> list = ceoMapper.getPendingReceipts(null);
 
         if (list.isEmpty()) {
             log.info("경비 처리가 필요한 내역 조회 테스트 (리스트는 비어 있음)");

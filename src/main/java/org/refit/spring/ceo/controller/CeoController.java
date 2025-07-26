@@ -71,7 +71,7 @@ public class CeoController {
             @RequestBody EmailRequestDto request,
             @UserId Long userId) {
 
-        int countCompletedReceiptsReceipt = ceoService.countCompletedReceipts();
+        int countCompletedReceiptsReceipt = ceoService.countCompletedReceipts(userId);
 
         ceoService.sendEmail(request.getEmail(), userId);
         return ResponseEntity.ok(Map.of(
