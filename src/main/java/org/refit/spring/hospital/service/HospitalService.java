@@ -15,12 +15,6 @@ import java.util.List;
 public class HospitalService {
     private final HospitalMapper hospitalMapper;
 
-
-//    public List<HospitalExpenseResponseDto>  findHospitalExpenseById(Long userId) {
-//        return hospitalMapper.findByAllHospitalExpenseByUserId(userId);
-//    }
-
-
     public List<HospitalExpenseResponseDto> getHospitalExpenses(Long userId, Date cursorDate) {
         if (cursorDate == null) {
             return hospitalMapper.findFirstPage(userId);
@@ -28,8 +22,8 @@ public class HospitalService {
         return hospitalMapper.findByCursorDate(userId, cursorDate);
     }
 
-    public HospitalExpenseDetailResponseDto findHospitalExpenseDetailById(Long receiptId) {
-        return hospitalMapper.findByHospitalExpenseDetailId(receiptId);
+    public HospitalExpenseDetailResponseDto findHospitalExpenseDetail(Long userId, Long receiptId) {
+        return hospitalMapper.findHospitalExpenseDetailByUserIdAndReceiptId(userId, receiptId);
     }
 
     public List<InsuranceSubscribedResponseDto> findInsuranceSubscribeById(Long hospitalSubscribeId) {
