@@ -9,6 +9,7 @@ import org.refit.spring.ceo.dto.ReceiptDetailDto;
 import org.refit.spring.ceo.service.CeoService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +24,7 @@ public class CeoController {
     @ApiOperation(value = "경비 처리가 필요한 내역 조회", notes = "경비 처리가 필요한 내역을 최신순으로 다 가져옵니다.")
     @GetMapping("/pending")
     public ResponseEntity<Map<String, Object>> getPendingReceipts(
-            @UserId Long userId) {
+            @ApiIgnore @UserId Long userId) {
         List<CeoListDto> list = ceoService.getPendingReceipts(userId);
         int countPendingReceipts = ceoService.countPendingReceipts(userId);
         int countCompletedReceiptsThisMonth = ceoService.countCompletedReceiptsThisMonth(userId);
@@ -38,8 +39,8 @@ public class CeoController {
     @ApiOperation(value = "경비 청구 항목 상세 조회", notes = "경비 청구 항목의 상세 정보를 보여줍니다.")
     @GetMapping("/receiptDetail")
     public ResponseEntity<ReceiptDetailDto> getReceiptDetail(
-            @RequestParam("id") Long receipted,
-            @UserId Long userId) {
+            @RequestParam("userId") Long receipted,
+            @ApiIgnore @UserId Long userId) {
 
         return ResponseEntity.ok(ceoService.getReceiptDetail(receipted, userId));
     }
@@ -49,7 +50,7 @@ public class CeoController {
     public ResponseEntity<List<Object>> getCompletedReceipts(
             @RequestParam(value = "period", defaultValue = "1") int period,
             @RequestParam(required = false) String cursorDateTime,
-            @UserId Long userId) {
+            @ApiIgnore @UserId Long userId) {
 
         List<CeoListDto> list = ceoService.getCompletedReceipts(period, cursorDateTime, userId);
 
@@ -69,7 +70,7 @@ public class CeoController {
     @PostMapping("/sendEmail")
     public ResponseEntity<?> sendEmail(
             @RequestBody EmailRequestDto request,
-            @UserId Long userId) {
+            @ApiIgnore @UserId Long userId) {
 
         int countCompletedReceiptsReceipt = ceoService.countCompletedReceipts(userId);
 
@@ -83,7 +84,7 @@ public class CeoController {
     @PatchMapping("/receiptProcessing")
     public ResponseEntity<Map<String, Object>> receiptProcessing(
             @RequestBody Map<String, Object> requestBody,
-            @UserId Long userId) {
+            @ApiIgnore @UserId Long userId) {
 
         Long receiptProcessId = Long.valueOf(requestBody.get("receiptProcessId").toString());
         String progressState = requestBody.get("progressState").toString();
