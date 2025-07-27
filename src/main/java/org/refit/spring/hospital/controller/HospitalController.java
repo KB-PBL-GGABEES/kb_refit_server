@@ -1,5 +1,6 @@
 package org.refit.spring.hospital.controller;
 
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 
 import org.refit.spring.hospital.dto.HospitalExpenseDetailResponseDto;
@@ -25,6 +26,7 @@ public class HospitalController {
     private final HospitalService hospitalService;
 
     // 병원 영수증 목록 조회 (커서 기반 페이지네이션)
+    @ApiOperation(value = "의료비 납입 내역 조회", notes = "의료비 납입 내역을 조회할 수 있습니다.")
     @GetMapping("/list")
     public ResponseEntity<?> getHospitalExpenses(
             @UserId Long userId,
@@ -51,6 +53,7 @@ public class HospitalController {
     }
 
     // 병원 영수증 상세 조회
+    @ApiOperation(value = "의료비 납입 내역 상세 조회", notes = "의료비 납입 내역을 상세 조회할 수 있습니다.")
     @GetMapping("/detail")
     public ResponseEntity<?> getHospitalExpenseDetail(
             @UserId Long userId,
@@ -67,6 +70,7 @@ public class HospitalController {
     }
 
     // 가입된 보험 목록 조회
+    @ApiOperation(value = "가입된 보험 목록 조회", notes = "가입된 보험 목록을 조회할 수 있습니다.")
     @GetMapping("/insurance")
     public ResponseEntity<?> findInsuranceSubscribeById(@UserId Long userId) {
         List<InsuranceSubscribedResponseDto> result = hospitalService.findInsuranceSubscribeById(userId);
