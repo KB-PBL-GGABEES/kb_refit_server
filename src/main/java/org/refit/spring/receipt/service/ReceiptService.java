@@ -44,6 +44,7 @@ public class ReceiptService {
         refundReceipt.setSurtax(-nowReceipt.getSurtax());
         refundReceipt.setTransactionType("환불");
         refundReceipt.setCreatedAt(new Date());
+        refundReceipt.setUpdatedAt(new Date());
         refundReceipt.setCompanyId(nowReceipt.getCompanyId());
         refundReceipt.setUserId(userId);
         refundReceipt.setCardId(nowReceipt.getCardId());
