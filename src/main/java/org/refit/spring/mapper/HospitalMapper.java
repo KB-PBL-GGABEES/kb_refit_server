@@ -3,6 +3,7 @@ package org.refit.spring.mapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 import org.refit.spring.hospital.dto.HospitalExpenseDetailResponseDto;
 import org.refit.spring.hospital.dto.HospitalExpenseResponseDto;
 import org.refit.spring.hospital.dto.HospitalRecentResponseDto;
@@ -77,6 +78,9 @@ public interface HospitalMapper {
     );
     
     // 최근 병원비 조회
+    @Select("SELECT EXISTS(SELECT 1 FROM receipt WHERE user_id = #{userId})")
+    boolean existsUserReceipt(@Param("userId") Long userId);
+
     @Select("SELECT " +
             "COALESCE(SUM(r.total_price), 0) AS recentTotalPrice, " +
             "COUNT(CASE " +
@@ -87,7 +91,7 @@ public interface HospitalMapper {
             "JOIN company c ON r.company_id = c.company_id " +
             "JOIN categories cat ON c.category_id = cat.category_id " +
             "LEFT JOIN hospital_process hp ON r.receipt_id = hp.receipt_id " +
-            "WHERE cat.category_name = '병원' " +
+            "WHERE cat.category_id = 1 " +
             "AND r.created_at >= DATE_SUB(NOW(), INTERVAL 3 YEAR) " +
             "AND r.user_id = #{userId}")
     HospitalRecentResponseDto findByHospitalRecentId(@Param("userId") Long userId);
@@ -101,5 +105,20 @@ public interface HospitalMapper {
     List<InsuranceSubscribedResponseDto> findByInsuranceSubscribeId(@Param("userId") Long userId);
 
     // 보험 청구 요청
+    @Select("SELECT EXISTS(SELECT 1 FROM receipt WHERE receipt_id = #{receiptId} AND user_id = #{userId})")
+    boolean validateReceiptOwnership(@Param("userId") Long userId, @Param("receiptId") Long receiptId);
 
+    // 보험 청구 요청 정보 업데이트
+    @Update("UPDATE hospital_process SET " +
+            "insurance_id = #{insuranceId}, " +
+            "sicked_date = #{sickedDate}, " +
+            "visited_reason = #{visitedReason}, " +
+            "process_state = #{processState} " +
+            "WHERE receipt_id = #{receiptId}")
+    int updateInsuranceClaimRequest(
+            @Param("receiptId") Long receiptId,
+            @Param("sickedDate") Date sickedDate,
+            @Param("visitedReason") String visitedReason,
+            @Param("insuranceId") Long insuranceId,
+            @Param("processState") String processState);
 }
