@@ -20,6 +20,6 @@ public class UserService {
         Long updatedStar = user.getTotalStarPoint() + star;
         user.setTotalCarbonPoint(updatedCarbon);
         user.setTotalStarPoint(updatedStar);
-        userMapper.updateReward(updatedCarbon, updatedStar);
+        userMapper.updateReward(userId, updatedCarbon, updatedStar);
     }
 }

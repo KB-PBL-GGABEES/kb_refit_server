@@ -3,9 +3,7 @@ package org.refit.spring.receipt.controller;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.refit.spring.auth.annotation.UserId;
-import org.refit.spring.auth.entity.User;
 import org.refit.spring.auth.service.UserService;
-import org.refit.spring.mapper.ReceiptMapper;
 import org.refit.spring.receipt.dto.ReceiptListDto;
 import org.refit.spring.receipt.dto.ReceiptRequestDto;
 import org.refit.spring.receipt.dto.ReceiptResponseDto;
@@ -13,13 +11,9 @@ import org.refit.spring.receipt.entity.Receipt;
 import org.refit.spring.receipt.service.ReceiptService;
 import org.refit.spring.reward.entity.Reward;
 import org.refit.spring.reward.service.RewardService;
-import org.refit.spring.security.jwt.JwtTokenProvider;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
-import java.util.List;
+import springfox.documentation.annotations.ApiIgnore;
 
 
 @RestController
@@ -31,11 +25,13 @@ public class ReceiptController {
 
     private final UserService userService;
 
+    private static final Long CARBON_POINT = 100L;
+
     @ApiOperation(value = "영수증 등록", notes = "결제 시 영수증이 생성됩니다.")
     @PostMapping("/create")
-    public ResponseEntity<?> create(@UserId Long userId, @RequestBody ReceiptRequestDto receiptRequestDto) {
+    public ResponseEntity<?> create(@ApiIgnore @UserId Long userId, @RequestBody ReceiptRequestDto receiptRequestDto) {
         Receipt receipt = receiptService.create(receiptRequestDto, userId);
-        Reward reward = rewardService.create(100L, receipt.getTotalPrice(), userId);
+        Reward reward = rewardService.create(CARBON_POINT, receipt.getTotalPrice(), userId);
         userService.updatePoint(userId, reward.getCarbonPoint(), reward.getReward());
         ReceiptResponseDto dto = ReceiptResponseDto.from(receipt, userId, reward.getCarbonPoint(), reward.getReward());
         return ResponseEntity.ok(dto);
@@ -43,9 +39,9 @@ public class ReceiptController {
 
     @ApiOperation(value = "환불 영수증 등록", notes = "결제 시 생성된 영수증 아이디를 이용해 환불 영수증을 생성합니다.")
     @PostMapping("/refund")
-    public ResponseEntity<?> refund(@UserId Long userId, @RequestParam("receiptId") Long receiptId) {
+    public ResponseEntity<?> refund(@ApiIgnore @UserId Long userId, @RequestParam("receiptId") Long receiptId) {
         Receipt receipt = receiptService.refund(userId, receiptId);
-        Reward reward = rewardService.create(-100L, receipt.getTotalPrice(), userId);
+        Reward reward = rewardService.create(-CARBON_POINT, receipt.getTotalPrice(), userId);
         userService.updatePoint(userId, reward.getCarbonPoint(), reward.getReward());
         ReceiptResponseDto dto = ReceiptResponseDto.from(receipt, userId, reward.getCarbonPoint(), reward.getReward());
         return ResponseEntity.ok(dto);
@@ -54,7 +50,7 @@ public class ReceiptController {
     @ApiOperation(value = "영수증 목록 조회", notes = "전체 영수증을 조회합니다.")
     @GetMapping("/list")
     public ResponseEntity<?> getList(
-            @UserId Long userId,
+            @ApiIgnore @UserId Long userId,
             @RequestParam(required = false) Long cursorId) {
         ReceiptListDto dto = receiptService.getList(userId, cursorId);
         return ResponseEntity.ok(dto);
@@ -64,7 +60,7 @@ public class ReceiptController {
     @ApiOperation(value = "영수증 상세 조회", notes = "영수증 아이디를 활용해 영수증에 기록된 모든 정보를 확인합니다.")
     @GetMapping("/get")
     public ResponseEntity<?> get(
-            @UserId Long userId,
+            @ApiIgnore @UserId Long userId,
             @RequestParam(required = false) Long cursorId,
             @RequestParam("receiptId") Long receiptId) {
         Receipt receipt = receiptService.get(userId, cursorId, receiptId);
@@ -73,7 +69,7 @@ public class ReceiptController {
 
     @ApiOperation(value = "한 달 비용 조회", notes = "이번 달과 지난 달의 사용 내역 합계를 확인합니다.")
     @GetMapping("/monthlyReport")
-    public ResponseEntity<?> getTotal(@UserId Long userId) {
+    public ResponseEntity<?> getTotal(@ApiIgnore @UserId Long userId) {
         return ResponseEntity.ok(receiptService.getTotal(userId));
     }
 
