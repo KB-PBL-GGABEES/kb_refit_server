@@ -103,5 +103,23 @@ public class BadgeResponseDto {
                     .build();
         }
     }
+
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    @Builder
+    public static class toggleWornBadgeDto {
+        private Long userId;
+        private Long badgeId;
+        private boolean isWorn;
+
+        public static toggleWornBadgeDto from(PersonalBadge personalBadge) {
+            return toggleWornBadgeDto.builder()
+                    .badgeId(personalBadge.getBadgeId())
+                    .userId(personalBadge.getUserId())
+                    .isWorn(personalBadge.isWorn())
+                    .build();
+        }
+    }
 }
 
