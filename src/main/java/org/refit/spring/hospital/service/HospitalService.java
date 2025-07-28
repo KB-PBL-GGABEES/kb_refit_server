@@ -3,6 +3,7 @@ package org.refit.spring.hospital.service;
 import lombok.RequiredArgsConstructor;
 import org.refit.spring.hospital.dto.HospitalExpenseDetailResponseDto;
 import org.refit.spring.hospital.dto.HospitalExpenseResponseDto;
+import org.refit.spring.hospital.dto.HospitalRecentResponseDto;
 import org.refit.spring.hospital.dto.InsuranceSubscribedResponseDto;
 import org.refit.spring.mapper.HospitalMapper;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,10 @@ public class HospitalService {
 
     public HospitalExpenseDetailResponseDto findHospitalExpenseDetail(Long userId, Long receiptId) {
         return hospitalMapper.findHospitalExpenseDetailByUserIdAndReceiptId(userId, receiptId);
+    }
+
+    public HospitalRecentResponseDto getHospitalRecentInfo(Long userId) {
+        return hospitalMapper.findByHospitalRecentId(userId);
     }
 
     public List<InsuranceSubscribedResponseDto> findInsuranceSubscribeById(Long hospitalSubscribeId) {
