@@ -8,10 +8,7 @@ import org.refit.spring.wallet.dto.BadgeResponseDto;
 import org.refit.spring.wallet.entity.Badge;
 import org.refit.spring.wallet.service.WalletService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -24,7 +21,7 @@ public class WalletController {
 
     @ApiOperation(value = "뱃지 도감 조회", notes = "전체 뱃지 도감 리스트와 현재 보유 여부를 확인할 수 있습니다.")
     @GetMapping("/badge")
-    public ResponseEntity<?> getBadgeList(@UserId Long userId) {
+    public ResponseEntity<BadgeResponseDto.BadgeListDto> getBadgeList(@UserId Long userId) {
         BadgeResponseDto.BadgeListDto list = walletService.getBadgeList(userId);
         return ResponseEntity.ok(list);
     }
@@ -41,8 +38,15 @@ public class WalletController {
 
     @ApiOperation(value = "특정 뱃지 정보 조회", notes = "특정한 뱃지의 상세 정보를 조회할 수 있습니다.")
     @GetMapping("/badge/detail/{badgeId}")
-    public ResponseEntity<?> getBadgeDetail(@UserId Long userId, @PathVariable("badgeId") Long badgeId) {
+    public ResponseEntity<BadgeResponseDto.specificBadgeDetailDto> getBadgeDetail(@UserId Long userId, @PathVariable("badgeId") Long badgeId) {
         BadgeResponseDto.specificBadgeDetailDto result = walletService.getSpecificBadgeDetail(badgeId, userId);
+        return ResponseEntity.ok(result);
+    }
+
+    @ApiOperation(value = "뱃지 장착/해제", notes = "특정 뱃지를 장착하고 해제할 수 있습니다.")
+    @PatchMapping("/badge/{badgeId}")
+    public ResponseEntity<?> updateMyWornBadge(@UserId Long userId, @PathVariable("badgeId") Long badgeId) {
+        BadgeResponseDto.toggleWornBadgeDto result = walletService.toggleWornBadge(userId, badgeId);
         return ResponseEntity.ok(result);
     }
 }
