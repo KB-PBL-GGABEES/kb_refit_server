@@ -11,6 +11,6 @@ public interface WalletBrandMapper {
     @Select("SELECT * FROM wallet_brand")
     List<WalletBrand> findAllWalletBrands();
 
-    @Select("SELECT wallet_id FROM personal_wallet_brand WHERE user_id = #{userId}")
-    List<Long> findOwnedWalletIdsByUserId(Long userId);
+    @Select("SELECT * FROM wallet_brand WHERE wallet_id = #{walletId}")
+    WalletBrand findWalletBrandById(Long walletId);
 }
