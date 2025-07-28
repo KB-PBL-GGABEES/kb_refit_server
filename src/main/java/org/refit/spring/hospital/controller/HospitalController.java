@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.refit.spring.hospital.dto.HospitalExpenseDetailResponseDto;
 import org.refit.spring.hospital.dto.HospitalExpenseResponseDto;
+import org.refit.spring.hospital.dto.HospitalRecentResponseDto;
 import org.refit.spring.hospital.dto.InsuranceSubscribedResponseDto;
 import org.refit.spring.hospital.service.HospitalService;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -64,6 +65,20 @@ public class HospitalController {
         if (result == null) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Collections.singletonMap("message", "해당 userId와 receiptId에 해당하는 데이터가 없습니다."));
+        }
+
+        return ResponseEntity.ok(result);
+    }
+
+    // 최근 병원비 조회
+    @ApiOperation(value = "최근 병원비 및 보험청구 가능 건수", notes = "최근 3년간 병원비 총액과 보험청구 가능한 건수를 조회합니다.")
+    @GetMapping("/recent")
+    public ResponseE3ntity<?> getHospitalRecentInfo(@UserId Long userId) {
+        HospitalRecentResponseDto result = hospitalService.getHospitalRecentInfo(userId);
+
+        if (result == null) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("message", "해당 userId에 대한 최근 병원비 데이터가 없습니다."));
         }
 
         return ResponseEntity.ok(result);
