@@ -26,7 +26,7 @@ public class RewardService {
     public Reward create(Long carbon, Long totalPrice, Long userId) {
         Reward reward = new Reward();
         reward.setCarbonPoint(carbon);
-        reward.setReward((long) Math.floor(totalPrice * REWARD_RATE));
+        reward.setReward((long) (totalPrice * REWARD_RATE));
         reward.setCreatedAt(new Date());
         reward.setUserId(userId);
         rewardMapper.create(reward);
