@@ -6,6 +6,7 @@ import org.refit.spring.auth.annotation.UserId;
 import org.refit.spring.auth.entity.User;
 import org.refit.spring.auth.service.UserService;
 import org.refit.spring.reward.dto.RewardListDto;
+import org.refit.spring.reward.dto.RewardResponseDto;
 import org.refit.spring.reward.service.RewardService;
 import org.refit.spring.security.jwt.JwtTokenProvider;
 import org.springframework.http.HttpStatus;
@@ -29,4 +30,11 @@ public class RewardController {
         return ResponseEntity.ok(dto);
     }
 
+    @ApiOperation(value = "포인트 리스트 조회", notes = "메인 페이지 포인트 리스트에서 보여지는 리워드들을 제공합니다.")
+    @GetMapping("/getAllPoints")
+    public ResponseEntity<?> getTotalPoint(
+            @ApiIgnore @UserId Long userId) {
+        RewardResponseDto dto = rewardService.getTotal(userId);
+        return ResponseEntity.ok(dto);
+    }
 }

@@ -8,7 +8,7 @@ import java.util.List;
 
 @Mapper
 public interface ReceiptMapper {
-    @Insert("INSERT INTO receipt (total_price, supply_price, surtax, transaction_type, created_at, updated_at, company_id, user_id) VALUES (#{totalPrice}, #{supplyPrice}, #{surtax}, #{transactionType}, NOW(), NOW(), #{companyId}, #{userId})")
+    @Insert("INSERT INTO receipt (total_price, supply_price, surtax, transaction_type, created_at, updated_at, company_id, user_id, card_id) VALUES (#{totalPrice}, #{supplyPrice}, #{surtax}, #{transactionType}, NOW(), NOW(), #{companyId}, #{userId}, #{cardId})")
     @Options(useGeneratedKeys = true, keyProperty = "receiptId")
     void create(Receipt receipt);
 
@@ -28,9 +28,9 @@ public interface ReceiptMapper {
     @Select("SELECT * FROM receipt WHERE user_id = #{userId} AND receipt_id = #{receiptId}")
     Receipt get(@Param("userId") Long userId, @Param("receiptId") Long receiptId);
 
-    @Select("SELECT SUM(total_price) FROM receipt WHERE user_id = #{userId} AND MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE())")
+    @Select("SELECT IFNULL(SUM(total_price), 0) FROM receipt WHERE user_id = #{userId} AND MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE())")
     Long getTotal(@Param("userId") Long userId);
 
-    @Select("SELECT SUM(total_price) FROM receipt WHERE user_id = #{userId} AND MONTH(created_at) = MONTH(DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH)) AND YEAR(created_at) = YEAR(DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH))")
+    @Select("SELECT IFNULL(SUM(total_price), 0) FROM receipt WHERE user_id = #{userId} AND MONTH(created_at) = MONTH(DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH)) AND YEAR(created_at) = YEAR(DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH))")
     Long getLastMonthTotal(@Param("userId") Long userId);
 }
