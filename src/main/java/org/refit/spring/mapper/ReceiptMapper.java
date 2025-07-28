@@ -8,7 +8,7 @@ import java.util.List;
 
 @Mapper
 public interface ReceiptMapper {
-    @Insert("INSERT INTO receipt (total_price, supply_price, surtax, transaction_type, created_at, updated_at, company_id, user_id, card_id) VALUES (#{totalPrice}, #{supplyPrice}, #{surtax}, #{transactionType}, NOW(), NOW(), #{companyId}, #{userId}, #{cardId})")
+    @Insert("INSERT INTO receipt (total_price, supply_price, surtax, transaction_type, created_at, updated_at, company_id, user_id, card_id) VALUES (#{totalPrice}, #{supplyPrice}, #{surtax}, #{transactionType}, #{createdAt}, #{updatedAt}, #{companyId}, #{userId}, #{cardId})")
     @Options(useGeneratedKeys = true, keyProperty = "receiptId")
     void create(Receipt receipt);
 

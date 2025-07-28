@@ -60,6 +60,7 @@ public class ReceiptService {
         receipt.setCardId(cardId);
         receipt.setTransactionType("카드 결제");
         receipt.setCreatedAt(new Date());
+        receipt.setUpdatedAt(new Date());
         receipt.setUserId(userId);
         receipt.setCompanyId(companyId);
         receiptMapper.create(receipt);
@@ -102,6 +103,7 @@ public class ReceiptService {
         long supply = (long) (total / 1.1);
         receipt.setSupplyPrice(supply);
         receipt.setSurtax(total - supply);
+        receipt.setUpdatedAt(new Date());
     }
 
     @Transactional(readOnly = true)
