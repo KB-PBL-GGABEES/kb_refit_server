@@ -57,4 +57,17 @@ public class WalletService {
         //3. DTO 반환
         return BadgeResponseDto.specificBadgeDetailDto.from(badge, isOwned);
     }
+
+    public BadgeResponseDto.toggleWornBadgeDto toggleWornBadge(Long userId, Long badgeId) {
+        PersonalBadge personalBadge = personalBadgeMapper.findByUserIdAndBadgeId(userId, badgeId);
+        if (personalBadge == null) {
+            throw new IllegalArgumentException("해당 뱃지를 보유하고 있지 않습니다.");
+        }
+
+        boolean newState = !personalBadge.isWorn();
+        personalBadgeMapper.updateIsWorn(userId, badgeId, newState);
+        personalBadge.setWorn(newState);
+
+        return BadgeResponseDto.toggleWornBadgeDto.from(personalBadge);
+    }
 }
