@@ -2,6 +2,7 @@ package org.refit.spring.wallet.dto;
 
 import lombok.*;
 import org.refit.spring.auth.entity.User;
+import org.refit.spring.wallet.entity.PersonalBadge;
 import org.refit.spring.wallet.entity.PersonalWalletBrand;
 import org.refit.spring.wallet.entity.WalletBrand;
 
@@ -73,4 +74,23 @@ public class WalletResponseDto {
                     .build();
         }
     }
+
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    @Builder
+    public static class ToggleMountedWalletDto {
+        private Long userId;
+        private Long walletId;
+        private boolean isMounted;
+
+        public static WalletResponseDto.ToggleMountedWalletDto from(PersonalWalletBrand personalWalletBrand) {
+            return ToggleMountedWalletDto.builder()
+                    .userId(personalWalletBrand.getUserId())
+                    .walletId(personalWalletBrand.getWalletId())
+                    .isMounted(personalWalletBrand.isMounted())
+                    .build();
+        }
+    }
+
 }
