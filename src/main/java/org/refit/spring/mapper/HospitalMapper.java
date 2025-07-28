@@ -77,11 +77,16 @@ public interface HospitalMapper {
     );
     
     // 최근 병원비 조회
-    @Select("SELECT COALESCE(SUM(r.total_price), 0) AS recentTotalPrice, " +
-            "COUNT(CASE WHEN r.transaction_type = '보험청구' THEN 1 END) AS insuranceBillable " +
+    @Select("SELECT " +
+            "COALESCE(SUM(r.total_price), 0) AS recentTotalPrice, " +
+            "COUNT(CASE " +
+            "  WHEN (hp.insurance_id IS NULL OR hp.process_state IS NULL OR hp.process_state = 'none') THEN 1 " +
+            "  ELSE NULL " +
+            "END) AS insuranceBillable " +
             "FROM receipt r " +
             "JOIN company c ON r.company_id = c.company_id " +
             "JOIN categories cat ON c.category_id = cat.category_id " +
+            "LEFT JOIN hospital_process hp ON r.receipt_id = hp.receipt_id " +
             "WHERE cat.category_name = '병원' " +
             "AND r.created_at >= DATE_SUB(NOW(), INTERVAL 3 YEAR) " +
             "AND r.user_id = #{userId}")
