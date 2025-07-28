@@ -14,6 +14,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 
+@Api(tags = "전자지갑 API", description = "뱃지 및 지갑 디자인 관련 API입니다.")
 @RestController
 @RequestMapping("/api/wallet")
 @RequiredArgsConstructor
@@ -61,7 +62,7 @@ public class WalletController {
 
     @ApiOperation(value = "지갑 브랜드 상세 조회", notes = "전자지갑 브랜드 디자인의 상세 정보를 확인할 수 있습니다.")
     @GetMapping("/brand/detail/{walletId}")
-    public ResponseEntity<?> getWalletDetail(@ApiIgnore @UserId Long userId, @PathVariable Long walletId) {
+    public ResponseEntity<?> getWalletDetail(@ApiIgnore @UserId Long userId, @PathVariable("walletId") Long walletId) {
         WalletResponseDto.WalletBrandDetailDto result = walletService.getWalletDetail(userId, walletId);
 
         if (result == null) {
@@ -70,5 +71,16 @@ public class WalletController {
 
         return ResponseEntity.ok(result);
     }
+
+    @ApiOperation(value = "지갑 디자인 착용/해제", notes = "전자지갑 브랜드 디자인을 착용하고 해제할 수 있습니다.")
+    @PatchMapping("/brand/detail/{walletId}")
+    public ResponseEntity<?> updateWalletDesign(@ApiIgnore @UserId Long userId, @PathVariable("walletId") Long walletId) {
+        WalletResponseDto.ToggleMountedWalletDto result = walletService.toggleMountedWallet(userId, walletId);
+        if (result == null) {
+            return ResponseEntity.noContent().build(); // 204 No Content
+        }
+        return ResponseEntity.ok(result);
+    }
+
 
 }

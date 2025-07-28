@@ -108,4 +108,21 @@ public class WalletService {
 
         return WalletResponseDto.WalletBrandDetailDto.from(brand, user, personal != null ? personal : new PersonalWalletBrand(), isOwned);
     }
+
+    public WalletResponseDto.ToggleMountedWalletDto toggleMountedWallet(Long userId, Long walletId) {
+        PersonalWalletBrand target = personalWalletBrandMapper.findByUserIdAndWalletId(userId, walletId);
+        if (target == null) {
+            return null; // ← 이게 핵심!
+        }
+
+        // 1. 기존에 착용한 지갑 해제 (is_mounted = true → false)
+        personalWalletBrandMapper.unmountCurrentWallet(userId);
+
+        // 2. 새 지갑 착용 (is_mounted = false → true)
+        personalWalletBrandMapper.mountNewWallet(userId, walletId);
+
+        // 3. 변경된 결과 조회 후 DTO 변환
+        PersonalWalletBrand updated = personalWalletBrandMapper.findByUserIdAndWalletId(userId, walletId);
+        return WalletResponseDto.ToggleMountedWalletDto.from(updated);
+    }
 }
