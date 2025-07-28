@@ -15,12 +15,15 @@ public interface RewardMapper {
     @Select("SELECT * FROM reward WHERE user_id = #{userId} AND reward_id < #{cursorId} ORDER BY reward_id DESC LIMIT 20")
     List<Reward> getList(@Param("userId") Long userId, @Param("cursorId") Long cursorId);
 
-    @Select("SELECT SUM(reward) FROM reward WHERE user_id = #{userId}")
+    @Select("SELECT IFNULL(SUM(reward), 0) FROM reward WHERE user_id = #{userId}")
     Long getTotalCashback(@Param("userId") Long userId);
 
+    @Select("SELECT IFNULL(SUM(carbon_point), 0) FROM reward WHERE user_id = #{userId}")
     Long getTotalCarbon(@Param("userId") Long userId);
 
-    Long getTotalStar(@Param("userId") Long userId);
-
+    @Select("SELECT IFNULL(category_name, '') FROM receipt r " +
+            "INNER JOIN company co ON r.company_id = co.company_id " +
+            "INNER JOIN categories ca ON co.category_id = ca.category_id " +
+            "WHERE r.user_id = #{userId} GROUP BY ca.category_id ORDER BY COUNT(*) DESC LIMIT 1")
     String getCategory(@Param("userId") Long userId);
 }

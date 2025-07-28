@@ -24,4 +24,5 @@ public class Receipt {
     List<ReceiptContentDto> contentList;
     private Long companyId;
     private Long userId;
+    private Long cardId;
 }
