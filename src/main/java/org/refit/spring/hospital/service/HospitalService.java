@@ -16,6 +16,7 @@ import java.util.List;
 public class HospitalService {
     private final HospitalMapper hospitalMapper;
 
+    // 병원 영수증 목록 조회
     public List<HospitalExpenseResponseDto> getHospitalExpenses(Long userId, Date cursorDate) {
         if (cursorDate == null) {
             return hospitalMapper.findFirstPage(userId);
@@ -23,15 +24,35 @@ public class HospitalService {
         return hospitalMapper.findByCursorDate(userId, cursorDate);
     }
 
+    // 병원 영수증 상세 조회
     public HospitalExpenseDetailResponseDto findHospitalExpenseDetail(Long userId, Long receiptId) {
         return hospitalMapper.findHospitalExpenseDetailByUserIdAndReceiptId(userId, receiptId);
     }
 
+    // 최근 병원비 조회
     public HospitalRecentResponseDto getHospitalRecentInfo(Long userId) {
+        boolean exists = hospitalMapper.existsUserReceipt(userId);
+        if (!exists) {
+            return null; // 컨트롤러에서 에러 응답 처리
+        }
         return hospitalMapper.findByHospitalRecentId(userId);
     }
 
+    // 가입된 보험 목록 조회
     public List<InsuranceSubscribedResponseDto> findInsuranceSubscribeById(Long hospitalSubscribeId) {
         return hospitalMapper.findByInsuranceSubscribeId(hospitalSubscribeId);
     }
+
+
+    // 보험 청구 요청
+    public boolean requestInsuranceClaim(Long receiptId, Date sickedDate, String visitedReason, Long insuranceId, String processState) {
+        int updatedRows = hospitalMapper.updateInsuranceClaimRequest(
+                receiptId, sickedDate, visitedReason, insuranceId, processState);
+        return updatedRows > 0;
+    }
 }
+
+
+
+
+
