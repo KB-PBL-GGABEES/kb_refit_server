@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -73,6 +74,19 @@ public class CeoServiceImpl implements CeoService {
     }
 
     // 한달 법카 금액 조회
+    @Override
+    public Map<String, Object> getCorporateCardCost(Long userId) {
+        Long thisMonth = ceoMapper.getCorporateCardCostThisMonth(userId);
+        Long lastMonth = ceoMapper.getCorporateCardCostLastMonth(userId);
+
+        return Map.of(
+                "month", LocalDateTime.now().getMonthValue(),
+                "totalPrice", thisMonth != null ? thisMonth : 0L,
+                "lastMonth", lastMonth != null ? lastMonth : 0L
+        );
+    }
+
+
 
     // 법카 내역 조회
 }

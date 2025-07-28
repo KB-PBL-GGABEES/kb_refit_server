@@ -4,6 +4,7 @@ import org.refit.spring.ceo.dto.CeoListDto;
 import org.refit.spring.ceo.dto.ReceiptDetailDto;
 
 import java.util.List;
+import java.util.Map;
 
 public interface CeoService {
 
@@ -26,6 +27,7 @@ public interface CeoService {
     void receiptProcessing(Long receiptProcessId, String progressState, String rejectedReason, Long userId);
     
     // 한달 법카 금액 조회
-    
+    Map<String, Object> getCorporateCardCost(Long userId);
+
     // 법카 내역 조회
 }

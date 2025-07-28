@@ -10,6 +10,7 @@ import org.refit.spring.receipt.entity.Receipt;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface CeoMapper {
@@ -25,7 +26,7 @@ public interface CeoMapper {
             "            JOIN company c ON r.company_id = c.company_id\n" +
             "            JOIN receipt_process p ON r.receipt_id = p.receipt_id\n" +
             "        WHERE p.process_state = 'none'\n" +
-            "        ORDER BY r.receipt_id DESC")
+            "        ORDER BY r.receipt_id")
     List<Ceo> getPendingReceipts(@Param("userId") Long userId);
 
     // 경비 처리가 필요한 내역 개수
@@ -104,7 +105,35 @@ public interface CeoMapper {
                             @Param("rejectedReason") String rejectedReason,
                             @Param("userId") Long userId);
 
-    // 한달 법카 금액 조회
+    // 이번 달 법카 사용 금액 조회
+    @Select("    SELECT\n" +
+            "        SUM(r.total_price) AS totalPrice\n" +
+            "    FROM receipt r\n" +
+            "    JOIN card c ON r.card_id = c.card_id\n" +
+            "    JOIN employee e ON r.user_id = e.user_id\n" +
+            "    WHERE c.is_corporate = TRUE\n" +
+            "      AND e.company_id = (\n" +
+            "          SELECT company_id FROM employee WHERE user_id = #{ceoId} LIMIT 1\n" +
+            "      )\n" +
+            "      AND MONTH(r.created_at) = MONTH(CURDATE())\n" +
+            "      AND YEAR(r.created_at) = YEAR(CURDATE())")
+    Long getCorporateCardCostThisMonth(@Param("ceoId") Long ceoId);
+
+    // 지난달 법카 사용 금액 조회
+    @Select("SELECT\n" +
+            "        SUM(r.total_price) AS lastMonth\n" +
+            "    FROM receipt r\n" +
+            "    JOIN card c ON r.card_id = c.card_id\n" +
+            "    JOIN employee e ON r.user_id = e.user_id\n" +
+            "    WHERE c.is_corporate = TRUE\n" +
+            "      AND e.company_id = (\n" +
+            "          SELECT company_id FROM employee WHERE user_id = #{ceoId} LIMIT 1\n" +
+            "      )\n" +
+            "      AND MONTH(r.created_at) = MONTH(DATE_SUB(CURDATE(), INTERVAL 1 MONTH))\n" +
+            "      AND YEAR(r.created_at) = YEAR(DATE_SUB(CURDATE(), INTERVAL 1 MONTH))")
+    Long getCorporateCardCostLastMonth(@Param("ceoId") Long ceoId);
 
     // 법카 내역 조회
+
+
 }

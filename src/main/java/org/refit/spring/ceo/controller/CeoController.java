@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -102,6 +103,18 @@ public class CeoController {
     }
 
     // 한달 법카 금액 조회
+    @ApiOperation(value = "한달 법카 금액 조회", notes = "법카의 이번 달 사용액과 지난달 사용액을 가져옵니다.")
+    @GetMapping("/corporateCardCost")
+    public ResponseEntity<Map<String, Object>> getCorporateCardCost(
+            @ApiIgnore @UserId Long userId) {
+        return ResponseEntity.ok(ceoService.getCorporateCardCost(userId));
+    }
 
     // 법카 내역 조회
+    @ApiOperation(value = "법카 내역 조회", notes = "법카의 사용 내역을 보여줍니다.")
+    @GetMapping("/corporateCard")
+    public ResponseEntity<List<Object>> getCorporateCard(
+            @ApiIgnore @UserId Long userId) {
+        return null;
+    }
 }
