@@ -54,8 +54,21 @@ public class WalletController {
 
     @ApiOperation(value = "지갑 브랜드 상점", notes = "전자지갑의 브랜드 별 지갑 디자인을 구매할 수 있는 상점입니다.")
     @GetMapping("/brand")
-    public ResponseEntity<?> getWalletStore(@ApiIgnore @UserId Long userId) {
+    public ResponseEntity<WalletResponseDto.WalletBrandListDto> getWalletStore(@ApiIgnore @UserId Long userId) {
         WalletResponseDto.WalletBrandListDto result = walletService.getWalletList(userId);
         return ResponseEntity.ok(result);
     }
+
+    @ApiOperation(value = "지갑 브랜드 상세 조회", notes = "전자지갑 브랜드 디자인의 상세 정보를 확인할 수 있습니다.")
+    @GetMapping("/brand/detail/{walletId}")
+    public ResponseEntity<?> getWalletDetail(@ApiIgnore @UserId Long userId, @PathVariable Long walletId) {
+        WalletResponseDto.WalletBrandDetailDto result = walletService.getWalletDetail(userId, walletId);
+
+        if (result == null) {
+            return ResponseEntity.noContent().build(); // 204
+        }
+
+        return ResponseEntity.ok(result);
+    }
+
 }

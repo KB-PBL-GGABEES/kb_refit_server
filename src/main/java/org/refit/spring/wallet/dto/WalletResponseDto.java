@@ -2,6 +2,7 @@ package org.refit.spring.wallet.dto;
 
 import lombok.*;
 import org.refit.spring.auth.entity.User;
+import org.refit.spring.wallet.entity.PersonalWalletBrand;
 import org.refit.spring.wallet.entity.WalletBrand;
 
 import java.util.List;
@@ -43,6 +44,33 @@ public class WalletResponseDto {
                     .walletBrandDtoList(brandList)
                     .build();
         }
+    }
 
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    @Builder
+    public static class WalletBrandDetailDto {
+        private Long walletId;
+        private Long totalStarPoint;
+        private String brandName;
+        private String brandImage;
+        private Long walletCost;
+        private boolean isOwned; // 지갑 보유 여부
+        private boolean isMounted; // 착용여부
+        private String brandIntroduce;
+
+        public static WalletBrandDetailDto from(WalletBrand brand, User user, PersonalWalletBrand personalWalletBrand, boolean isOwned) {
+            return WalletBrandDetailDto.builder()
+                    .walletId(brand.getWalletId())
+                    .totalStarPoint(user.getTotalStarPoint())
+                    .brandName(brand.getBrandName())
+                    .brandImage(brand.getBrandImage())
+                    .walletCost(brand.getWalletCost())
+                    .isOwned(isOwned)
+                    .isMounted(personalWalletBrand.isMounted())
+                    .brandIntroduce(brand.getBrandIntroduce())
+                    .build();
+        }
     }
 }

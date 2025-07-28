@@ -2,14 +2,12 @@ package org.refit.spring.wallet.service;
 
 import lombok.RequiredArgsConstructor;
 import org.refit.spring.auth.entity.User;
-import org.refit.spring.mapper.BadgeMapper;
-import org.refit.spring.mapper.PersonalBadgeMapper;
-import org.refit.spring.mapper.UserMapper;
-import org.refit.spring.mapper.WalletBrandMapper;
+import org.refit.spring.mapper.*;
 import org.refit.spring.wallet.dto.BadgeResponseDto;
 import org.refit.spring.wallet.dto.WalletResponseDto;
 import org.refit.spring.wallet.entity.Badge;
 import org.refit.spring.wallet.entity.PersonalBadge;
+import org.refit.spring.wallet.entity.PersonalWalletBrand;
 import org.refit.spring.wallet.entity.WalletBrand;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +22,7 @@ public class WalletService {
     private final PersonalBadgeMapper personalBadgeMapper;
     private final UserMapper userMapper;
     private final WalletBrandMapper walletBrandMapper;
+    private final PersonalWalletBrandMapper personalWalletBrandMapper;
 
     public BadgeResponseDto.BadgeListDto getBadgeList(Long userId) {
         List<Badge> allBadges = badgeMapper.findAll(); // 전체 뱃지 목록
@@ -86,7 +85,7 @@ public class WalletService {
         List<WalletBrand> walletBrandList = walletBrandMapper.findAllWalletBrands();
 
         // 3. 유저가 보유한 walletId 리스트
-        List<Long> ownedWalletIds = walletBrandMapper.findOwnedWalletIdsByUserId(userId);
+        List<Long> ownedWalletIds = personalWalletBrandMapper.findOwnedWalletIdsByUserId(userId);
 
         // 4. DTO로 변환
         List<WalletResponseDto.WalletBrandDto> walletBrandDtos = walletBrandList.stream()
@@ -94,5 +93,19 @@ public class WalletService {
                 .collect(Collectors.toList());
 
         return WalletResponseDto.WalletBrandListDto.from(walletBrandDtos, user);
+    }
+
+    public WalletResponseDto.WalletBrandDetailDto getWalletDetail(Long userId, Long walletId) {
+        WalletBrand brand = walletBrandMapper.findWalletBrandById(walletId);
+        if (brand == null) {
+            return null; //204처리
+        }
+        User user = userMapper.findByUserId(userId);
+        PersonalWalletBrand personal = personalWalletBrandMapper.findByUserIdAndWalletId(userId, walletId);
+
+        boolean isOwned = (personal != null);
+//        boolean isMounted = (isOwned && personal.isMounted());
+
+        return WalletResponseDto.WalletBrandDetailDto.from(brand, user, personal != null ? personal : new PersonalWalletBrand(), isOwned);
     }
 }
