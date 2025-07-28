@@ -11,6 +11,7 @@ import org.refit.spring.security.jwt.JwtTokenProvider;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 @RestController
 @RequestMapping("/api/reward")
@@ -22,8 +23,8 @@ public class RewardController {
     @ApiOperation(value = "리워드 내역 조회", notes = "탄소중립포인트와 리워드 내역을 목록으로 조회합니다.")
     @GetMapping("")
     public ResponseEntity<?> getList(
-            @RequestParam(required = false) Long cursorId,
-            @UserId Long userId) {
+            @ApiIgnore @UserId Long userId,
+            @RequestParam(required = false) Long cursorId) {
         RewardListDto dto = rewardService.getList(userId, cursorId);
         return ResponseEntity.ok(dto);
     }

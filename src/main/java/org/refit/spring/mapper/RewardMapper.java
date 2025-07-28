@@ -14,4 +14,13 @@ public interface RewardMapper {
 
     @Select("SELECT * FROM reward WHERE user_id = #{userId} AND reward_id < #{cursorId} ORDER BY reward_id DESC LIMIT 20")
     List<Reward> getList(@Param("userId") Long userId, @Param("cursorId") Long cursorId);
+
+    @Select("SELECT SUM(reward) FROM reward WHERE user_id = #{userId}")
+    Long getTotalCashback(@Param("userId") Long userId);
+
+    Long getTotalCarbon(@Param("userId") Long userId);
+
+    Long getTotalStar(@Param("userId") Long userId);
+
+    String getCategory(@Param("userId") Long userId);
 }
