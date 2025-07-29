@@ -2,6 +2,7 @@ package org.refit.spring.receipt.service;
 
 import lombok.RequiredArgsConstructor;
 import org.refit.spring.auth.entity.User;
+import org.refit.spring.mapper.CeoMapper;
 import org.refit.spring.mapper.MerchandiseMapper;
 import org.refit.spring.mapper.ReceiptMapper;
 import org.refit.spring.merchandise.entity.Merchandise;
@@ -21,6 +22,7 @@ import java.util.NoSuchElementException;
 public class ReceiptService {
     private final ReceiptMapper receiptMapper;
     private final MerchandiseMapper merchandiseMapper;
+    private final CeoMapper ceoMapper;
 
     @Transactional
     public Receipt create(ReceiptRequestDto dto, Long userId) {
@@ -31,6 +33,8 @@ public class ReceiptService {
         updatePrice(receipt);
         receipt.setContentList(list);
         receiptMapper.update(userId, receipt);
+        Long ceoId = ceoMapper.findCeoId(firstMerchandise.getCompanyId());
+        ceoMapper.insertProcess(ceoId, userId, receipt.getReceiptId());
         return receipt;
     }
 
@@ -160,5 +164,10 @@ public class ReceiptService {
         dto.setTotal(receiptMapper.getTotal(userId));
         dto.setLastMonth(receiptMapper.getLastMonthTotal(userId));
         return dto;
+    }
+
+    public RejectedListDto getRejected(Long userId) {
+        List<Receipt> list = receiptMapper.findRejected(userId);
+        return new RejectedListDto(list);
     }
 }
