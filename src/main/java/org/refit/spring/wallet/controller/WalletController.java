@@ -4,15 +4,16 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.refit.spring.auth.annotation.UserId;
+import org.refit.spring.wallet.dto.BadgeRequestDto;
 import org.refit.spring.wallet.dto.BadgeResponseDto;
 import org.refit.spring.wallet.dto.WalletResponseDto;
-import org.refit.spring.wallet.entity.Badge;
 import org.refit.spring.wallet.service.WalletService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 @Api(tags = "전자지갑 API", description = "뱃지 및 지갑 디자인 관련 API입니다.")
 @RestController
@@ -46,10 +47,27 @@ public class WalletController {
         return ResponseEntity.ok(result);
     }
 
-    @ApiOperation(value = "뱃지 장착/해제", notes = "특정 뱃지를 장착하고 해제할 수 있습니다.")
-    @PatchMapping("/badge/{badgeId}")
-    public ResponseEntity<?> updateMyWornBadge(@ApiIgnore @UserId Long userId, @PathVariable("badgeId") Long badgeId) {
-        BadgeResponseDto.toggleWornBadgeDto result = walletService.toggleWornBadge(userId, badgeId);
+    @ApiOperation(value = "뱃지 장착/해제", notes = "최대 4개까지 뱃지를 장착할 수 있으며, 초과 시 기존 뱃지를 교체합니다.")
+    @PatchMapping("/badge/equip")
+    public ResponseEntity<?> updateMyWornBadge(@ApiIgnore @UserId Long userId, @RequestBody BadgeRequestDto.UpdateWornBadgeDto requestDto) {
+        BadgeResponseDto.ToggleWornBadgeDto result = walletService.toggleWornBadge(userId, requestDto);
+
+        if (result == null) {
+            Map<String, String> error = new HashMap<>();
+
+            if (requestDto.getUpdateBadgeId() == null && requestDto.hasBadgeToUnwear()) {
+                error.put("message", "보유하고 있지 않은 뱃지입니다.");
+            } else if (!requestDto.hasBadgeToUnwear() && requestDto.getUpdateBadgeId() != null) {
+                error.put("message", "착용하려는 뱃지가 존재하지 않거나 보유하고 있지 않습니다.");
+            } else if (requestDto.hasBadgeToUnwear() && requestDto.getUpdateBadgeId() != null) {
+                error.put("message", "착용 또는 해제하려는 뱃지가 존재하지 않습니다.");
+            } else {
+                error.put("message", "요청이 올바르지 않습니다.");
+            }
+
+            return ResponseEntity.badRequest().body(error);
+        }
+
         return ResponseEntity.ok(result);
     }
 

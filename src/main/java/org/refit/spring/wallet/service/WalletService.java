@@ -3,6 +3,7 @@ package org.refit.spring.wallet.service;
 import lombok.RequiredArgsConstructor;
 import org.refit.spring.auth.entity.User;
 import org.refit.spring.mapper.*;
+import org.refit.spring.wallet.dto.BadgeRequestDto;
 import org.refit.spring.wallet.dto.BadgeResponseDto;
 import org.refit.spring.wallet.dto.WalletResponseDto;
 import org.refit.spring.wallet.entity.Badge;
@@ -64,17 +65,52 @@ public class WalletService {
         return BadgeResponseDto.specificBadgeDetailDto.from(badge, isOwned);
     }
 
-    public BadgeResponseDto.toggleWornBadgeDto toggleWornBadge(Long userId, Long badgeId) {
-        PersonalBadge personalBadge = personalBadgeMapper.findByUserIdAndBadgeId(userId, badgeId);
-        if (personalBadge == null) {
-            throw new IllegalArgumentException("해당 뱃지를 보유하고 있지 않습니다.");
+    public BadgeResponseDto.ToggleWornBadgeDto toggleWornBadge(Long userId, BadgeRequestDto.UpdateWornBadgeDto requestDto) {
+        Long previousBadgeId = requestDto.getPreviousBadgeId();
+        Long updateBadgeId = requestDto.getUpdateBadgeId();
+
+        // 현재 착용 중인 뱃지 개수
+        List<PersonalBadge> wornBadges = personalBadgeMapper.findWornBadgesByUserId(userId);
+        int wornCount = wornBadges.size();
+
+        // [1] 해제만 요청한 경우
+        if (updateBadgeId == null && previousBadgeId != null) {
+            PersonalBadge badgeToUnwear = personalBadgeMapper.findByUserIdAndBadgeId(userId, previousBadgeId);
+            if (badgeToUnwear == null) return null;
+
+            personalBadgeMapper.updateBadgeWornStatus(userId, previousBadgeId, false);
+            badgeToUnwear.setWorn(false); // 변경 상태 반영
+            return BadgeResponseDto.ToggleWornBadgeDto.from(badgeToUnwear);
         }
 
-        boolean newState = !personalBadge.isWorn();
-        personalBadgeMapper.updateIsWorn(userId, badgeId, newState);
-        personalBadge.setWorn(newState);
+        // [2] 착용만 요청한 경우
+        if (previousBadgeId == null && updateBadgeId != null) {
+            if (wornCount >= 4) return null; // 착용 제한 초과
 
-        return BadgeResponseDto.toggleWornBadgeDto.from(personalBadge);
+            PersonalBadge badgeToWear = personalBadgeMapper.findByUserIdAndBadgeId(userId, updateBadgeId);
+            if (badgeToWear == null) return null;
+
+            personalBadgeMapper.updateBadgeWornStatus(userId, updateBadgeId, true);
+            badgeToWear.setWorn(true); // 변경 상태 반영
+            return BadgeResponseDto.ToggleWornBadgeDto.from(badgeToWear);
+        }
+
+        // [3] 해제 + 착용 둘 다 요청한 경우
+        if (previousBadgeId != null && updateBadgeId != null) {
+            PersonalBadge badgeToUnwear = personalBadgeMapper.findByUserIdAndBadgeId(userId, previousBadgeId);
+            PersonalBadge badgeToWear = personalBadgeMapper.findByUserIdAndBadgeId(userId, updateBadgeId);
+
+            if (badgeToUnwear == null || badgeToWear == null) return null;
+
+            personalBadgeMapper.updateBadgeWornStatus(userId, previousBadgeId, false);
+            personalBadgeMapper.updateBadgeWornStatus(userId, updateBadgeId, true);
+
+            badgeToWear.setWorn(true);  // 착용한 뱃지 반환
+            return BadgeResponseDto.ToggleWornBadgeDto.from(badgeToWear);
+        }
+
+        // [예외] 잘못된 요청
+        return null;
     }
 
     public WalletResponseDto.WalletBrandListDto getWalletList(Long userId) {
