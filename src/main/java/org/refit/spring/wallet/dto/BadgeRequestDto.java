@@ -1,4 +1,16 @@
 package org.refit.spring.wallet.dto;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 public class BadgeRequestDto {
+    @Getter
+    public static class UpdateWornBadgeDto {
+        private Long previousBadgeId;
+        private Long updateBadgeId;
+
+        public boolean hasBadgeToUnwear() {
+            return previousBadgeId != null;
+        }
+    }
 }

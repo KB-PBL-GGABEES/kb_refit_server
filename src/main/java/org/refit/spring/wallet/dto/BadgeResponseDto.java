@@ -108,13 +108,13 @@ public class BadgeResponseDto {
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     @Builder
-    public static class toggleWornBadgeDto {
+    public static class ToggleWornBadgeDto {
         private Long userId;
         private Long badgeId;
         private boolean isWorn;
 
-        public static toggleWornBadgeDto from(PersonalBadge personalBadge) {
-            return toggleWornBadgeDto.builder()
+        public static ToggleWornBadgeDto from(PersonalBadge personalBadge) {
+            return ToggleWornBadgeDto.builder()
                     .badgeId(personalBadge.getBadgeId())
                     .userId(personalBadge.getUserId())
                     .isWorn(personalBadge.isWorn())

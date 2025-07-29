@@ -24,4 +24,12 @@ public interface PersonalBadgeMapper {
 
     @Update("UPDATE personal_badge SET is_worn = #{isWorn}, updated_at = NOW() WHERE user_id = #{userId} AND badge_id = #{badgeId}")
     void updateIsWorn(@Param("userId") Long userId, @Param("badgeId") Long badgeId, @Param("isWorn") boolean isWorn);
+
+    @Select("SELECT * FROM personal_badge WHERE user_id = #{userId} AND badge_id = #{badgeId}")
+    PersonalBadge findPersonalBadge(@Param("userId") Long userId, @Param("badgeId") Long badgeId);
+
+    @Update("UPDATE personal_badge SET is_worn = #{isWorn} WHERE user_id = #{userId} AND badge_id = #{badgeId}")
+    void updateBadgeWornStatus(@Param("userId") Long userId,
+                               @Param("badgeId") Long badgeId,
+                               @Param("isWorn") boolean isWorn);
 }
