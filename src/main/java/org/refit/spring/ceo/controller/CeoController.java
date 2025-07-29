@@ -5,9 +5,9 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.refit.spring.auth.annotation.UserId;
 import org.refit.spring.ceo.dto.CeoListDto;
-import org.refit.spring.ceo.dto.CorporateCardDetailDto;
+import org.refit.spring.ceo.dto.CorporateCardListlDto;
 import org.refit.spring.ceo.dto.EmailRequestDto;
-import org.refit.spring.ceo.dto.ReceiptDetailDto;
+import org.refit.spring.ceo.dto.ReceiptListlDto;
 import org.refit.spring.ceo.service.CeoService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -40,12 +40,12 @@ public class CeoController {
     }
 
     @ApiOperation(value = "경비 청구 항목 상세 조회", notes = "경비 청구 항목의 상세 정보를 보여줍니다.")
-    @GetMapping("/receiptDetail")
-    public ResponseEntity<ReceiptDetailDto> getReceiptDetail(
+    @GetMapping("/receiptList")
+    public ResponseEntity<ReceiptListlDto> getReceiptList(
             @RequestParam("userId") Long receipted,
             @ApiIgnore @UserId Long userId) {
 
-        return ResponseEntity.ok(ceoService.getReceiptDetail(receipted, userId));
+        return ResponseEntity.ok(ceoService.getReceiptList(receipted, userId));
     }
 
     @ApiOperation(value = "경비 처리 완료 내역 조회", notes = "경비 처리가 완료된(승인/반려) 내역을 20개씩 가져옵니다.")
@@ -83,7 +83,7 @@ public class CeoController {
                 "경비 처리 수", countCompletedReceiptsReceipt));
     }
 
-    @ApiOperation(value = "영수 처리 승인 및 반려", notes = "process_state를 승인(accepted) 또는 반려(rejected)로 반영(Update)합니다.")
+    @ApiOperation(value = "영수 처리 승인 및 반려 / 법카 영수 반려", notes = "process_state를 승인(accepted) 또는 반려(rejected)로 반영(Update)합니다.")
     @PatchMapping("/receiptProcessing")
     public ResponseEntity<Map<String, Object>> receiptProcessing(
             @RequestBody Map<String, Object> requestBody,
@@ -104,7 +104,6 @@ public class CeoController {
         ));
     }
 
-    // 한달 법카 금액 조회
     @ApiOperation(value = "한달 법카 금액 조회", notes = "법카의 이번 달 사용액과 지난달 사용액을 가져옵니다.")
     @GetMapping("/corporateCardCost")
     public ResponseEntity<Map<String, Object>> getCorporateCardCost(
@@ -112,14 +111,13 @@ public class CeoController {
         return ResponseEntity.ok(ceoService.getCorporateCardCost(userId));
     }
 
-    // 법카 내역 조회
     @ApiOperation(value = "법카 내역 조회", notes = "법카의 사용 내역을 보여줍니다.")
     @GetMapping("/corporateCard")
     public ResponseEntity<List<Object>> getCorporateCard(
             @RequestParam(required = false) String cursorDateTime,
             @ApiIgnore @UserId Long userId) {
 
-        List<CorporateCardDetailDto> list = ceoService.getCorporateCardReceipts(cursorDateTime, userId);
+        List<CorporateCardListlDto> list = ceoService.getCorporateCardReceipts(cursorDateTime, userId);
 
         String nextCursorDateTime = list.size() < 20 ? null :
                 list.get(list.size() - 1).getReceiptDateTime().toString();

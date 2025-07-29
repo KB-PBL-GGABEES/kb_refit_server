@@ -1,21 +1,22 @@
 package org.refit.spring.mapper;
 
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
-import org.refit.spring.ceo.dto.CorporateCardDetailDto;
+import org.apache.ibatis.annotations.*;
+import org.refit.spring.ceo.dto.CorporateCardListlDto;
 import org.refit.spring.ceo.entity.Ceo;
-import org.refit.spring.ceo.dto.ReceiptDetailDto;
-import org.refit.spring.ceo.entity.ReceiptDetail;
-import org.refit.spring.receipt.entity.Receipt;
+import org.refit.spring.ceo.dto.ReceiptListlDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 @Mapper
 public interface CeoMapper {
+
+    // 영수 처리 항목에 추가
+    @Insert("INSERT INTO receipt_process (process_state, ceo_id, created_at, receipt_id) VALUES ('none', #{ceoId}, now(), #{receiptId})")
+    void insertProcess(@Param("ceoId") Long ceoId, @Param("userId") Long userId, @Param("receiptId") Long receiptId);
+
+    @Select("SELECT ceo_id FROM company WHERE company_id = #{companyId}")
+    Long findCeoId(@Param("companyId") Long companyId);
 
     // 경비 처리가 필요한 내역 조회
     @Select("SELECT\n" +
@@ -48,20 +49,20 @@ public interface CeoMapper {
             "AND r.user_id = #{userId}")
     int countCompletedReceiptsThisMonth(@Param("userId") Long userId);
 
-
     // 경비 청구 항목 상세 조회
     @Select("SELECT \n" +
             "        u.user_id AS userId,\n" +
             "        u.name AS name,\n" +
             "        p.progress_type AS progressType,\n" +
             "        p.progress_detail AS progressDetail,\n" +
+            "        p.voucher,\n" +
             "        r.receipt_id AS receiptId\n" +
             "    FROM receipt r\n" +
             "    JOIN user u ON r.user_id = u.user_id\n" +
             "    JOIN receipt_process p ON r.receipt_id = p.receipt_id\n" +
             "    WHERE r.receipt_id = #{receiptId}\n" +
             "    LIMIT 1")
-    ReceiptDetailDto getReceiptDetail(
+    ReceiptListlDto getReceiptList(
             @Param("userId") Long userId,
             @Param("receiptId") Long receiptId);
 
@@ -152,7 +153,7 @@ public interface CeoMapper {
             "      SELECT company_id FROM employee WHERE user_id = #{userId} LIMIT 1)\n" +
             "  AND r.created_at < #{cursor}\n" +
             "ORDER BY r.created_at LIMIT 20")
-    List<CorporateCardDetailDto> getCorporateCardReceipts(
+    List<CorporateCardListlDto> getCorporateCardReceipts(
                     @Param("cursor") LocalDateTime cursor,
                     @Param("userId") Long userId);
 }

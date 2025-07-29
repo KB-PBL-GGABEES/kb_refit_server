@@ -1,8 +1,8 @@
 package org.refit.spring.ceo.service;
 
 import org.refit.spring.ceo.dto.CeoListDto;
-import org.refit.spring.ceo.dto.CorporateCardDetailDto;
-import org.refit.spring.ceo.dto.ReceiptDetailDto;
+import org.refit.spring.ceo.dto.CorporateCardListlDto;
+import org.refit.spring.ceo.dto.ReceiptListlDto;
 
 import java.util.List;
 import java.util.Map;
@@ -15,7 +15,7 @@ public interface CeoService {
     int countCompletedReceiptsThisMonth(Long userId);
 
     // 경비 청구 항목 상세 조회
-    ReceiptDetailDto getReceiptDetail(Long receipted, Long userId);
+    ReceiptListlDto getReceiptList(Long receipted, Long userId);
 
     // 경비 처리 완료 내역 조회
     List<CeoListDto> getCompletedReceipts(int period, String cursorDateTime, Long userId);
@@ -31,5 +31,5 @@ public interface CeoService {
     Map<String, Object> getCorporateCardCost(Long userId);
 
     // 법카 내역 조회
-    List<CorporateCardDetailDto> getCorporateCardReceipts(String cursorDateTime, Long userId);
+    List<CorporateCardListlDto> getCorporateCardReceipts(String cursorDateTime, Long userId);
 }

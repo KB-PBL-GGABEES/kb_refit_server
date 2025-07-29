@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CorporateCardDetail {
+public class CorporateCardList {
     private Long receiptId;         // 영수증
     private String companyName;     // 상호명
     private Long totalPrice;        // 주문 합계
