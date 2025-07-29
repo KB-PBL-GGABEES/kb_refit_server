@@ -1,5 +1,6 @@
 package org.refit.spring.hospital.controller;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 
@@ -10,10 +11,12 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+@Api(tags = "의료 영수증 API", description = "의료 영수증 관련 API입니다.")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/hospital")
@@ -24,7 +27,7 @@ public class HospitalController {
     // 병원 영수증 목록 조회 (커서 기반 페이지네이션)
     @ApiOperation(value = "의료비 납입 내역 조회", notes = "의료비 납입 내역을 조회할 수 있습니다.")
     @GetMapping("/list")
-    public ResponseEntity<?> getHospitalExpenses(@UserId Long userId,
+    public ResponseEntity<?> getHospitalExpenses(@ApiIgnore @UserId Long userId,
             @RequestParam(value = "cursorDate", required = false)
             @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date cursorDate) {
 
@@ -50,7 +53,7 @@ public class HospitalController {
     // 병원 영수증 상세 조회
     @ApiOperation(value = "의료비 납입 내역 상세 조회", notes = "의료비 납입 내역을 상세 조회할 수 있습니다.")
     @GetMapping("/detail")
-    public ResponseEntity<?> getHospitalExpenseDetail(@UserId Long userId,
+    public ResponseEntity<?> getHospitalExpenseDetail(@ApiIgnore @UserId Long userId,
             @RequestParam("receiptId") Long receiptId)
     {
 
@@ -67,7 +70,7 @@ public class HospitalController {
     // 최근 병원비 조회
     @ApiOperation(value = "최근 병원비 및 보험청구 가능 건수", notes = "최근 3년간 병원비 총액과 보험청구 가능한 건수를 조회합니다.")
     @GetMapping("/recent")
-    public ResponseEntity<?> getHospitalRecentInfo(@UserId Long userId) {
+    public ResponseEntity<?> getHospitalRecentInfo(@ApiIgnore @UserId Long userId) {
         HospitalRecentResponseDto result = hospitalService.getHospitalRecentInfo(userId);
 
         if (result == null) {
@@ -81,7 +84,7 @@ public class HospitalController {
     // 가입된 보험 목록 조회
     @ApiOperation(value = "가입된 보험 목록 조회", notes = "가입된 보험 목록을 조회할 수 있습니다.")
     @GetMapping("/insurance")
-    public ResponseEntity<?> findInsuranceSubscribeById(@UserId Long userId) {
+    public ResponseEntity<?> findInsuranceSubscribeById(@ApiIgnore @UserId Long userId) {
         List<InsuranceSubscribedResponseDto> result = hospitalService.findInsuranceSubscribeById(userId);
 
         if (result == null || result.isEmpty()) {
