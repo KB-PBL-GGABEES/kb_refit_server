@@ -1,9 +1,6 @@
 package org.refit.spring.mapper;
 
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.*;
 import org.refit.spring.ceo.entity.Ceo;
 import org.refit.spring.ceo.dto.ReceiptDetailDto;
 import org.refit.spring.receipt.entity.Receipt;

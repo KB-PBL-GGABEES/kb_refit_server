@@ -1,9 +1,11 @@
 package org.refit.spring.receipt.controller;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.refit.spring.auth.annotation.UserId;
 import org.refit.spring.auth.service.UserService;
+import org.refit.spring.receipt.dto.ReceiptDetailDto;
 import org.refit.spring.receipt.dto.ReceiptListDto;
 import org.refit.spring.receipt.dto.ReceiptRequestDto;
 import org.refit.spring.receipt.dto.ReceiptResponseDto;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 
+@Api(tags = "영수증 API", description = "영수증 등록 및 조회 관련 API입니다.")
 @RestController
 @RequestMapping("/api/receipt")
 @RequiredArgsConstructor
@@ -63,7 +66,7 @@ public class ReceiptController {
             @ApiIgnore @UserId Long userId,
             @RequestParam(required = false) Long cursorId,
             @RequestParam("receiptId") Long receiptId) {
-        Receipt receipt = receiptService.get(userId, cursorId, receiptId);
+        ReceiptDetailDto receipt = receiptService.get(userId, cursorId, receiptId);
         return ResponseEntity.ok(receipt);
     }
 
