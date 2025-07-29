@@ -116,7 +116,7 @@ public class ReceiptService {
     }
 
     @Transactional(readOnly = true)
-    public Receipt get(Long userId, Long cursorId, Long receiptId) {
+    public ReceiptDetailDto get(Long userId, Long cursorId, Long receiptId) {
         if (cursorId == null) cursorId = Long.MAX_VALUE;
 
         Receipt receipt = receiptMapper.get(userId, receiptId);
@@ -134,8 +134,22 @@ public class ReceiptService {
             dto.setAmount(content.getAmount());
             contentDtoList.add(dto);
         }
-        receipt.setContentList(contentDtoList);
-        return receipt;
+        return new ReceiptDetailDto(
+                receipt.getUserId(),
+                receipt.getReceiptId(),
+                receipt.getCompanyId(),
+                receiptMapper.getCompanyName(receipt.getCompanyId()),
+                receiptMapper.getCompanyAddress(receipt.getCompanyId()),
+                contentDtoList,
+                receipt.getTotalPrice(),
+                receipt.getSupplyPrice(),
+                receipt.getSurtax(),
+                receipt.getTransactionType(),
+                receipt.getCreatedAt(),
+                receiptMapper.getState(receiptId),
+                receiptMapper.getCardNumber(userId, receipt.getCardId()),
+                receiptMapper.getCorporate(userId, receipt.getCardId())
+        );
     }
 
 
