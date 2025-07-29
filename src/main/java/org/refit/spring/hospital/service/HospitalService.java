@@ -26,7 +26,12 @@ public class HospitalService {
 
     // 병원 영수증 상세 조회
     public HospitalExpenseDetailResponseDto findHospitalExpenseDetail(Long userId, Long receiptId) {
-        return hospitalMapper.findHospitalExpenseDetailByUserIdAndReceiptId(userId, receiptId);
+        List<HospitalExpenseDetailResponseDto> results =
+                hospitalMapper.findHospitalExpenseDetailByUserIdAndReceiptId(userId, receiptId);
+
+        if (results == null || results.isEmpty()) return null;
+
+        return results.get(0);
     }
 
     // 최근 병원비 조회
@@ -44,12 +49,12 @@ public class HospitalService {
     }
 
 
-    // 보험 청구 요청
-    public boolean requestInsuranceClaim(Long receiptId, Date sickedDate, String visitedReason, Long insuranceId, String processState) {
-        int updatedRows = hospitalMapper.updateInsuranceClaimRequest(
-                receiptId, sickedDate, visitedReason, insuranceId, processState);
-        return updatedRows > 0;
-    }
+//    // 보험 청구 요청
+//    public boolean requestInsuranceClaim(Long receiptId, Date sickedDate, String visitedReason, Long insuranceId, String processState) {
+//        int updatedRows = hospitalMapper.updateInsuranceClaimRequest(
+//                receiptId, sickedDate, visitedReason, insuranceId, processState);
+//        return updatedRows > 0;
+//    }
 }
 
 

@@ -3,6 +3,7 @@ package org.refit.spring.hospital.controller;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 
+import org.refit.spring.auth.annotation.UserId;
 import org.refit.spring.hospital.dto.*;
 import org.refit.spring.hospital.service.HospitalService;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -23,9 +24,7 @@ public class HospitalController {
     // 병원 영수증 목록 조회 (커서 기반 페이지네이션)
     @ApiOperation(value = "의료비 납입 내역 조회", notes = "의료비 납입 내역을 조회할 수 있습니다.")
     @GetMapping("/list")
-    public ResponseEntity<?> getHospitalExpenses(
-            @RequestParam("userId") Long userId,
-//            @UserId Long userId,
+    public ResponseEntity<?> getHospitalExpenses(@UserId Long userId,
             @RequestParam(value = "cursorDate", required = false)
             @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date cursorDate) {
 
@@ -38,7 +37,7 @@ public class HospitalController {
         }
 
         // 다음 커서 계산
-        Date nextCursor = (list.size() < 20) ? null : list.get(list.size() - 1).getCreatedAt();
+        Date nextCursor = (list.size() < 2) ? null : list.get(list.size() - 1).getCreatedAt();
         String nextCursorDateStr = (nextCursor != null) ? new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(nextCursor) : null;
 
         Map<String, Object> response = new HashMap<>();
@@ -51,10 +50,9 @@ public class HospitalController {
     // 병원 영수증 상세 조회
     @ApiOperation(value = "의료비 납입 내역 상세 조회", notes = "의료비 납입 내역을 상세 조회할 수 있습니다.")
     @GetMapping("/detail")
-    public ResponseEntity<?> getHospitalExpenseDetail(
-            @RequestParam("userId") Long userId,
-//            @UserId Long userId,
-            @RequestParam("receiptId") Long receiptId) {
+    public ResponseEntity<?> getHospitalExpenseDetail(@UserId Long userId,
+            @RequestParam("receiptId") Long receiptId)
+    {
 
         HospitalExpenseDetailResponseDto result = hospitalService.findHospitalExpenseDetail(userId, receiptId);
 
@@ -69,7 +67,7 @@ public class HospitalController {
     // 최근 병원비 조회
     @ApiOperation(value = "최근 병원비 및 보험청구 가능 건수", notes = "최근 3년간 병원비 총액과 보험청구 가능한 건수를 조회합니다.")
     @GetMapping("/recent")
-    public ResponseEntity<?> getHospitalRecentInfo(@RequestParam("userId") Long userId) {
+    public ResponseEntity<?> getHospitalRecentInfo(@UserId Long userId) {
         HospitalRecentResponseDto result = hospitalService.getHospitalRecentInfo(userId);
 
         if (result == null) {
@@ -83,42 +81,35 @@ public class HospitalController {
     // 가입된 보험 목록 조회
     @ApiOperation(value = "가입된 보험 목록 조회", notes = "가입된 보험 목록을 조회할 수 있습니다.")
     @GetMapping("/insurance")
-    public ResponseEntity<?> findInsuranceSubscribeById(
-            @RequestParam("userId") Long userId)
-//            @UserId Long userId)
-    {
+    public ResponseEntity<?> findInsuranceSubscribeById(@UserId Long userId) {
         List<InsuranceSubscribedResponseDto> result = hospitalService.findInsuranceSubscribeById(userId);
 
         if (result == null || result.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Collections.singletonMap("message", "해당 userId의 데이터가 존재하지 않습니다."));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Collections.singletonMap("message", "가입된 보험 정보가 없습니다."));
         }
 
         return ResponseEntity.ok(result);
     }
 
     // 보험 청구 요청
-    @ApiOperation(value = "보험 청구 요청", notes = "보험 청구를 요청합니다.")
-    @PostMapping("/insurance/claim")
-    public ResponseEntity<?> requestInsuranceClaim(
-            @RequestParam("userId") Long userId,
-            @RequestBody InsuranceClaimRequestDto requestDto) {
-
-        boolean success = hospitalService.requestInsuranceClaim(
-                requestDto.getReceiptId(),
-                requestDto.getSickedDate(),
-                requestDto.getVisitedReason(),
-                requestDto.getInsuranceId(),
-                requestDto.getProcessState()
-        );
-
-        if (!success) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Collections.singletonMap("message", "보험 청구 요청에 실패했습니다."));
-        }
-
-        return ResponseEntity.ok(Collections.singletonMap("message", "보험 청구 요청이 성공적으로 처리되었습니다."));
-    }
+//    @ApiOperation(value = "보험 청구 요청", notes = "보험 청구를 요청합니다.")
+//    @PostMapping("/insurance/claim")
+//    public ResponseEntity<?> requestInsuranceClaim(
+//            @UserId Long userId,
+//            @RequestBody InsuranceClaimRequestDto requestDto) {
+//        boolean success = hospitalService.requestInsuranceClaim(
+//                requestDto.getReceiptId(),
+//                requestDto.getSickedDate(),
+//                requestDto.getVisitedReason(),
+//                requestDto.getInsuranceId(),
+//                requestDto.getProcessState()
+//        );
+//        if (!success) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+//                    .body(Collections.singletonMap("message", "보험 청구 요청 실패: receiptId 또는 userId가 유효하지 않습니다."));
+//        }
+//        return ResponseEntity.ok(Collections.singletonMap("message", "보험 청구 요청이 완료되었습니다."));
+//    }
 }
-//
 
