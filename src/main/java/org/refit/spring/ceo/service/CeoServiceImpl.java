@@ -2,6 +2,7 @@ package org.refit.spring.ceo.service;
 
 import lombok.RequiredArgsConstructor;
 import org.refit.spring.ceo.dto.CeoListDto;
+import org.refit.spring.ceo.dto.CorporateCardDetailDto;
 import org.refit.spring.ceo.dto.ReceiptDetailDto;
 import org.refit.spring.mapper.CeoMapper;
 import org.springframework.stereotype.Service;
@@ -86,7 +87,13 @@ public class CeoServiceImpl implements CeoService {
         );
     }
 
-
-
     // 법카 내역 조회
+    @Override
+    public List<CorporateCardDetailDto> getCorporateCardReceipts(String cursorDateTime, Long userId) {
+        LocalDateTime cursor = (cursorDateTime == null)
+                ? LocalDateTime.now().plusDays(1)
+                : LocalDateTime.parse(cursorDateTime);
+
+        return ceoMapper.getCorporateCardReceipts(cursor, userId);
+    }
 }

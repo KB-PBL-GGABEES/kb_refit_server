@@ -4,8 +4,10 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
+import org.refit.spring.ceo.dto.CorporateCardDetailDto;
 import org.refit.spring.ceo.entity.Ceo;
 import org.refit.spring.ceo.dto.ReceiptDetailDto;
+import org.refit.spring.ceo.entity.ReceiptDetail;
 import org.refit.spring.receipt.entity.Receipt;
 
 import java.time.LocalDateTime;
@@ -61,7 +63,7 @@ public interface CeoMapper {
             "    LIMIT 1")
     ReceiptDetailDto getReceiptDetail(
             @Param("userId") Long userId,
-            Long receiptId);
+            @Param("receiptId") Long receiptId);
 
     // 경비 처리 완료 내역 조회
     @Select("SELECT\n" +
@@ -106,8 +108,7 @@ public interface CeoMapper {
                             @Param("userId") Long userId);
 
     // 이번 달 법카 사용 금액 조회
-    @Select("    SELECT\n" +
-            "        SUM(r.total_price) AS totalPrice\n" +
+    @Select("SELECT SUM(r.total_price) AS totalPrice\n" +
             "    FROM receipt r\n" +
             "    JOIN card c ON r.card_id = c.card_id\n" +
             "    JOIN employee e ON r.user_id = e.user_id\n" +
@@ -120,8 +121,7 @@ public interface CeoMapper {
     Long getCorporateCardCostThisMonth(@Param("ceoId") Long ceoId);
 
     // 지난달 법카 사용 금액 조회
-    @Select("SELECT\n" +
-            "        SUM(r.total_price) AS lastMonth\n" +
+    @Select("SELECT SUM(r.total_price) AS lastMonth\n" +
             "    FROM receipt r\n" +
             "    JOIN card c ON r.card_id = c.card_id\n" +
             "    JOIN employee e ON r.user_id = e.user_id\n" +
@@ -134,6 +134,25 @@ public interface CeoMapper {
     Long getCorporateCardCostLastMonth(@Param("ceoId") Long ceoId);
 
     // 법카 내역 조회
-
-
+    @Select("SELECT \n" +
+            "    r.receipt_id,\n" +
+            "    r.total_price,\n" +
+            "    r.created_at AS receipt_date_time,\n" +
+            "    cp.company_name,\n" +
+            "    rp.process_state,\n" +
+            "    r.card_id, \n" +
+            "    c.is_corporate AS corporate \n" +
+            "FROM receipt r\n" +
+            "JOIN card c ON r.card_id = c.card_id\n" +
+            "JOIN employee e ON r.user_id = e.user_id\n" +
+            "JOIN company cp ON r.company_id = cp.company_id\n" +
+            "LEFT JOIN receipt_process rp ON r.receipt_id = rp.receipt_id\n" +
+            "WHERE c.is_corporate = TRUE\n" +
+            "  AND e.company_id = (\n" +
+            "      SELECT company_id FROM employee WHERE user_id = #{userId} LIMIT 1)\n" +
+            "  AND r.created_at < #{cursor}\n" +
+            "ORDER BY r.created_at LIMIT 20")
+    List<CorporateCardDetailDto> getCorporateCardReceipts(
+                    @Param("cursor") LocalDateTime cursor,
+                    @Param("userId") Long userId);
 }
