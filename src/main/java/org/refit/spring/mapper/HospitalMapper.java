@@ -68,8 +68,7 @@ public interface HospitalMapper {
             "AND cat.category_id = 1")
     List<HospitalExpenseDetailResponseDto> findHospitalExpenseDetailByUserIdAndReceiptId(
             @Param("userId") Long userId,
-            @Param("receiptId") Long receiptId
-    );
+            @Param("receiptId") Long receiptId);
     
     // 최근 병원비 조회
     @Select("SELECT EXISTS(SELECT 1 FROM receipt WHERE user_id = #{userId})")
@@ -105,12 +104,24 @@ public interface HospitalMapper {
            "WHERE r.receipt_id = #{receiptId} AND r.user_id = #{userId} AND cat.category_id = 1")
    InsuranceVisit findHospitalVisitInfo(@Param("userId") Long userId, @Param("receiptId") Long receiptId);
 
+
+    // 보험이 none인 경우에만 보험 청구 가능
+    @Select("SELECT process_state FROM hospital_process WHERE receipt_id = #{receiptId}")
+    String findProcessStateByReceiptId(@Param("receiptId") Long receiptId);
+
+   // 보험 청구 내용 수정 (state=none일 때만)
+    @Update("UPDATE hospital_process " +
+            "SET process_state = #{processState}, sicked_date = #{sickedDate}, visited_reason = #{visitedReason}, insurance_id = #{insuranceId} " +
+            "WHERE receipt_id = #{receiptId}")
+    void updateInsuranceClaim(InsuranceClaimRequestDto dto);
+
    // 보험 가입 여부 확인용 메서드
     @Select("SELECT COUNT(*) > 0 " +
             "FROM insurance " +
             "WHERE insurance_id = #{insuranceId} AND user_id = #{userId}")
     boolean existsUserInsurance(@Param("userId") Long userId,
                                 @Param("insuranceId") Long insuranceId);
+
 
     // 보험 청구_POST
     @Insert("INSERT INTO hospital_process (process_state, sicked_date, visited_reason, receipt_id, insurance_id) " +

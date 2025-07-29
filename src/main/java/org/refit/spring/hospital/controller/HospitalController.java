@@ -96,6 +96,7 @@ public class HospitalController {
     }
 
     // 보험 청구_방문 정보
+    @ApiOperation(value = "보험 청구 요청-방문 정보 조회", notes = "보험 청구 페이지에서 병원 방문 정보 조회를 할 수 있습니다.")
     @GetMapping("/insurance/claim")
     public ResponseEntity<?> getHospitalVisitInfo(
             @ApiIgnore @UserId Long userId,
@@ -111,6 +112,7 @@ public class HospitalController {
         return ResponseEntity.ok(result);
     }
     // 보험 청구_POST
+    @ApiOperation(value = "보험 청구 요청", notes = "보험 청구 페이지에서 보험 청구를 요청할 수 있습니다.")
     @PostMapping("/insurance/claim")
     public ResponseEntity<?> claimInsurance(@ApiIgnore @UserId Long userId,
                                             @RequestBody InsuranceClaimRequestDto dto) {
