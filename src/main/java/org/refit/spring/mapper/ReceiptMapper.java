@@ -48,4 +48,11 @@ public interface ReceiptMapper {
 
     @Select("SELECT is_corporate FROM card WHERE user_id = #{userId} AND card_id = #{cardId}")
     Integer getCorporate(@Param("userId") Long userId, @Param("cardId") Long cardId);
+
+    @Select("SELECT r.* FROM receipt_progress rp " +
+            "INNER JOIN receipt r ON rp.receipt_id = r.receipt_id " +
+            "INNER JOIN card c  ON r.card_id = c.card_id " +
+            "INNER JOIN user u ON c.user_id = u.user_id " +
+            "WHERE user_id = #{userId} AND c.is_corporate = 1 AND rp.process_state = 'rejected'")
+    List<Receipt> findRejected(@Param("userId") Long userId);
 }

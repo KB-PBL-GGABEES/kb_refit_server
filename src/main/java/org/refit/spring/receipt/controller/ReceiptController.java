@@ -76,4 +76,9 @@ public class ReceiptController {
         return ResponseEntity.ok(receiptService.getTotal(userId));
     }
 
+    @ApiOperation(value = "법인 처리 불가 항목 조회", notes = "법인 카드를 사용했으나, 처리가 불가한 항목을 확인합니다.")
+    @GetMapping("/getRejected")
+    public ResponseEntity<?> getRejected(@ApiIgnore @UserId Long userId) {
+        return ResponseEntity.ok(receiptService.getRejected(userId));
+    }
 }
