@@ -95,24 +95,37 @@ public class HospitalController {
         return ResponseEntity.ok(result);
     }
 
-    // 보험 청구 요청
-//    @ApiOperation(value = "보험 청구 요청", notes = "보험 청구를 요청합니다.")
-//    @PostMapping("/insurance/claim")
-//    public ResponseEntity<?> requestInsuranceClaim(
-//            @UserId Long userId,
-//            @RequestBody InsuranceClaimRequestDto requestDto) {
-//        boolean success = hospitalService.requestInsuranceClaim(
-//                requestDto.getReceiptId(),
-//                requestDto.getSickedDate(),
-//                requestDto.getVisitedReason(),
-//                requestDto.getInsuranceId(),
-//                requestDto.getProcessState()
-//        );
-//        if (!success) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-//                    .body(Collections.singletonMap("message", "보험 청구 요청 실패: receiptId 또는 userId가 유효하지 않습니다."));
-//        }
-//        return ResponseEntity.ok(Collections.singletonMap("message", "보험 청구 요청이 완료되었습니다."));
-//    }
+    // 보험 청구_방문 정보
+    @GetMapping("/insurance/claim")
+    public ResponseEntity<?> getHospitalVisitInfo(
+            @ApiIgnore @UserId Long userId,
+            @RequestParam Long receiptId) {
+
+        InsuranceVisit result = hospitalService.getHospitalVisitInfo(userId, receiptId);
+
+        if (result == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Collections.singletonMap("message", "해당 영수증 정보를 찾을 수 없습니다."));
+        }
+
+        return ResponseEntity.ok(result);
+    }
+    // 보험 청구_POST
+    @PostMapping("/insurance/claim")
+    public ResponseEntity<?> claimInsurance(@ApiIgnore @UserId Long userId,
+                                            @RequestBody InsuranceClaimRequestDto dto) {
+        try {
+            hospitalService.insertInsuranceClaim(dto, userId);
+
+            Map<String, String> successMap = new HashMap<>();
+            successMap.put("message", "보험 청구가 완료되었습니다.");
+            return ResponseEntity.status(HttpStatus.CREATED).body(successMap);
+
+        } catch (IllegalArgumentException e) {
+            Map<String, String> errorMap = new HashMap<>();
+            errorMap.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMap);
+        }
+    }
 }
 

@@ -1,13 +1,7 @@
 package org.refit.spring.mapper;
 
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
-import org.refit.spring.hospital.dto.HospitalExpenseDetailResponseDto;
-import org.refit.spring.hospital.dto.HospitalExpenseResponseDto;
-import org.refit.spring.hospital.dto.HospitalRecentResponseDto;
-import org.refit.spring.hospital.dto.InsuranceSubscribedResponseDto;
+import org.apache.ibatis.annotations.*;
+import org.refit.spring.hospital.dto.*;
 
 import java.util.List;
 import java.util.Date;
@@ -85,7 +79,6 @@ public interface HospitalMapper {
             "COALESCE(SUM(r.total_price), 0) AS recentTotalPrice, " +
             "COUNT(CASE " +
             "  WHEN (hp.insurance_id IS NULL OR hp.process_state IS NULL OR hp.process_state = 'none') THEN 1 " +
-            "  ELSE NULL " +
             "END) AS insuranceBillable " +
             "FROM receipt r " +
             "JOIN company c ON r.company_id = c.company_id " +
@@ -104,21 +97,24 @@ public interface HospitalMapper {
             "WHERE user_id = #{userId}")
     List<InsuranceSubscribedResponseDto> findByInsuranceSubscribeId(@Param("userId") Long userId);
 
-//    // 보험 청구 요청
-//    @Select("SELECT EXISTS(SELECT 1 FROM receipt WHERE receipt_id = #{receiptId} AND user_id = #{userId})")
-//    boolean validateReceiptOwnership(@Param("userId") Long userId, @Param("receiptId") Long receiptId);
-//
-//    // 보험 청구 요청 정보 업데이트
-//    @Update("UPDATE hospital_process SET " +
-//            "insurance_id = #{insuranceId}, " +
-//            "sicked_date = #{sickedDate}, " +
-//            "visited_reason = #{visitedReason}, " +
-//            "process_state = #{processState} " +
-//            "WHERE receipt_id = #{receiptId}")
-//    int updateInsuranceClaimRequest(
-//            @Param("receiptId") Long receiptId,
-//            @Param("sickedDate") Date sickedDate,
-//            @Param("visitedReason") String visitedReason,
-//            @Param("insuranceId") Long insuranceId,
-//            @Param("processState") String processState);
+   // 보험 청구_방문 정보
+   @Select("SELECT c.company_name AS hospitalName, r.created_at AS createdAt " +
+           "FROM receipt r " +
+           "JOIN company c ON r.company_id = c.company_id " +
+           "JOIN categories cat ON c.category_id = cat.category_id " +
+           "WHERE r.receipt_id = #{receiptId} AND r.user_id = #{userId} AND cat.category_id = 1")
+   InsuranceVisit findHospitalVisitInfo(@Param("userId") Long userId, @Param("receiptId") Long receiptId);
+
+   // 보험 가입 여부 확인용 메서드
+    @Select("SELECT COUNT(*) > 0 " +
+            "FROM insurance " +
+            "WHERE insurance_id = #{insuranceId} AND user_id = #{userId}")
+    boolean existsUserInsurance(@Param("userId") Long userId,
+                                @Param("insuranceId") Long insuranceId);
+
+    // 보험 청구_POST
+    @Insert("INSERT INTO hospital_process (process_state, sicked_date, visited_reason, receipt_id, insurance_id) " +
+            "VALUES ('inProgress', #{sickedDate}, #{visitedReason}, #{receiptId}, #{insuranceId})")
+    void insertInsuranceClaim(InsuranceClaimRequestDto dto);
+
 }
