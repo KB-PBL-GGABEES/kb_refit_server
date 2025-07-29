@@ -1,5 +1,6 @@
 package org.refit.spring.reward.controller;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.refit.spring.auth.annotation.UserId;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+@Api(tags = "리워드 API", description = "리워드 내역과 메인 화면용 포인트 리스트 관련 API입니다.")
 @RestController
 @RequestMapping("/api/reward")
 @RequiredArgsConstructor
