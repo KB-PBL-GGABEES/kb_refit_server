@@ -3,13 +3,11 @@ package org.refit.spring.reward.controller;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.refit.spring.auth.annotation.UserId;
-import org.refit.spring.auth.entity.User;
-import org.refit.spring.auth.service.UserService;
 import org.refit.spring.reward.dto.RewardListDto;
 import org.refit.spring.reward.dto.RewardResponseDto;
+import org.refit.spring.reward.dto.RewardWalletRequestDto;
+import org.refit.spring.reward.dto.RewardWalletResponseDto;
 import org.refit.spring.reward.service.RewardService;
-import org.refit.spring.security.jwt.JwtTokenProvider;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -35,6 +33,15 @@ public class RewardController {
     public ResponseEntity<?> getTotalPoint(
             @ApiIgnore @UserId Long userId) {
         RewardResponseDto dto = rewardService.getTotal(userId);
+        return ResponseEntity.ok(dto);
+    }
+
+    @ApiOperation(value = "지갑 상점 구매", notes = "상점에서 포인트로 지갑을 구매하면 포인트가 차감되고 보유 지갑 브랜드 테이블에 추가됩니다.")
+    @PostMapping("/purchase")
+    public ResponseEntity<?> getWallet(
+            @ApiIgnore @UserId Long userId,
+            @RequestBody RewardWalletRequestDto rewardWalletRequestDto) {
+        RewardWalletResponseDto dto = rewardService.purchaseWallet(userId, rewardWalletRequestDto);
         return ResponseEntity.ok(dto);
     }
 }
