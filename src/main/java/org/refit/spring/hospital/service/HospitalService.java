@@ -1,10 +1,7 @@
 package org.refit.spring.hospital.service;
 
 import lombok.RequiredArgsConstructor;
-import org.refit.spring.hospital.dto.HospitalExpenseDetailResponseDto;
-import org.refit.spring.hospital.dto.HospitalExpenseResponseDto;
-import org.refit.spring.hospital.dto.HospitalRecentResponseDto;
-import org.refit.spring.hospital.dto.InsuranceSubscribedResponseDto;
+import org.refit.spring.hospital.dto.*;
 import org.refit.spring.mapper.HospitalMapper;
 import org.springframework.stereotype.Service;
 
@@ -49,12 +46,26 @@ public class HospitalService {
     }
 
 
-//    // 보험 청구 요청
-//    public boolean requestInsuranceClaim(Long receiptId, Date sickedDate, String visitedReason, Long insuranceId, String processState) {
-//        int updatedRows = hospitalMapper.updateInsuranceClaimRequest(
-//                receiptId, sickedDate, visitedReason, insuranceId, processState);
-//        return updatedRows > 0;
-//    }
+    // 보험 청구_방문 정보
+    public InsuranceVisit getHospitalVisitInfo(Long userId, Long receiptId) {
+        return hospitalMapper.findHospitalVisitInfo(userId, receiptId);
+    }
+
+    // 보험 청구_POST
+    public void insertInsuranceClaim(InsuranceClaimRequestDto dto, Long userId) {
+        boolean isSubscribed = hospitalMapper.existsUserInsurance(userId, dto.getInsuranceId());
+
+        if (!isSubscribed) {
+            throw new IllegalArgumentException("가입된 보험이 없거나 유효하지 않습니다.");
+        }
+
+        // 기본값 처리 (필요 시)
+        if (dto.getProcessState() == null || dto.getProcessState().trim().isEmpty()){
+            dto.setProcessState("inProgress");
+        }
+
+        hospitalMapper.insertInsuranceClaim(dto);
+    }
 }
 
 
