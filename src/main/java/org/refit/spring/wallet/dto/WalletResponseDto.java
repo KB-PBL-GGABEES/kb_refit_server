@@ -59,7 +59,6 @@ public class WalletResponseDto {
         private Long walletCost;
         private boolean isOwned; // 지갑 보유 여부
         private boolean isMounted; // 착용여부
-        private String brandIntroduce;
 
         public static WalletBrandDetailDto from(WalletBrand brand, User user, PersonalWalletBrand personalWalletBrand, boolean isOwned) {
             return WalletBrandDetailDto.builder()
@@ -70,7 +69,6 @@ public class WalletResponseDto {
                     .walletCost(brand.getWalletCost())
                     .isOwned(isOwned)
                     .isMounted(personalWalletBrand.isMounted())
-                    .brandIntroduce(brand.getBrandIntroduce())
                     .build();
         }
     }

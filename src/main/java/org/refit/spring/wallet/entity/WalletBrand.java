@@ -14,5 +14,4 @@ public class WalletBrand {
     private String brandImage;
     private String brandName;
     private Long walletCost;
-    private String brandIntroduce;
 }
