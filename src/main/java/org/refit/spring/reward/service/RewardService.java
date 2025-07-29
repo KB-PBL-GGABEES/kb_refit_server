@@ -7,6 +7,8 @@ import org.refit.spring.mapper.RewardMapper;
 import org.refit.spring.mapper.UserMapper;
 import org.refit.spring.reward.dto.RewardListDto;
 import org.refit.spring.reward.dto.RewardResponseDto;
+import org.refit.spring.reward.dto.RewardWalletRequestDto;
+import org.refit.spring.reward.dto.RewardWalletResponseDto;
 import org.refit.spring.reward.entity.Reward;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,5 +59,27 @@ public class RewardService {
         dto.setTotalStarPoint(user.getTotalStarPoint());
         dto.setCategory(rewardMapper.getCategory(userId));
         return dto;
+    }
+
+    @Transactional
+    public RewardWalletResponseDto purchaseWallet(Long userId, RewardWalletRequestDto dto) {
+        if (rewardMapper.checkPossess(userId, dto.getWalletId())) {
+            throw new IllegalStateException("이미 보유 중인 지갑입니다.");
+        }
+        RewardWalletResponseDto responseDto = new RewardWalletResponseDto();
+        responseDto.setUserId(userId);
+        responseDto.setWalletId(dto.getWalletId());
+        Long cost = rewardMapper.getCost(dto.getWalletId());
+        responseDto.setWalletCost(cost);
+        User user = userMapper.findByUserId(userId);
+        Long userPoint = user.getTotalStarPoint();
+        if (userPoint < cost) {
+            throw new IllegalStateException("보유 포인트가 부족합니다.");
+        }
+        responseDto.setTotalStarPoint(userPoint - cost);
+        rewardMapper.updateStarPoint(userId, userPoint - cost);
+        rewardMapper.createPersonal(userId, dto.getWalletId());
+
+        return responseDto;
     }
  }
