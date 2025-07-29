@@ -81,4 +81,12 @@ public class ReceiptController {
     public ResponseEntity<?> getRejected(@ApiIgnore @UserId Long userId) {
         return ResponseEntity.ok(receiptService.getRejected(userId));
     }
+
+    @ApiOperation(value = "계좌 이체 후 완료 처리", notes = "법인 처리 불가 항목을 계좌이체 완료 하였을 시 상태를 deposit으로 변경합니다.")
+    @PatchMapping("/completeDeposit")
+    public ResponseEntity<?> changeState(@ApiIgnore @UserId Long userId,
+                                         @RequestBody Long receiptProcessId) {
+        receiptService.changeState(userId, receiptProcessId);
+        return ResponseEntity.ok().build();
+    }
 }
