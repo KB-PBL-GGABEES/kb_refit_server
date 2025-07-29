@@ -1,6 +1,7 @@
 package org.refit.spring.ceo.service;
 
 import org.refit.spring.ceo.dto.CeoListDto;
+import org.refit.spring.ceo.dto.CorporateCardDetailDto;
 import org.refit.spring.ceo.dto.ReceiptDetailDto;
 
 import java.util.List;
@@ -30,4 +31,5 @@ public interface CeoService {
     Map<String, Object> getCorporateCardCost(Long userId);
 
     // 법카 내역 조회
+    List<CorporateCardDetailDto> getCorporateCardReceipts(String cursorDateTime, Long userId);
 }
