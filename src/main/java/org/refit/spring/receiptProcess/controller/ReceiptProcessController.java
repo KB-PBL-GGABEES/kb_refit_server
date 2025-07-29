@@ -3,6 +3,7 @@ package org.refit.spring.receiptProcess.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import org.refit.spring.auth.annotation.UserId;
 import org.refit.spring.receiptProcess.dto.CheckCompanyResponseDto;
 import org.refit.spring.receiptProcess.dto.ReceiptProcessRequestDto;
 import org.refit.spring.receiptProcess.dto.ReceiptSelectDto;
@@ -10,6 +11,7 @@ import org.refit.spring.receiptProcess.service.ReceiptProcessService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Collections;
 import java.util.List;
@@ -24,8 +26,8 @@ public class ReceiptProcessController {
 
 
     @ApiOperation(value = "사업장 선택 조회", notes = "사업장을 조회할 수 있습니다.")
-    @GetMapping
-    public ResponseEntity<?> getCompanySelectionList(@RequestParam("userId") Long userId) {
+    @GetMapping("/select")
+    public ResponseEntity<?> getCompanySelectionList(@ApiIgnore @UserId Long userId) {
         try {
             List<ReceiptSelectDto> companyList = receiptProcessService.getCompanySelectionListByUserId(userId);
             if (companyList == null || companyList.isEmpty()) {
@@ -40,7 +42,7 @@ public class ReceiptProcessController {
     }
 
     @ApiOperation(value = "영수 처리 정보 조회", notes = "영수 처리 정보를 조회할 수 있습니다.")
-    @GetMapping("/check")
+    @GetMapping
     public ResponseEntity<?> getCompanyId(@RequestParam("companyName") String companyName,
                                           @RequestParam("address") String address) {
         try {
