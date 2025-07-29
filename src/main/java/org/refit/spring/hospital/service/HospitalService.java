@@ -53,18 +53,31 @@ public class HospitalService {
 
     // 보험 청구_POST
     public void insertInsuranceClaim(InsuranceClaimRequestDto dto, Long userId) {
-        boolean isSubscribed = hospitalMapper.existsUserInsurance(userId, dto.getInsuranceId());
+        // 1. 이미 hospital_process 존재하는지 확인
+        String existingState = hospitalMapper.findProcessStateByReceiptId(dto.getReceiptId());
 
-        if (!isSubscribed) {
-            throw new IllegalArgumentException("가입된 보험이 없거나 유효하지 않습니다.");
+        if (existingState != null && !existingState.equalsIgnoreCase("none")) {
+            throw new IllegalArgumentException("이미 보험 청구가 접수된 영수증입니다.");
         }
 
-        // 기본값 처리 (필요 시)
-        if (dto.getProcessState() == null || dto.getProcessState().trim().isEmpty()){
+        // 2. 보험 가입 여부 확인
+        boolean isSubscribed = hospitalMapper.existsUserInsurance(userId, dto.getInsuranceId());
+        if (!isSubscribed) {
+            throw new IllegalArgumentException("가입된 보험에 가입되어 있지 않습니다.");
+        }
+
+        // 3. 기본값 처리
+        if (dto.getProcessState() == null || dto.getProcessState().trim().isEmpty()) {
             dto.setProcessState("inProgress");
         }
-
-        hospitalMapper.insertInsuranceClaim(dto);
+        // 4. INSERT or UPDATE
+        if (existingState != null) {
+            // 기존 hospital_process가 있지만 상태가 none이면 갱신
+            hospitalMapper.updateInsuranceClaim(dto);
+        } else {
+            // 신규 청구
+            hospitalMapper.insertInsuranceClaim(dto);
+        }
     }
 }
 
