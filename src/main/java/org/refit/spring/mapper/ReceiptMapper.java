@@ -33,4 +33,19 @@ public interface ReceiptMapper {
 
     @Select("SELECT IFNULL(SUM(total_price), 0) FROM receipt WHERE user_id = #{userId} AND MONTH(created_at) = MONTH(DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH)) AND YEAR(created_at) = YEAR(DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH))")
     Long getLastMonthTotal(@Param("userId") Long userId);
+
+    @Select("SELECT company_name FROM company WHERE company_id = #{companyId}")
+    String getCompanyName(@Param("companyId") Long companyId);
+
+    @Select("SELECT address FROM company WHERE company_id = #{companyId}")
+    String getCompanyAddress(@Param("companyId") Long companyId);
+
+    @Select("SELECT process_state FROM receipt_process WHERE receipt_id = #{receiptId}")
+    String getState(@Param("receiptId") Long receiptId);
+
+    @Select("SELECT card_number FROM card WHERE user_id = #{userId} AND card_id = #{cardId}")
+    String getCardNumber(@Param("userId") Long userId, @Param("cardId") Long cardId);
+
+    @Select("SELECT is_corporate FROM card WHERE user_id = #{userId} AND card_id = #{cardId}")
+    Integer getCorporate(@Param("userId") Long userId, @Param("cardId") Long cardId);
 }
