@@ -64,7 +64,7 @@ public class RewardService {
     @Transactional
     public RewardWalletResponseDto purchaseWallet(Long userId, RewardWalletRequestDto dto) {
         if (rewardMapper.checkPossess(userId, dto.getWalletId())) {
-            throw new IllegalStateException("이미 보유 중인 지갑입니다.");
+            throw new IllegalArgumentException("이미 보유 중인 지갑입니다.");
         }
         RewardWalletResponseDto responseDto = new RewardWalletResponseDto();
         responseDto.setUserId(userId);
@@ -74,7 +74,7 @@ public class RewardService {
         User user = userMapper.findByUserId(userId);
         Long userPoint = user.getTotalStarPoint();
         if (userPoint < cost) {
-            throw new IllegalStateException("보유 포인트가 부족합니다.");
+            throw new IllegalArgumentException("보유 포인트가 부족합니다.");
         }
         responseDto.setTotalStarPoint(userPoint - cost);
         rewardMapper.updateStarPoint(userId, userPoint - cost);
