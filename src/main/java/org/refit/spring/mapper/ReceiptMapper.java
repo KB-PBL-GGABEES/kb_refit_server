@@ -53,7 +53,17 @@ public interface ReceiptMapper {
             "INNER JOIN receipt r ON rp.receipt_id = r.receipt_id " +
             "INNER JOIN card c  ON r.card_id = c.card_id " +
             "INNER JOIN user u ON c.user_id = u.user_id " +
-            "WHERE c.user_id = #{userId} AND c.is_corporate = 1 AND rp.process_state = 'rejected'")
+            "WHERE c.user_id = #{userId} AND c.is_corporate = 1 AND rp.process_state = 'rejected' " +
+            "ORDER BY receipt_process_id DESC")
     List<Receipt> findRejected(@Param("userId") Long userId);
 
+    @Update("UPDATE receipt_process rp SET rp.process_state = 'deposit' " +
+            "WHERE rp.receipt_process_id = #{receiptProcessId} " +
+            "AND EXISTS (SELECT 1 FROM receipt r " +
+            "INNER JOIN card c ON r.card_id = c.card_id "+
+            "WHERE c.user_id = #{userId} " +
+            "AND r.receipt_id = rp.receipt_id " +
+            "AND rp.process_state = 'rejected')")
+    int updateProcessState(@Param("userId") Long userId,
+                            @Param("receiptProcessId") Long receiptProcessId);
 }

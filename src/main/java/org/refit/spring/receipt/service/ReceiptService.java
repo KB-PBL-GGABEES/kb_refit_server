@@ -9,8 +9,10 @@ import org.refit.spring.merchandise.entity.Merchandise;
 import org.refit.spring.receipt.dto.*;
 import org.refit.spring.receipt.entity.Receipt;
 import org.refit.spring.receipt.entity.ReceiptContent;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -169,5 +171,10 @@ public class ReceiptService {
     public RejectedListDto getRejected(Long userId) {
         List<Receipt> list = receiptMapper.findRejected(userId);
         return new RejectedListDto(list);
+    }
+
+    public void changeState(Long userId, Long receiptProcessId) {
+        int update = receiptMapper.updateProcessState(userId, receiptProcessId);
+        if (update == 0) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 영수증은 처리 대상이 아닙니다.");
     }
 }
