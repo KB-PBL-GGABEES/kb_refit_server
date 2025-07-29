@@ -30,7 +30,7 @@ public interface HospitalMapper {
             "WHERE r.user_id = #{userId} " +
             "AND cat.category_id = 1 " +
             "ORDER BY r.created_at DESC " +
-            "LIMIT 20")
+            "LIMIT 2")
     List<HospitalExpenseResponseDto> findFirstPage(@Param("userId") Long userId);
 
     // 커서 이후 페이지: created_at < cursorDate
@@ -47,7 +47,7 @@ public interface HospitalMapper {
             "AND cat.category_id = 1 " +
             "AND r.created_at < #{cursorDate} " +
             "ORDER BY r.created_at DESC " +
-            "LIMIT 20")
+            "LIMIT 2")
     List<HospitalExpenseResponseDto> findByCursorDate(@Param("userId") Long userId, @Param("cursorDate") Date cursorDate);
 
     // 의료비 납입 내역 상세 조회
@@ -72,7 +72,7 @@ public interface HospitalMapper {
             "WHERE r.user_id = #{userId} " +
             "AND r.receipt_id = #{receiptId} " +
             "AND cat.category_id = 1")
-    HospitalExpenseDetailResponseDto findHospitalExpenseDetailByUserIdAndReceiptId(
+    List<HospitalExpenseDetailResponseDto> findHospitalExpenseDetailByUserIdAndReceiptId(
             @Param("userId") Long userId,
             @Param("receiptId") Long receiptId
     );
@@ -104,21 +104,21 @@ public interface HospitalMapper {
             "WHERE user_id = #{userId}")
     List<InsuranceSubscribedResponseDto> findByInsuranceSubscribeId(@Param("userId") Long userId);
 
-    // 보험 청구 요청
-    @Select("SELECT EXISTS(SELECT 1 FROM receipt WHERE receipt_id = #{receiptId} AND user_id = #{userId})")
-    boolean validateReceiptOwnership(@Param("userId") Long userId, @Param("receiptId") Long receiptId);
-
-    // 보험 청구 요청 정보 업데이트
-    @Update("UPDATE hospital_process SET " +
-            "insurance_id = #{insuranceId}, " +
-            "sicked_date = #{sickedDate}, " +
-            "visited_reason = #{visitedReason}, " +
-            "process_state = #{processState} " +
-            "WHERE receipt_id = #{receiptId}")
-    int updateInsuranceClaimRequest(
-            @Param("receiptId") Long receiptId,
-            @Param("sickedDate") Date sickedDate,
-            @Param("visitedReason") String visitedReason,
-            @Param("insuranceId") Long insuranceId,
-            @Param("processState") String processState);
+//    // 보험 청구 요청
+//    @Select("SELECT EXISTS(SELECT 1 FROM receipt WHERE receipt_id = #{receiptId} AND user_id = #{userId})")
+//    boolean validateReceiptOwnership(@Param("userId") Long userId, @Param("receiptId") Long receiptId);
+//
+//    // 보험 청구 요청 정보 업데이트
+//    @Update("UPDATE hospital_process SET " +
+//            "insurance_id = #{insuranceId}, " +
+//            "sicked_date = #{sickedDate}, " +
+//            "visited_reason = #{visitedReason}, " +
+//            "process_state = #{processState} " +
+//            "WHERE receipt_id = #{receiptId}")
+//    int updateInsuranceClaimRequest(
+//            @Param("receiptId") Long receiptId,
+//            @Param("sickedDate") Date sickedDate,
+//            @Param("visitedReason") String visitedReason,
+//            @Param("insuranceId") Long insuranceId,
+//            @Param("processState") String processState);
 }
