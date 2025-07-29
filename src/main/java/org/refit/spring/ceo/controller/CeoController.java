@@ -1,9 +1,11 @@
 package org.refit.spring.ceo.controller;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.refit.spring.auth.annotation.UserId;
 import org.refit.spring.ceo.dto.CeoListDto;
+import org.refit.spring.ceo.dto.CorporateCardDetailDto;
 import org.refit.spring.ceo.dto.EmailRequestDto;
 import org.refit.spring.ceo.dto.ReceiptDetailDto;
 import org.refit.spring.ceo.service.CeoService;
@@ -11,11 +13,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@Api(tags = "사장님 API", description = "영수 처리 및 법인카드 관련 API입니다.")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/ceo")
@@ -114,7 +116,20 @@ public class CeoController {
     @ApiOperation(value = "법카 내역 조회", notes = "법카의 사용 내역을 보여줍니다.")
     @GetMapping("/corporateCard")
     public ResponseEntity<List<Object>> getCorporateCard(
+            @RequestParam(required = false) String cursorDateTime,
             @ApiIgnore @UserId Long userId) {
-        return null;
+
+        List<CorporateCardDetailDto> list = ceoService.getCorporateCardReceipts(cursorDateTime, userId);
+
+        String nextCursorDateTime = list.size() < 20 ? null :
+                list.get(list.size() - 1).getReceiptDateTime().toString();
+
+        List<Object> response = new ArrayList<>(list);
+
+        Map<String, Object> cursorMap = new java.util.HashMap<>();
+        cursorMap.put("cursorId", nextCursorDateTime);
+        response.add(cursorMap);
+
+        return ResponseEntity.ok(response);
     }
 }
