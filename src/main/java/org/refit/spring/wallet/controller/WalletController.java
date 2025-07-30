@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Api(tags = "전자지갑 API", description = "뱃지 및 지갑 디자인 관련 API입니다.")
@@ -107,8 +108,20 @@ public class WalletController {
             walletService.saveCurrentWornBadgesAsPreset(userId, request.getPresetName());
             return ResponseEntity.ok().build(); //200
         } catch (IllegalStateException e) {
-            return ResponseEntity.internalServerError().build(); //500
+            return ResponseEntity.badRequest().build();
         }
+    }
+
+    @ApiOperation(value = "뱃지 프리셋 조회", notes = "현재 로그인한 유저의 뱃지 프리셋 목록을 조회합니다.")
+    @GetMapping("/badge/preset")
+    public ResponseEntity<?> savePreset(@ApiIgnore @UserId Long userId) {
+        List<BadgeResponseDto.BadgePresetListDto> result = walletService.getMyBadgePresets(userId);
+
+        if (result.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(result);
     }
 
 }

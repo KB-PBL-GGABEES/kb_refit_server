@@ -2,6 +2,8 @@ package org.refit.spring.wallet.dto;
 
 import lombok.*;
 import org.refit.spring.wallet.entity.Badge;
+import org.refit.spring.wallet.entity.BadgePreset;
+import org.refit.spring.wallet.entity.BadgePresetDetail;
 import org.refit.spring.wallet.entity.PersonalBadge;
 
 import java.util.List;
@@ -118,6 +120,40 @@ public class BadgeResponseDto {
                     .badgeId(personalBadge.getBadgeId())
                     .userId(personalBadge.getUserId())
                     .isWorn(personalBadge.isWorn())
+                    .build();
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    @Builder
+    public static class BadgePresetDto {
+        private Long personalBadgeId;
+
+        public static BadgePresetDto from(BadgePresetDetail badgePresetDetail) {
+            return BadgePresetDto.builder()
+                    .personalBadgeId(badgePresetDetail.getPersonalBadgeId())
+                    .build();
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    @Builder
+    public static class BadgePresetListDto {
+        private Long presetId;
+        private String presetName;
+        private boolean isApplied;
+        List<BadgePresetDto> badgePresetList;
+
+        public static BadgePresetListDto from(BadgePreset badgePreset, List<BadgePresetDto> presetList) {
+            return BadgePresetListDto.builder()
+                    .presetId(badgePreset.getPresetId())
+                    .presetName(badgePreset.getPresetName())
+                    .isApplied(badgePreset.isApplied())
+                    .badgePresetList(presetList)
                     .build();
         }
     }
