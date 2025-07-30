@@ -210,4 +210,24 @@ public class WalletService {
                 .collect(Collectors.toList());
     }
 
+    public String deletePreset(Long userId, Long presetId) {
+        //1. presetId로 해당 프리셋 가져오기
+        List<BadgePreset> userPresets = badgePresetMapper.findAllByUserId(userId);
+
+        if (userPresets == null || userPresets.isEmpty()) {
+            return null;
+        }
+
+        boolean isOwner = userPresets.stream()
+                .anyMatch(preset -> preset.getPresetId().equals(presetId));
+
+        if (!isOwner) {
+            return null;
+        }
+
+        //2. 프리셋 삭제
+        badgePresetMapper.deletePresetById(presetId);
+        return "ok";
+    }
+
 }
