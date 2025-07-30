@@ -1,11 +1,10 @@
 package org.refit.spring.receiptProcess.service;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Param;
 import org.refit.spring.mapper.ReceiptProcessMapper;
-import org.refit.spring.receiptProcess.dto.CheckCompanyResponseDto;
-import org.refit.spring.receiptProcess.dto.ReceiptProcessCheckDto;
-import org.refit.spring.receiptProcess.dto.ReceiptProcessRequestDto;
-import org.refit.spring.receiptProcess.dto.ReceiptSelectDto;
+import org.refit.spring.receiptProcess.dto.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -40,5 +39,16 @@ public class ReceiptProcessService {
                 dto.getVoucher(),
                 dto.getReceiptId()
         );
+    }
+
+    // userId + receiptId로 ceoId 찾기
+    public Long findCeoIdByUserIdAndReceiptId(Long userId, Long receiptId) {
+        return receiptProcessMapper.findCeoIdByUserIdAndReceiptId(userId, receiptId);
+    }
+
+    // 관련 이미지 파일명 DB조회
+    public ReceiptVoucherResponseDto getVoucherFileName(Long receiptId) {
+        String fileName = receiptProcessMapper.findVoucherFileNameByReceiptId(receiptId);
+        return fileName != null ? new ReceiptVoucherResponseDto(receiptId, fileName) : null;
     }
 }
