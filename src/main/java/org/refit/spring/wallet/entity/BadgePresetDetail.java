@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BadgePresetDetail {
-    private Long badgePresetDetailId;
+    private Long badgePresetId;
     private Long presetId;
     private Long personalBadgeId;
 }

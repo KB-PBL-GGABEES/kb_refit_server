@@ -9,6 +9,7 @@ import org.refit.spring.wallet.dto.WalletResponseDto;
 import org.refit.spring.wallet.entity.*;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -180,10 +181,33 @@ public class WalletService {
         // 3. 프리셋 상세 저장 (1~4개 반복)
         for (PersonalBadge badge : wornBadges) {
             BadgePresetDetail detail = BadgePresetDetail.builder()
-                    .presetId(preset.getBadgePresetId())
+                    .presetId(preset.getPresetId())
                     .personalBadgeId(badge.getPersonalBadgeId())
                     .build();
             badgePresetMapper.insertPresetDetail(detail);
         }
     }
+
+    //프리셋 조회
+    public List<BadgeResponseDto.BadgePresetListDto> getMyBadgePresets(Long userId) {
+        // 1. 프리셋 메타 정보 가져오기
+        List<BadgePreset> badgePresets = badgePresetMapper.findAllByUserId(userId);
+
+        // 2. 각 프리셋에 대해 디테일 정보 가져오기 및 변환
+        return badgePresets.stream()
+                .map(preset -> {
+                    // 해당 preset에 포함된 personalBadgeId들 조회
+                    List<BadgePresetDetail> details = badgePresetMapper.findAllByPresetId(preset.getPresetId());
+
+                    // DTO로 변환
+                    List<BadgeResponseDto.BadgePresetDto> badgeDtoList = details.stream()
+                            .map(BadgeResponseDto.BadgePresetDto::from)
+                            .collect(Collectors.toList());
+
+                    // 최종 응답 DTO로 조립
+                    return BadgeResponseDto.BadgePresetListDto.from(preset, badgeDtoList);
+                })
+                .collect(Collectors.toList());
+    }
+
 }
