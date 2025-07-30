@@ -100,5 +100,15 @@ public class WalletController {
         return ResponseEntity.ok(result);
     }
 
+    @ApiOperation(value = "뱃지 프리셋 저장", notes = "현재 착용한 뱃지들을 하나의 프리셋으로 저장합니다.")
+    @PostMapping("/badge/preset")
+    public ResponseEntity<Void> savePreset(@ApiIgnore @UserId Long userId, @RequestBody BadgeRequestDto.SaveBadgePresetDto request) {
+        try {
+            walletService.saveCurrentWornBadgesAsPreset(userId, request.getPresetName());
+            return ResponseEntity.ok().build(); //200
+        } catch (IllegalStateException e) {
+            return ResponseEntity.internalServerError().build(); //500
+        }
+    }
 
 }
