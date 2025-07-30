@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.refit.spring.auth.annotation.UserId;
 import org.refit.spring.receiptProcess.dto.CheckCompanyResponseDto;
+import org.refit.spring.receiptProcess.dto.ReceiptProcessCheckDto;
 import org.refit.spring.receiptProcess.dto.ReceiptProcessRequestDto;
 import org.refit.spring.receiptProcess.dto.ReceiptSelectDto;
 import org.refit.spring.receiptProcess.service.ReceiptProcessService;
@@ -43,15 +44,14 @@ public class ReceiptProcessController {
 
     @ApiOperation(value = "영수 처리 정보 조회", notes = "영수 처리 정보를 조회할 수 있습니다.")
     @GetMapping
-    public ResponseEntity<?> getCompanyId(@RequestParam("companyName") String companyName,
-                                          @RequestParam("address") String address) {
+    public ResponseEntity<?> getCompanyInfo(@RequestParam("receiptId") Long receiptId) {
         try {
-            Long companyId = receiptProcessService.getCompanyIdByNameAndAddress(companyName, address);
-            if (companyId == null) {
+            ReceiptProcessCheckDto companyInfo = receiptProcessService.getCompanyInfoByReceiptId(receiptId);
+            if (companyInfo == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Collections.singletonMap("message", "일치하는 회사 정보가 존재하지 않습니다."));
+                        .body(Collections.singletonMap("message", "해당 영수증에 대한 회사 정보가 존재하지 않습니다."));
             }
-            return ResponseEntity.ok(companyId);
+            return ResponseEntity.ok(companyInfo);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Collections.singletonMap("message", "회사 정보 확인 중 오류가 발생했습니다."));
@@ -79,15 +79,18 @@ public class ReceiptProcessController {
 
     @ApiOperation(value = "영수 처리 요청", notes = "영수 처리를 요청할 수 있습니다.")
     @PostMapping
-    public ResponseEntity<?> registerReceiptProcess(@RequestBody ReceiptProcessRequestDto dto) {
+    public ResponseEntity<?> registerReceiptProcess(@RequestBody ReceiptProcessRequestDto dto,
+                                                    @ApiIgnore @UserId Long ceoId) {
         try {
             if (dto == null || dto.getReceiptId() == null || dto.getProgressType() == null) {
                 return ResponseEntity.badRequest()
                         .body(Collections.singletonMap("message", "필수 경비 처리 정보가 누락되었습니다."));
             }
-            receiptProcessService.registerReceiptProcess(dto);
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(Collections.singletonMap("message", "경비 처리 등록 완료"));
+
+            receiptProcessService.registerReceiptProcess(dto, ceoId);
+
+            return ResponseEntity.noContent().build();
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Collections.singletonMap("message", "경비 처리 등록 중 오류가 발생했습니다."));

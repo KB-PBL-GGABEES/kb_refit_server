@@ -3,6 +3,7 @@ package org.refit.spring.receiptProcess.service;
 import lombok.RequiredArgsConstructor;
 import org.refit.spring.mapper.ReceiptProcessMapper;
 import org.refit.spring.receiptProcess.dto.CheckCompanyResponseDto;
+import org.refit.spring.receiptProcess.dto.ReceiptProcessCheckDto;
 import org.refit.spring.receiptProcess.dto.ReceiptProcessRequestDto;
 import org.refit.spring.receiptProcess.dto.ReceiptSelectDto;
 import org.springframework.stereotype.Service;
@@ -21,8 +22,8 @@ public class ReceiptProcessService {
     }
 
     // 영수 처리 정보 조회
-    public Long getCompanyIdByNameAndAddress(String companyName, String address) {
-        return receiptProcessMapper.findCompanyIdByNameAndAddress(companyName, address);
+    public ReceiptProcessCheckDto getCompanyInfoByReceiptId(Long receiptId) {
+        return receiptProcessMapper.findCompanyInfoByReceiptId(receiptId);
     }
 
     // 사업자 정보 확인 요청
@@ -31,7 +32,13 @@ public class ReceiptProcessService {
     }
 
     // 영수 처리 요청
-    public void registerReceiptProcess(ReceiptProcessRequestDto dto) {
-        receiptProcessMapper.insertReceiptProcess(dto);
+    public void registerReceiptProcess(ReceiptProcessRequestDto dto, Long ceoId) {
+        receiptProcessMapper.insertReceiptProcess(
+                ceoId,
+                dto.getProgressType(),
+                dto.getProgressDetail(),
+                dto.getVoucher(),
+                dto.getReceiptId()
+        );
     }
 }
