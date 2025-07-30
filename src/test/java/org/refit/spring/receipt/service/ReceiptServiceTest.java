@@ -21,7 +21,7 @@ class ReceiptServiceTest {
     @Autowired
     private ReceiptService service;
 
-    /*
+
     @DisplayName("구매 영수증 생성 테스트")
     @Test
     void create() {
@@ -29,6 +29,7 @@ class ReceiptServiceTest {
         ReceiptContentRequestsDto content = new ReceiptContentRequestsDto();
         content.setMerchandiseId(1L);
         content.setAmount(3L);
+        dto.setCardId(1L);
         dto.setContentsList(List.of(content));
 
         Receipt receipt = service.create(dto, 1L);
@@ -50,10 +51,10 @@ class ReceiptServiceTest {
     void get() {
         Long receiptId = 8L;
         Long cursorId = null;
-        Receipt receipt = service.get(cursorId, receiptId);
+        ReceiptDetailDto receipt = service.get(1L, cursorId, receiptId);
         log.info(receipt.getReceiptId());
         log.info(receipt.getTotalPrice());
-        for (ReceiptContentDto contentDto: receipt.getContentList()) {
+        for (ReceiptContentDto contentDto: receipt.getReceiptContents()) {
             log.info(contentDto.getMerchandiseName());
             log.info(contentDto.getMerchandisePrice());
             log.info(contentDto.getAmount());
@@ -69,5 +70,40 @@ class ReceiptServiceTest {
         log.info(dto.getLastMonth());
     }
 
-     */
+    @DisplayName("영수증 환불 테스트")
+    @Test
+    void refund() {
+        ReceiptRequestDto dto = new ReceiptRequestDto();
+        ReceiptContentRequestsDto content = new ReceiptContentRequestsDto();
+        content.setMerchandiseId(1L);
+        content.setAmount(1L);
+        dto.setContentsList(List.of(content));
+        dto.setCardId(1L);
+
+        Receipt original = service.create(dto, 1L);
+        Receipt refund = service.refund(1L, original.getReceiptId());
+
+        log.info(refund);
+    }
+
+    @DisplayName("처리 대상 영수증 상태 변경")
+    @Test
+    void changeState() {
+        Long userId = 1L;
+        Long receiptProcessId = 1L;
+        try {
+            service.changeState(userId, receiptProcessId);
+            log.info("성공");
+        } catch (Exception e) {
+            log.warn("실패");
+        }
+    }
+
+    @DisplayName("처리 거절된 영수증 목록 조회")
+    @Test
+    void getRejected() {
+        Long userId = 1L;
+        RejectedListDto result = service.getRejected(userId);
+        log.info(result.getList());
+    }
 }
