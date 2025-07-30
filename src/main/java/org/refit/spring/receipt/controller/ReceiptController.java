@@ -46,9 +46,7 @@ public class ReceiptController {
         Reward reward = rewardService.create(CARBON_POINT, receipt.getTotalPrice(), userId);
         userService.updatePoint(userId, reward.getCarbonPoint(), reward.getReward());
         ReceiptResponseDto dto = ReceiptResponseDto.from(receipt, userId, reward.getCarbonPoint(), reward.getReward());
-        receiptService.checkAndInsertBadge(userId, receipt.getReceiptId());
-        URI location = URI.create("/receipt/" + receipt.getReceiptId());
-        return ResponseEntity.created(location).body(dto);
+        return ResponseEntity.ok(dto);
     }
 
     @ApiOperation(value = "환불 영수증 등록", notes = "결제 시 생성된 영수증 아이디를 이용해 환불 영수증을 생성합니다.")
