@@ -1,19 +1,27 @@
 package org.refit.spring.receipt.service;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.ibatis.jdbc.SQL;
 import org.refit.spring.auth.entity.User;
 import org.refit.spring.mapper.CeoMapper;
 import org.refit.spring.mapper.MerchandiseMapper;
+import org.refit.spring.mapper.PersonalBadgeMapper;
 import org.refit.spring.mapper.ReceiptMapper;
 import org.refit.spring.merchandise.entity.Merchandise;
 import org.refit.spring.receipt.dto.*;
 import org.refit.spring.receipt.entity.Receipt;
 import org.refit.spring.receipt.entity.ReceiptContent;
+import org.refit.spring.wallet.entity.Badge;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -25,6 +33,9 @@ public class ReceiptService {
     private final ReceiptMapper receiptMapper;
     private final MerchandiseMapper merchandiseMapper;
     private final CeoMapper ceoMapper;
+    private final PersonalBadgeMapper personalBadgeMapper;
+
+    private final DataSource dataSource;
 
     @Transactional
     public Receipt create(ReceiptRequestDto dto, Long userId) {
@@ -176,5 +187,21 @@ public class ReceiptService {
     public void changeState(Long userId, Long receiptProcessId) {
         int update = receiptMapper.updateProcessState(userId, receiptProcessId);
         if (update == 0) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 영수증은 처리 대상이 아닙니다.");
+    }
+
+    public void checkAndInsertBadge(Long userId, Long receiptId) {
+        Long badgeId = receiptMapper.findBadge(userId, receiptId);
+        if (badgeId != null) {
+            String sqlTemplate = personalBadgeMapper.getCondition(badgeId);
+            String sql = sqlTemplate.replace("${userId}", userId.toString());
+            try (Connection conn = dataSource.getConnection();
+                 Statement stmt = conn.createStatement();
+                 ResultSet rs = stmt.executeQuery(sql)) {
+                if (rs.next()) {
+                    long res = rs.getLong(1);
+                    if (res > 0) personalBadgeMapper.insertBadge(badgeId, userId);
+                }
+            } catch (SQLException e) {}
+        }
     }
 }
