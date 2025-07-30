@@ -4,10 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.refit.spring.auth.annotation.UserId;
-import org.refit.spring.receiptProcess.dto.CheckCompanyResponseDto;
-import org.refit.spring.receiptProcess.dto.ReceiptProcessCheckDto;
-import org.refit.spring.receiptProcess.dto.ReceiptProcessRequestDto;
-import org.refit.spring.receiptProcess.dto.ReceiptSelectDto;
+import org.refit.spring.receiptProcess.dto.*;
 import org.refit.spring.receiptProcess.service.ReceiptProcessService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -76,24 +73,30 @@ public class ReceiptProcessController {
     }
 
 
-
     @ApiOperation(value = "영수 처리 요청", notes = "영수 처리를 요청할 수 있습니다.")
     @PostMapping
     public ResponseEntity<?> registerReceiptProcess(@RequestBody ReceiptProcessRequestDto dto,
-                                                    @ApiIgnore @UserId Long ceoId) {
+                                                    @ApiIgnore @UserId Long userId) {
         try {
+            // 필수값 검증
             if (dto == null || dto.getReceiptId() == null || dto.getProgressType() == null) {
                 return ResponseEntity.badRequest()
                         .body(Collections.singletonMap("message", "필수 경비 처리 정보가 누락되었습니다."));
             }
 
+            // voucher가 비어있으면 null로 세팅
             if (dto.getVoucher() == null || dto.getVoucher().trim().isEmpty()) {
                 dto.setVoucher(null);
-            } else if (!dto.getVoucher().matches("^[\\w\\-]+\\.(png|jpg|jpeg|gif)$")) {
-                return ResponseEntity.badRequest()
-                        .body(Collections.singletonMap("message", "voucher 값은 png/jpg 이미지 파일명이어야 합니다."));
             }
 
+            // userId → ceoId 변환
+            Long ceoId = receiptProcessService.findCeoIdByUserIdAndReceiptId(userId, dto.getReceiptId());
+            if (ceoId == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Collections.singletonMap("message", "해당 사용자에 대한 ceo 정보가 존재하지 않습니다."));
+            }
+
+            // 등록 요청
             receiptProcessService.registerReceiptProcess(dto, ceoId);
             return ResponseEntity.noContent().build();
 
@@ -101,5 +104,18 @@ public class ReceiptProcessController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Collections.singletonMap("message", "경비 처리 등록 중 오류가 발생했습니다."));
         }
+    }
+
+    @ApiOperation(value = "관련 이미지 파일명 DB조회", notes = "관련 이미지 파일명을 조회할 수 있습니다.")
+    @GetMapping("/voucher")
+    public ResponseEntity<?> getReceiptVoucher(@RequestParam("receiptId") Long receiptId) {
+        ReceiptVoucherResponseDto dto = receiptProcessService.getVoucherFileName(receiptId);
+
+        if (dto == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Collections.singletonMap("message", "해당 영수증의 이미지 파일명이 없습니다."));
+        }
+
+        return ResponseEntity.ok(dto);
     }
 }

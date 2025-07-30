@@ -42,4 +42,17 @@ public interface ReceiptProcessMapper {
             @Param("voucher") String voucher,
             @Param("receiptId") Long receiptId
     );
+    // userId와 receiptId로 ceoId 찾기
+    @Select("SELECT c.ceo_id " +
+            "FROM receipt r " +
+            "JOIN company c ON r.company_id = c.company_id " +
+            "WHERE r.receipt_id = #{receiptId} AND r.user_id = #{userId}")
+    Long findCeoIdByUserIdAndReceiptId(@Param("userId") Long userId,
+                                       @Param("receiptId") Long receiptId);
+
+    // 관련 이미지 파일명 DB조회
+    @Select("SELECT voucher FROM receipt_process WHERE receipt_id = #{receiptId}")
+    String findVoucherFileNameByReceiptId(@Param("receiptId") Long receiptId);
+
+
 }
