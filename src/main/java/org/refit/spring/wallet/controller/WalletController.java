@@ -124,4 +124,13 @@ public class WalletController {
         return ResponseEntity.ok(result);
     }
 
+    @ApiOperation(value = "뱃지 프리셋 삭제", notes = "현재 로그인 한 유저의 프리셋을 선택하여 삭제합니다.")
+    @DeleteMapping("/badge/preset/{presetId}")
+    public ResponseEntity<Void> deletePreset(@ApiIgnore @UserId Long userId, @PathVariable("presetId") Long presetId) {
+        String result = walletService.deletePreset(userId, presetId);
+        if (result == null || result.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok().build();
+    }
 }
