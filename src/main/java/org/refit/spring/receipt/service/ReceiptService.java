@@ -1,6 +1,8 @@
 package org.refit.spring.receipt.service;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.ibatis.jdbc.SQL;
+import org.refit.spring.auth.entity.User;
 import org.refit.spring.mapper.CeoMapper;
 import org.refit.spring.mapper.MerchandiseMapper;
 import org.refit.spring.mapper.PersonalBadgeMapper;
@@ -9,6 +11,7 @@ import org.refit.spring.merchandise.entity.Merchandise;
 import org.refit.spring.receipt.dto.*;
 import org.refit.spring.receipt.entity.Receipt;
 import org.refit.spring.receipt.entity.ReceiptContent;
+import org.refit.spring.wallet.entity.Badge;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
