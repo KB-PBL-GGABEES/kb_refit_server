@@ -9,6 +9,8 @@ import org.refit.spring.ceo.dto.CorporateCardListlDto;
 import org.refit.spring.ceo.dto.EmailRequestDto;
 import org.refit.spring.ceo.dto.ReceiptListlDto;
 import org.refit.spring.ceo.service.CeoService;
+import org.refit.spring.common.pagination.CursorPageRequest;
+import org.refit.spring.common.pagination.CursorPageResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -16,6 +18,8 @@ import springfox.documentation.annotations.ApiIgnore;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import static org.refit.spring.common.pagination.CursorPageRequest.DEFAULT_PAGE_SIZE;
 
 @Api(tags = "사장님 API", description = "영수 처리 및 법인카드 관련 API입니다.")
 @RestController
@@ -50,23 +54,20 @@ public class CeoController {
 
     @ApiOperation(value = "경비 처리 완료 내역 조회", notes = "경비 처리가 완료된(승인/반려) 내역을 20개씩 가져옵니다.")
     @GetMapping("/completed")
-    public ResponseEntity<List<Object>> getCompletedReceipts(
+    public ResponseEntity<CursorPageResponse<CeoListDto>> getCompletedReceipts(
             @RequestParam(value = "period", defaultValue = "1") int period,
-            @RequestParam(required = false) String cursorDateTime,
+            @ModelAttribute CursorPageRequest pageRequest,
             @ApiIgnore @UserId Long userId) {
 
-        List<CeoListDto> list = ceoService.getCompletedReceipts(period, cursorDateTime, userId);
+        List<CeoListDto> list = ceoService.getCompletedReceipts(period, pageRequest, userId);
 
-        String nextCursorDateTime = list.size() < 20 ? null :
-                list.get(list.size() - 1).getReceiptDateTime().toString();
+        String nextCursor = (list.size() < pageRequest.getSize())
+                ? null
+                : list.get(list.size() - 1).getReceiptDateTime().toString();
 
-        List<Object> response = new ArrayList<>(list);
-
-        Map<String, Object> cursorMap = new java.util.HashMap<>();
-        cursorMap.put("cursorId", nextCursorDateTime);
-        response.add(cursorMap);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(CursorPageResponse.of(
+                list, pageRequest.getSize(), "cursor", nextCursor
+        ));
     }
 
     @ApiOperation(value = "처리 완료된 항목 이메일 전송", notes = "경비 처리가 완료된(승인/반려) 항목을 특정 이메일로 보냅니다.")
@@ -113,21 +114,18 @@ public class CeoController {
 
     @ApiOperation(value = "법카 내역 조회", notes = "법카의 사용 내역을 보여줍니다.")
     @GetMapping("/corporateCard")
-    public ResponseEntity<List<Object>> getCorporateCard(
-            @RequestParam(required = false) String cursorDateTime,
+    public ResponseEntity<CursorPageResponse<CorporateCardListlDto>> getCorporateCard(
+            @ModelAttribute CursorPageRequest pageRequest,
             @ApiIgnore @UserId Long userId) {
 
-        List<CorporateCardListlDto> list = ceoService.getCorporateCardReceipts(cursorDateTime, userId);
+        List<CorporateCardListlDto> list = ceoService.getCorporateCardReceipts(pageRequest, userId);
 
-        String nextCursorDateTime = list.size() < 20 ? null :
-                list.get(list.size() - 1).getReceiptDateTime().toString();
+        String nextCursor = (list.size() < pageRequest.getSize())
+                ? null
+                : list.get(list.size() - 1).getReceiptDateTime().toString();
 
-        List<Object> response = new ArrayList<>(list);
-
-        Map<String, Object> cursorMap = new java.util.HashMap<>();
-        cursorMap.put("cursorId", nextCursorDateTime);
-        response.add(cursorMap);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(CursorPageResponse.of(
+                list, pageRequest.getSize(), "cursor", nextCursor
+        ));
     }
 }

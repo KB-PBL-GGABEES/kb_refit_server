@@ -1,6 +1,7 @@
 package org.refit.spring.mapper;
 
 import org.apache.ibatis.annotations.*;
+import org.refit.spring.ceo.dto.CeoListDto;
 import org.refit.spring.ceo.dto.CorporateCardListlDto;
 import org.refit.spring.ceo.entity.Ceo;
 import org.refit.spring.ceo.dto.ReceiptListlDto;
@@ -83,10 +84,11 @@ public interface CeoMapper {
             "WHERE p.process_state IN ('accepted', 'rejected')\n" +
             "  AND r.created_at >= #{fromDate}\n" +
             "  AND r.created_at  < #{cursor}\n" +
-            "ORDER BY r.created_at DESC LIMIT 20")
-    List<Ceo> getCompletedReceipts(
+            "ORDER BY r.created_at LIMIT #{size}")
+    List<CeoListDto> getCompletedReceipts(
             @Param("fromDate") LocalDateTime fromDate,
             @Param("cursor") LocalDateTime cursor,
+            @Param("size") int size,
             @Param("userId") Long userId);
 
     // 처리 완료된 항목 이메일 전송
@@ -152,8 +154,9 @@ public interface CeoMapper {
             "  AND e.company_id = (\n" +
             "      SELECT company_id FROM employee WHERE user_id = #{userId} LIMIT 1)\n" +
             "  AND r.created_at < #{cursor}\n" +
-            "ORDER BY r.created_at LIMIT 20")
+            "ORDER BY r.created_at LIMIT #{size}")
     List<CorporateCardListlDto> getCorporateCardReceipts(
                     @Param("cursor") LocalDateTime cursor,
+                    @Param("size") int size,
                     @Param("userId") Long userId);
 }
