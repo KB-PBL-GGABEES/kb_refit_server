@@ -22,9 +22,11 @@ public interface ReceiptProcessMapper {
     List<ReceiptSelectDto> findCompanySelectionListByUserId(@Param("userId") Long userId);
 
     // 영수 처리 정보 조회
-    @Select("SELECT company_id FROM company WHERE company_name = #{companyName} AND address = #{address}")
-    Long findCompanyIdByNameAndAddress(@Param("companyName") String companyName,
-                                       @Param("address") String address);
+    @Select("SELECT c.company_name AS companyName, c.address AS address " +
+            "FROM receipt r " +
+            "JOIN company c ON r.company_id = c.company_id " +
+            "WHERE r.receipt_id = #{receiptId}")
+    ReceiptProcessCheckDto findCompanyInfoByReceiptId(@Param("receiptId") Long receiptId);
 
     // 사업자 정보 확인 요청
     @Insert("INSERT INTO company (company_id, ceo_Id, company_name, ceo_name, address, opened_date, created_at, updated_at, category_id) " +
@@ -32,8 +34,13 @@ public interface ReceiptProcessMapper {
     void insertVerifiedCompany(CheckCompanyResponseDto dto);
 
     // 영수 처리 요청
-    @Insert("INSERT INTO receipt_process (process_state, ceo_Id, progress_type, progress_detail, voucher, receipt_id, created_at) " +
+    @Insert("INSERT INTO receipt_process (process_state, ceo_id, progress_type, progress_detail, voucher, receipt_id, created_at) " +
             "VALUES ('inProgress', #{ceoId}, #{progressType}, #{progressDetail}, #{voucher}, #{receiptId}, NOW())")
-    void insertReceiptProcess(ReceiptProcessRequestDto dto);
-
+    void insertReceiptProcess(
+            @Param("ceoId") Long ceoId,
+            @Param("progressType") String progressType,
+            @Param("progressDetail") String progressDetail,
+            @Param("voucher") String voucher,
+            @Param("receiptId") Long receiptId
+    );
 }
