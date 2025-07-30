@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Api(tags = "영수 처리 API", description = "영수 처리 관련 API입니다.")
 @RestController
@@ -22,6 +24,17 @@ public class ReceiptProcessController {
 
     private final ReceiptProcessService receiptProcessService;
 
+
+    @ApiOperation(value = "사업자 진위 확인", notes = "OpenAPI를 통해 사업자 등록 정보를 진위 확인합니다.")
+    @PostMapping("/verifyCompany")
+    public ResponseEntity<?> checkCompany(@RequestBody CheckCompanyRequestDto dto) {
+        boolean isValid = receiptProcessService.verifyCompany(dto);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("isValid", isValid);
+
+        return ResponseEntity.ok(response);
+    }
 
     @ApiOperation(value = "사업장 선택 조회", notes = "사업장을 조회할 수 있습니다.")
     @GetMapping("/select")
