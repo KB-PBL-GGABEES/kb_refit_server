@@ -24,4 +24,7 @@ public interface BadgePresetMapper {
 
     @Select("SELECT * FROM badge_preset_detail WHERE preset_id = #{presetId}")
     List<BadgePresetDetail> findAllByPresetId(Long presetId);
+
+    @Delete("DELETE FROM badge_preset WHERE preset_id = #{presetId}")
+    void deletePresetById(Long presetId);
 }
