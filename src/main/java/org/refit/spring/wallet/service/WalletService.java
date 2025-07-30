@@ -6,10 +6,7 @@ import org.refit.spring.mapper.*;
 import org.refit.spring.wallet.dto.BadgeRequestDto;
 import org.refit.spring.wallet.dto.BadgeResponseDto;
 import org.refit.spring.wallet.dto.WalletResponseDto;
-import org.refit.spring.wallet.entity.Badge;
-import org.refit.spring.wallet.entity.PersonalBadge;
-import org.refit.spring.wallet.entity.PersonalWalletBrand;
-import org.refit.spring.wallet.entity.WalletBrand;
+import org.refit.spring.wallet.entity.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,6 +21,7 @@ public class WalletService {
     private final UserMapper userMapper;
     private final WalletBrandMapper walletBrandMapper;
     private final PersonalWalletBrandMapper personalWalletBrandMapper;
+    private final BadgePresetMapper badgePresetMapper;
 
     public BadgeResponseDto.BadgeListDto getBadgeList(Long userId) {
         List<Badge> allBadges = badgeMapper.findAll(); // 전체 뱃지 목록
@@ -160,5 +158,32 @@ public class WalletService {
         // 3. 변경된 결과 조회 후 DTO 변환
         PersonalWalletBrand updated = personalWalletBrandMapper.findByUserIdAndWalletId(userId, walletId);
         return WalletResponseDto.ToggleMountedWalletDto.from(updated);
+    }
+
+    //프리셋 저장
+    public void saveCurrentWornBadgesAsPreset(Long userId, String presetName) {
+        // 1. 현재 착용한 뱃지 조회
+        List<PersonalBadge> wornBadges = personalBadgeMapper.findWornBadgesByUserId(userId);
+
+        if (wornBadges.isEmpty()) {
+            throw new IllegalStateException("현재 착용 중인 뱃지가 없습니다.");
+        }
+
+        // 2. 프리셋 저장
+        BadgePreset preset = BadgePreset.builder()
+                .presetName(presetName)
+                .isApplied(false)
+                .userId(userId)
+                .build();
+        badgePresetMapper.insertBadgePreset(preset);
+
+        // 3. 프리셋 상세 저장 (1~4개 반복)
+        for (PersonalBadge badge : wornBadges) {
+            BadgePresetDetail detail = BadgePresetDetail.builder()
+                    .presetId(preset.getBadgePresetId())
+                    .personalBadgeId(badge.getPersonalBadgeId())
+                    .build();
+            badgePresetMapper.insertPresetDetail(detail);
+        }
     }
 }

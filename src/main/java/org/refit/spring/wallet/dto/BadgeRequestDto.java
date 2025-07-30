@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 
 public class BadgeRequestDto {
     @Getter
+    @NoArgsConstructor
     public static class UpdateWornBadgeDto {
         private Long previousBadgeId;
         private Long updateBadgeId;
@@ -12,5 +13,11 @@ public class BadgeRequestDto {
         public boolean hasBadgeToUnwear() {
             return previousBadgeId != null;
         }
+    }
+
+    @Getter
+    @NoArgsConstructor
+    public static class SaveBadgePresetDto {
+        private String presetName;
     }
 }
