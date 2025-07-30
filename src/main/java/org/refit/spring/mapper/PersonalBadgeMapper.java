@@ -1,9 +1,6 @@
 package org.refit.spring.mapper;
 
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.*;
 import org.refit.spring.wallet.entity.PersonalBadge;
 
 import java.util.List;
@@ -32,4 +29,10 @@ public interface PersonalBadgeMapper {
     void updateBadgeWornStatus(@Param("userId") Long userId,
                                @Param("badgeId") Long badgeId,
                                @Param("isWorn") boolean isWorn);
+
+    @Select("SELECT badge_condition FROM badge WHERE badge_id = #{badgeId}")
+    String getCondition(@Param("badgeId") Long badgeId);
+
+    @Insert("INSERT personal_badge (is_worn, created_at, updated_at, badge_id, user_id) VALUES (0, now(), now(), #{badgeId}, #{userId})")
+    void insertBadge(@Param("badgeId") Long badgeId, @Param("userId") Long userId);
 }

@@ -17,6 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.sql.SQLException;
+
 
 @Api(tags = "영수증 API", description = "영수증 등록 및 조회 관련 API입니다.")
 @RestController
@@ -32,11 +34,12 @@ public class ReceiptController {
 
     @ApiOperation(value = "영수증 등록", notes = "결제 시 영수증이 생성됩니다.")
     @PostMapping("/create")
-    public ResponseEntity<?> create(@ApiIgnore @UserId Long userId, @RequestBody ReceiptRequestDto receiptRequestDto) {
+    public ResponseEntity<?> create(@ApiIgnore @UserId Long userId, @RequestBody ReceiptRequestDto receiptRequestDto) throws SQLException {
         Receipt receipt = receiptService.create(receiptRequestDto, userId);
         Reward reward = rewardService.create(CARBON_POINT, receipt.getTotalPrice(), userId);
         userService.updatePoint(userId, reward.getCarbonPoint(), reward.getReward());
         ReceiptResponseDto dto = ReceiptResponseDto.from(receipt, userId, reward.getCarbonPoint(), reward.getReward());
+        receiptService.checkAndInsertBadge(userId, receipt.getReceiptId());
         return ResponseEntity.ok(dto);
     }
 

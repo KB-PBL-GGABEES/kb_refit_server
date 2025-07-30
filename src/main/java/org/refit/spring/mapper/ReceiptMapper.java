@@ -60,10 +60,18 @@ public interface ReceiptMapper {
     @Update("UPDATE receipt_process rp SET rp.process_state = 'deposit' " +
             "WHERE rp.receipt_process_id = #{receiptProcessId} " +
             "AND EXISTS (SELECT 1 FROM receipt r " +
-            "INNER JOIN card c ON r.card_id = c.card_id "+
+            "INNER JOIN card c ON r.card_id = c.card_id " +
             "WHERE c.user_id = #{userId} " +
             "AND r.receipt_id = rp.receipt_id " +
             "AND rp.process_state = 'rejected')")
-    int updateProcessState(@Param("userId") Long userId,
+    Integer updateProcessState(@Param("userId") Long userId,
                             @Param("receiptProcessId") Long receiptProcessId);
+
+    @Select("SELECT b.badge_id FROM receipt r " +
+            "INNER JOIN company c ON r.company_id = c.company_id " +
+            "INNER JOIN categories ca ON c.category_id = ca.category_id " +
+            "INNER JOIN badge b ON ca.category_id = b.category_id " +
+            "LEFT OUTER JOIN personal_badge p ON b.badge_id = p.badge_id AND p.user_id = #{userId} " +
+            "WHERE r.receipt_id = #{receiptId} AND p.badge_id IS NULL")
+    Long findBadge(@Param("userId") Long userId, @Param("receiptId") Long receiptId);
 }
