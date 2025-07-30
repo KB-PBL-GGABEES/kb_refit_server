@@ -87,8 +87,14 @@ public class ReceiptProcessController {
                         .body(Collections.singletonMap("message", "필수 경비 처리 정보가 누락되었습니다."));
             }
 
-            receiptProcessService.registerReceiptProcess(dto, ceoId);
+            if (dto.getVoucher() == null || dto.getVoucher().trim().isEmpty()) {
+                dto.setVoucher(null);
+            } else if (!dto.getVoucher().matches("^[\\w\\-]+\\.(png|jpg|jpeg|gif)$")) {
+                return ResponseEntity.badRequest()
+                        .body(Collections.singletonMap("message", "voucher 값은 png/jpg 이미지 파일명이어야 합니다."));
+            }
 
+            receiptProcessService.registerReceiptProcess(dto, ceoId);
             return ResponseEntity.noContent().build();
 
         } catch (Exception e) {

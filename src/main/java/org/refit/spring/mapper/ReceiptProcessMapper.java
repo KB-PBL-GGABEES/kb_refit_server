@@ -6,7 +6,6 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.refit.spring.receiptProcess.dto.CheckCompanyResponseDto;
 import org.refit.spring.receiptProcess.dto.ReceiptProcessCheckDto;
-import org.refit.spring.receiptProcess.dto.ReceiptProcessRequestDto;
 import org.refit.spring.receiptProcess.dto.ReceiptSelectDto;
 
 import java.util.List;
