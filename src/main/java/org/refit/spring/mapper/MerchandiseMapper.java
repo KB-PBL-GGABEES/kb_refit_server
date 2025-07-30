@@ -13,4 +13,5 @@ public interface MerchandiseMapper {
 
     @Select("SELECT * FROM merchandise WHERE company_id = #{companyId}")
     List<Merchandise> findAllByCompanyId(Long companyId);
+
 }
