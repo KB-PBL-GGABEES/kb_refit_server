@@ -27,7 +27,7 @@ public interface ReceiptMapper {
     @Select("SELECT * FROM receipt WHERE user_id = #{userId} AND receipt_id < #{cursorId} AND created_at >= DATE_SUB(NOW(), INTERVAL #{period} MONTH) ORDER BY receipt_id DESC LIMIT 20")
     List<Receipt> getListForMonths(@Param("userId") Long userId, @Param("cursorId") Long cursorId, @Param("period") int period);
 
-    @Select("SELECT * FROM receipt WHERE user_id = #{userId} AND receipt_id < #{cursorId} AND created_at BETWEEN #{startDate} AND #{endDate} ORDER BY receipt_id DESC LIMIT 20")
+    @Select("SELECT * FROM receipt WHERE user_id = #{userId} AND receipt_id < #{cursorId} AND created_at >= #{startDate} AND created_at < DATE_ADD(#{endDate}, INTERVAL 1 DAY) ORDER BY receipt_id DESC LIMIT 20")
     List<Receipt> getListWithPeriod(@Param("userId") Long userId, @Param("cursorId") Long cursorId, @Param("startDate") Date startDate, @Param("endDate") Date endDate);
 
     @Select("SELECT * FROM receipt_content rc JOIN receipt r ON rc.receipt_id = r.receipt_id WHERE r.user_id = #{userId} AND rc.receipt_id = #{receiptId}")
