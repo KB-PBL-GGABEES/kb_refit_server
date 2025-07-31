@@ -24,4 +24,8 @@ public interface PersonalWalletBrandMapper {
     // 새 지갑 착용
     @Update("UPDATE personal_wallet_brand SET is_mounted = TRUE WHERE user_id = #{userId} AND wallet_id = #{walletId}")
     void mountNewWallet(@Param("userId") Long userId, @Param("walletId") Long walletId);
+
+    // 현재 내가 착용하고 있는 지갑 조회
+    @Select("SELECT * FROM personal_wallet_brand WHERE user_id = #{userId} AND is_mounted = true LIMIT 1")
+    PersonalWalletBrand findMountedWalletByUserId(Long userId);
 }

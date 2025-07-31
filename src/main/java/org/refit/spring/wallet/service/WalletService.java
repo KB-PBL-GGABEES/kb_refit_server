@@ -52,8 +52,10 @@ public class WalletService {
 
 
     public BadgeResponseDto.wornBadgeListAndBenefitDto getWornBadgeListAndBenefit(Long userId) {
+        // 1. 착용한 뱃지 목록 조회
         List<PersonalBadge> wornBadges = personalBadgeMapper.findWornBadgesByUserId(userId);
 
+        // 2. BadgeDetailDto로 변환
         List<BadgeResponseDto.BadgeDetailDto> badgeDetailDtoList = wornBadges.stream()
                 .map(pb -> {
                     Badge badge = badgeMapper.findById(pb.getBadgeId());
@@ -61,7 +63,18 @@ public class WalletService {
                 })
                 .collect(Collectors.toList());
 
-        return BadgeResponseDto.wornBadgeListAndBenefitDto.from(badgeDetailDtoList);
+        // 3. 착용 중인 지갑 조회
+        PersonalWalletBrand mountedWallet = personalWalletBrandMapper.findMountedWalletByUserId(userId);
+        if (mountedWallet == null) {
+            // 지갑이 착용되어 있지 않은 경우 빈 이미지 또는 null 처리
+            return BadgeResponseDto.wornBadgeListAndBenefitDto.from(null, badgeDetailDtoList);
+        }
+
+        // 4. 지갑 브랜드 이미지 조회
+        WalletBrand walletBrand = walletBrandMapper.findWalletBrandById(mountedWallet.getWalletId());
+
+        // 5. DTO 변환 및 반환
+        return BadgeResponseDto.wornBadgeListAndBenefitDto.from(walletBrand, badgeDetailDtoList);
     }
 
     public BadgeResponseDto.specificBadgeDetailDto getSpecificBadgeDetail(Long badgeId, Long userId) {

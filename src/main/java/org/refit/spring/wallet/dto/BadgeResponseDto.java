@@ -1,10 +1,7 @@
 package org.refit.spring.wallet.dto;
 
 import lombok.*;
-import org.refit.spring.wallet.entity.Badge;
-import org.refit.spring.wallet.entity.BadgePreset;
-import org.refit.spring.wallet.entity.BadgePresetDetail;
-import org.refit.spring.wallet.entity.PersonalBadge;
+import org.refit.spring.wallet.entity.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -73,10 +70,12 @@ public class BadgeResponseDto {
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     @Builder
     public static class wornBadgeListAndBenefitDto {
+        private String brandImage;
         private List<BadgeDetailDto> myBadgeList;
 
-        public static wornBadgeListAndBenefitDto from(List<BadgeDetailDto> myBadgeList) {
+        public static wornBadgeListAndBenefitDto from(WalletBrand walletBrand, List<BadgeDetailDto> myBadgeList) {
             return wornBadgeListAndBenefitDto.builder()
+                    .brandImage(walletBrand.getBrandImage())
                     .myBadgeList(myBadgeList)
                     .build();
         }
