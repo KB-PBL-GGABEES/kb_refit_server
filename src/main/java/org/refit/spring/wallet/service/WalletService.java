@@ -24,18 +24,31 @@ public class WalletService {
     private final PersonalWalletBrandMapper personalWalletBrandMapper;
     private final BadgePresetMapper badgePresetMapper;
 
-    public BadgeResponseDto.BadgeListDto getBadgeList(Long userId) {
+    public BadgeResponseDto.EveryBadgeListDto getBadgeList(Long userId) {
         List<Badge> allBadges = badgeMapper.findAll(); // 전체 뱃지 목록
         List<Long> ownedBadgeIds = personalBadgeMapper.findBadgeIdsByUserId(userId); // 보유한 뱃지 ID
 
         Set<Long> ownedSet = ownedBadgeIds.stream().collect(Collectors.toSet());
 
-        List<BadgeResponseDto.BadgeListDetailDto> badgeList = allBadges.stream()
-                .map(badge -> BadgeResponseDto.BadgeListDetailDto.from(badge, ownedSet.contains(badge.getBadgeId())))
+        List<BadgeResponseDto.specificBadgeDetailDto> badgeList = allBadges.stream()
+                .map(badge -> BadgeResponseDto.specificBadgeDetailDto.from(badge, ownedSet.contains(badge.getBadgeId())))
                 .collect(Collectors.toList());
 
-        return BadgeResponseDto.BadgeListDto.from(badgeList);
+        return BadgeResponseDto.EveryBadgeListDto.from(badgeList);
     }
+
+//    public BadgeResponseDto.BadgeListDto getBadgeList(Long userId) {
+//        List<Badge> allBadges = badgeMapper.findAll(); // 전체 뱃지 목록
+//        List<Long> ownedBadgeIds = personalBadgeMapper.findBadgeIdsByUserId(userId); // 보유한 뱃지 ID
+//
+//        Set<Long> ownedSet = ownedBadgeIds.stream().collect(Collectors.toSet());
+//
+//        List<BadgeResponseDto.BadgeListDetailDto> badgeList = allBadges.stream()
+//                .map(badge -> BadgeResponseDto.BadgeListDetailDto.from(badge, ownedSet.contains(badge.getBadgeId())))
+//                .collect(Collectors.toList());
+//
+//        return BadgeResponseDto.BadgeListDto.from(badgeList);
+//    }
 
 
     public BadgeResponseDto.wornBadgeListAndBenefitDto getWornBadgeListAndBenefit(Long userId) {
@@ -116,17 +129,25 @@ public class WalletService {
         // 1. 유저 정보 가져오기
         User user = userMapper.findByUserId(userId);
 
-        // 2. 전체 브랜드 리스트
+        // 2. 전체 지갑 브랜드 리스트
         List<WalletBrand> walletBrandList = walletBrandMapper.findAllWalletBrands();
 
         // 3. 유저가 보유한 walletId 리스트
         List<Long> ownedWalletIds = personalWalletBrandMapper.findOwnedWalletIdsByUserId(userId);
 
-        // 4. DTO로 변환
-        List<WalletResponseDto.WalletBrandDto> walletBrandDtos = walletBrandList.stream()
-                .map(wallet -> WalletResponseDto.WalletBrandDto.from(wallet, ownedWalletIds.contains(wallet.getWalletId())))
+        // 4. 각 브랜드에 대해 보유 및 착용 여부 계산 후 DTO로 변환
+        List<WalletResponseDto.WalletBrandDetailDto> walletBrandDtos = walletBrandList.stream()
+                .map(brand -> {
+                    boolean isOwned = ownedWalletIds.contains(brand.getWalletId());
+                    PersonalWalletBrand personalWalletBrand = isOwned
+                            ? personalWalletBrandMapper.findByUserIdAndWalletId(userId, brand.getWalletId())
+                            : new PersonalWalletBrand(); // 기본값 객체
+
+                    return WalletResponseDto.WalletBrandDetailDto.from(brand, user, personalWalletBrand, isOwned);
+                })
                 .collect(Collectors.toList());
 
+        // 5. 최종 응답 DTO 생성
         return WalletResponseDto.WalletBrandListDto.from(walletBrandDtos, user);
     }
 

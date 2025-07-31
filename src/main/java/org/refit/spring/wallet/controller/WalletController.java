@@ -26,10 +26,14 @@ public class WalletController {
 
     @ApiOperation(value = "뱃지 도감 조회", notes = "전체 뱃지 도감 리스트와 현재 보유 여부를 확인할 수 있습니다.")
     @GetMapping("/badge")
-    public ResponseEntity<BadgeResponseDto.BadgeListDto> getBadgeList(@ApiIgnore @UserId Long userId) {
-        BadgeResponseDto.BadgeListDto list = walletService.getBadgeList(userId);
+    public ResponseEntity<BadgeResponseDto.EveryBadgeListDto> getBadgeList(@ApiIgnore @UserId Long userId) {
+        BadgeResponseDto.EveryBadgeListDto list = walletService.getBadgeList(userId);
         return ResponseEntity.ok(list);
     }
+//    public ResponseEntity<BadgeResponseDto.BadgeListDto> getBadgeList(@ApiIgnore @UserId Long userId) {
+//        BadgeResponseDto.BadgeListDto list = walletService.getBadgeList(userId);
+//        return ResponseEntity.ok(list);
+//    }
 
     @ApiOperation(value = "내가 착용한 뱃지 및 혜택 조회", notes = "현재 사용자가 착용한 뱃지의 리스트와 그에 해당하는 혜택을 조회할 수 있습니다.")
     @GetMapping("/badge/home")
@@ -78,6 +82,10 @@ public class WalletController {
         WalletResponseDto.WalletBrandListDto result = walletService.getWalletList(userId);
         return ResponseEntity.ok(result);
     }
+//    public ResponseEntity<WalletResponseDto.WalletBrandListDto> getWalletStore(@ApiIgnore @UserId Long userId) {
+//        WalletResponseDto.WalletBrandListDto result = walletService.getWalletList(userId);
+//        return ResponseEntity.ok(result);
+//    }
 
     @ApiOperation(value = "지갑 브랜드 상세 조회", notes = "전자지갑 브랜드 디자인의 상세 정보를 확인할 수 있습니다.")
     @GetMapping("/brand/detail/{walletId}")

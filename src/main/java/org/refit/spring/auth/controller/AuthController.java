@@ -15,7 +15,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 @Api(tags = "권한 관련 API", description = "로그인, refresh token, mydata 관련 API입니다..")
@@ -29,8 +31,15 @@ public class AuthController {
 
     //security에서 제공하는 login 사용할 예정
     @GetMapping("/test")
-    public String test() {
-        return new BCryptPasswordEncoder().encode("050505");
+    public List<String> test() {
+        ArrayList<String> arrayList = new ArrayList<>();
+        arrayList.add(new BCryptPasswordEncoder().encode("010101"));
+        arrayList.add(new BCryptPasswordEncoder().encode("020202"));
+        arrayList.add(new BCryptPasswordEncoder().encode("030303"));
+        arrayList.add(new BCryptPasswordEncoder().encode("040404"));
+        arrayList.add(new BCryptPasswordEncoder().encode("050505"));
+        arrayList.add(new BCryptPasswordEncoder().encode("060606"));
+        return arrayList;
     }
 
     @ApiOperation(value = "현재 로그인한 유저 정보 조회 API", notes = "현재 로그인한 유저의 정보를 조회할 수 있습니다.")
