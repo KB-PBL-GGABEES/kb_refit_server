@@ -27,4 +27,5 @@ public interface BadgePresetMapper {
 
     @Delete("DELETE FROM badge_preset WHERE preset_id = #{presetId}")
     void deletePresetById(Long presetId);
+
 }
