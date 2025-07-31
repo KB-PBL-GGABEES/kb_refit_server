@@ -6,10 +6,12 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.refit.spring.auth.annotation.UserId;
+import org.refit.spring.receipt.enums.ReceiptSort;
 import org.refit.spring.reward.dto.RewardListDto;
 import org.refit.spring.reward.dto.RewardResponseDto;
 import org.refit.spring.reward.dto.RewardWalletRequestDto;
 import org.refit.spring.reward.dto.RewardWalletResponseDto;
+import org.refit.spring.reward.enums.RewardType;
 import org.refit.spring.reward.service.RewardService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +29,7 @@ public class RewardController {
 
     private final RewardService rewardService;
 
-    @ApiOperation(value = "리워드 내역 조회", notes = "탄소중립포인트와 리워드 내역을 목록으로 조회합니다.")
+    @ApiOperation(value = "리워드 내역 조회", notes = "탄소중립포인트와 리워드 내역을 목록으로 조회하며, 파라미터를 이용해 필터링할 수 있습니다.")
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "잘못된 요청"),
             @ApiResponse(code = 500, message = "서버 내부 오류")
@@ -36,25 +38,12 @@ public class RewardController {
     public ResponseEntity<?> getList(
             @ApiIgnore @UserId Long userId,
             @RequestParam(required = false) Long cursorId,
-            @RequestParam(required = false) Integer period) {
-        RewardListDto dto;
-        if (period != null && period > 0) dto = rewardService.getListMonths(userId, cursorId, period);
-        else dto = rewardService.getList(userId, cursorId);
-        return ResponseEntity.ok(dto);
-    }
-
-    @ApiOperation(value = "설정한 기간 만큼의 리워드 내역 조회", notes = "시작 날짜와 종료 날짜를 선택해 기간별 조회가 가능합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(code = 400, message = "잘못된 요청"),
-            @ApiResponse(code = 500, message = "서버 내부 오류")
-    })
-    @GetMapping("/list/period")
-    public ResponseEntity<?> getListPeriod(
-            @ApiIgnore @UserId Long userId,
-            @RequestParam(required = false) Long cursorId,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate) {
-        RewardListDto dto = rewardService.getListPeriod(userId, cursorId, startDate, endDate);
+            @RequestParam(required = false) Integer period,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate,
+            @RequestParam(required = false) RewardType type,
+            @RequestParam(required = false) ReceiptSort sort) {
+        RewardListDto dto = rewardService.getList(userId, cursorId, period, startDate, endDate, type, sort);
         return ResponseEntity.ok(dto);
     }
 
