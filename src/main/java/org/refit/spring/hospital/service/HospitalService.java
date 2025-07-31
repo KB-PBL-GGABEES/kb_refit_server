@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +30,19 @@ public class HospitalService {
         if (results == null || results.isEmpty()) return null;
 
         return results.get(0);
+    }
+
+    // 진료비 세부산정내역 PDF 파일명 DB저장
+    public void updateHospitalVoucher(Long userId, HospitalVoucherRequestDto dto) {
+        hospitalMapper.updateHospitalVoucher(dto.getReceiptId(), dto.getHospitalVoucher(), userId);
+    }
+
+
+    // 진료비 세부산정내역 PDF 파일명 조회
+    public HospitalVoucherResponseDto findHospitalVoucher(Long userId, Long receiptId) {
+        String fileName = hospitalMapper.findHospitalVoucherByReceiptId(receiptId, userId);
+        if (fileName == null || fileName.isEmpty()) return null;
+        return new HospitalVoucherResponseDto(fileName);
     }
 
     // 최근 병원비 조회

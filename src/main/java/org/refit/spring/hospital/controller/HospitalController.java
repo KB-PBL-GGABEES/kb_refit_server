@@ -67,6 +67,38 @@ public class HospitalController {
         return ResponseEntity.ok(result);
     }
 
+    // 진료비 세부산정내역 PDF 파일명 DB저장
+    @ApiOperation(value = "진료비 세부산정내역 파일명 저장", notes = "프론트에서 보낸 파일명을 DB에 저장합니다.")
+    @PostMapping("/voucher")
+    public ResponseEntity<?> saveHospitalVoucher(@ApiIgnore @UserId Long userId,
+                                                 @RequestBody HospitalVoucherRequestDto dto) {
+
+        if (dto.getReceiptId() == null || dto.getHospitalVoucher() == null || dto.getHospitalVoucher().isEmpty()) {
+            return ResponseEntity.badRequest().body(Collections.singletonMap("message", "필수 정보 누락"));
+        }
+
+        hospitalService.updateHospitalVoucher(userId, dto);
+        return ResponseEntity.ok(Collections.singletonMap("message", "파일명이 정상적으로 저장되었습니다."));
+    }
+
+
+
+    // 진료비 세부산정내역 PDF 파일명 조회
+    @ApiOperation(value = "진료비 세부산정내역 파일명 조회", notes = "receiptId에 해당하는 PDF 파일명을 반환합니다.")
+    @GetMapping("/voucher")
+    public ResponseEntity<?> getHospitalVoucher(@ApiIgnore @UserId Long userId,
+                                                @RequestParam("receiptId") Long receiptId) {
+
+        HospitalVoucherResponseDto result = hospitalService.findHospitalVoucher(userId, receiptId);
+
+        if (result == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Collections.singletonMap("message", "해당 영수증에 대한 파일명이 존재하지 않습니다."));
+        }
+
+        return ResponseEntity.ok(result);
+    }
+
     // 최근 병원비 조회
     @ApiOperation(value = "최근 병원비 및 보험청구 가능 건수", notes = "최근 3년간 병원비 총액과 보험청구 가능한 건수를 조회합니다.")
     @GetMapping("/recent")
