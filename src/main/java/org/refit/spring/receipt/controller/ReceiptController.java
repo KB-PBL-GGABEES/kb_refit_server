@@ -4,7 +4,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import io.swagger.models.auth.In;
 import lombok.RequiredArgsConstructor;
 import org.refit.spring.auth.annotation.UserId;
 import org.refit.spring.auth.service.UserService;
@@ -49,7 +48,9 @@ public class ReceiptController {
         Reward reward = rewardService.create(CARBON_POINT, receipt.getTotalPrice(), userId);
         userService.updatePoint(userId, reward.getCarbonPoint(), reward.getReward());
         ReceiptResponseDto dto = ReceiptResponseDto.from(receipt, userId, reward.getCarbonPoint(), reward.getReward());
-        return ResponseEntity.ok(dto);
+        URI location = URI.create("/receipt/" + receipt.getReceiptId());
+
+        return ResponseEntity.created(location).body(dto);
     }
 
     @ApiOperation(value = "환불 영수증 등록", notes = "결제 시 생성된 영수증 아이디를 이용해 환불 영수증을 생성합니다.")
