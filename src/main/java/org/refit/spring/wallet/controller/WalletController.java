@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Api(tags = "전자지갑 API", description = "뱃지 및 지갑 디자인 관련 API입니다.")
+@Api(tags = "전자지갑 API", description = "뱃지 및 지갑 디자인, 프리셋 관련 API입니다.")
 @RestController
 @RequestMapping("/api/wallet")
 @RequiredArgsConstructor
@@ -132,5 +132,15 @@ public class WalletController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok().build();
+    }
+
+    @ApiOperation(value = "뱃지 프리셋 착용", notes = "선택한 프리셋을 한 번에 적용하여 기존 착용 뱃지를 모두 교체합니다.")
+    @PatchMapping("/badge/preset/apply/{presetId}")
+    public ResponseEntity<?> applyPreset(@ApiIgnore @UserId Long userId, @PathVariable("presetId") Long presetId) {
+        BadgeResponseDto.ApplyBadgePresetResultDto result = walletService.applyPreset(userId, presetId);
+        if (result == null || result.getWornBadgeIdList().isEmpty()) {
+            return ResponseEntity.noContent().build();//204
+        }
+        return ResponseEntity.ok(result);
     }
 }

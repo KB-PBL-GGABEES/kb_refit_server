@@ -1,5 +1,6 @@
 package org.refit.spring.wallet.dto;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.refit.spring.wallet.entity.BadgePreset;
@@ -20,17 +21,5 @@ public class BadgeRequestDto {
     @NoArgsConstructor
     public static class SaveBadgePresetDto {
         private String presetName;
-    }
-
-    @Getter
-    @NoArgsConstructor
-    public static class DeletePresetDto {
-        private Long presetId;
-
-        public BadgePreset toEntity() {
-            return BadgePreset.builder()
-                    .presetId(this.presetId)
-                    .build();
-        }
     }
 }
