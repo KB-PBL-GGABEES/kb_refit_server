@@ -42,6 +42,11 @@ public interface ReceiptProcessMapper {
             @Param("voucher") String voucher,
             @Param("receiptId") Long receiptId
     );
+
+    // receiptId가 실제로 존재하는지 확인
+    @Select("SELECT COUNT(*) > 0 FROM receipt WHERE receipt_id = #{receiptId}")
+    boolean existsReceiptById(@Param("receiptId") Long receiptId);
+
     // userId와 receiptId로 ceoId 찾기
     @Select("SELECT c.ceo_id " +
             "FROM receipt r " +
