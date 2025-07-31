@@ -4,6 +4,7 @@ import org.apache.ibatis.annotations.*;
 import org.refit.spring.receipt.entity.Receipt;
 import org.refit.spring.receipt.entity.ReceiptContent;
 
+import java.util.Date;
 import java.util.List;
 
 @Mapper
@@ -19,8 +20,15 @@ public interface ReceiptMapper {
     @Update("UPDATE receipt SET total_price = #{receipt.totalPrice}, supply_price = #{receipt.supplyPrice}, surtax = #{receipt.surtax} WHERE user_id = #{userId} AND receipt_id = #{receipt.receiptId}")
     void update(@Param("userId") Long userId, @Param("receipt") Receipt receipt);
 
+
     @Select("SELECT * FROM receipt WHERE user_id = #{userId} AND receipt_id < #{cursorId} ORDER BY receipt_id DESC LIMIT 20")
     List<Receipt> getList(@Param("userId") Long userId, @Param("cursorId") Long cursorId);
+
+    @Select("SELECT * FROM receipt WHERE user_id = #{userId} AND receipt_id < #{cursorId} AND created_at >= DATE_SUB(NOW(), INTERVAL #{period} MONTH) ORDER BY receipt_id DESC LIMIT 20")
+    List<Receipt> getListForMonths(@Param("userId") Long userId, @Param("cursorId") Long cursorId, @Param("period") int period);
+
+    @Select("SELECT * FROM receipt WHERE user_id = #{userId} AND receipt_id < #{cursorId} AND created_at BETWEEN #{startDate} AND #{endDate} ORDER BY receipt_id DESC LIMIT 20")
+    List<Receipt> getListWithPeriod(@Param("userId") Long userId, @Param("cursorId") Long cursorId, @Param("startDate") Date startDate, @Param("endDate") Date endDate);
 
     @Select("SELECT * FROM receipt_content rc JOIN receipt r ON rc.receipt_id = r.receipt_id WHERE r.user_id = #{userId} AND rc.receipt_id = #{receiptId}")
     List<ReceiptContent> findContentsByReceiptId(@Param("userId") Long userId, @Param("receiptId") Long receiptId);

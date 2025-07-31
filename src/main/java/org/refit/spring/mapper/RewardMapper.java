@@ -3,6 +3,7 @@ package org.refit.spring.mapper;
 import org.apache.ibatis.annotations.*;
 import org.refit.spring.reward.entity.Reward;
 
+import java.util.Date;
 import java.util.List;
 
 @Mapper
@@ -14,6 +15,12 @@ public interface RewardMapper {
 
     @Select("SELECT * FROM reward WHERE user_id = #{userId} AND reward_id < #{cursorId} ORDER BY reward_id DESC LIMIT 20")
     List<Reward> getList(@Param("userId") Long userId, @Param("cursorId") Long cursorId);
+
+    @Select("SELECT * FROM reward WHERE user_id = #{userId} AND reward_id < #{cursorId} AND created_at >= DATE_SUB(NOW(), INTERVAL #{period} MONTH) ORDER BY reward_id DESC LIMIT 20")
+    List<Reward> getListForMonths(@Param("userId") Long userId, @Param("cursorId") Long cursorId, @Param("period") int period);
+
+    @Select("SELECT * FROM reward WHERE user_id = #{userId} AND reward_id < #{cursorId} AND created_at BETWEEN #{startDate} AND #{endDate} ORDER BY reward_id DESC LIMIT 20")
+    List<Reward> getListWithPeriod(@Param("userId") Long userId, @Param("cursorId") Long cursorId, @Param("startDate") Date startDate, @Param("endDate") Date endDate);
 
     @Select("SELECT IFNULL(SUM(reward), 0) FROM reward WHERE user_id = #{userId}")
     Long getTotalCashback(@Param("userId") Long userId);

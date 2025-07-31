@@ -133,6 +133,22 @@ public class ReceiptService {
     }
 
     @Transactional(readOnly = true)
+    public ReceiptListDto getListMonths(Long userId, Long cursorId, Integer period) {
+        if (cursorId == null) cursorId = Long.MAX_VALUE;
+        List<Receipt> receipts = receiptMapper.getListForMonths(userId, cursorId, period);
+        Long nextCursorId = receipts.size() < 20 ? null : receipts.get(receipts.size() - 1).getReceiptId();
+        return ReceiptListDto.from(userId, receipts, nextCursorId);
+    }
+
+    @Transactional(readOnly = true)
+    public ReceiptListDto getListPeriod(Long userId, Long cursorId, Date startDate, Date endDate) {
+        if (cursorId == null) cursorId = Long.MAX_VALUE;
+        List<Receipt> receipts = receiptMapper.getListWithPeriod(userId, cursorId, startDate, endDate);
+        Long nextCursorId = receipts.size() < 20 ? null : receipts.get(receipts.size() - 1).getReceiptId();
+        return ReceiptListDto.from(userId, receipts, nextCursorId);
+    }
+
+    @Transactional(readOnly = true)
     public ReceiptDetailDto get(Long userId, Long cursorId, Long receiptId) {
         if (cursorId == null) cursorId = Long.MAX_VALUE;
 

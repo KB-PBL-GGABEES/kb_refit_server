@@ -44,6 +44,22 @@ public class RewardService {
     }
 
     @Transactional(readOnly = true)
+    public RewardListDto getListMonths(Long userId, Long cursorId, Integer period) {
+        if (cursorId == null) cursorId = Long.MAX_VALUE;
+        List<Reward> rewards = rewardMapper.getListForMonths(userId, cursorId, period);
+        Long nextCursorId = rewards.size() < 20 ? null : rewards.get(rewards.size() - 1).getRewardId();
+        return RewardListDto.from(userId, rewards, nextCursorId);
+    }
+
+    @Transactional(readOnly = true)
+    public RewardListDto getListPeriod(Long userId, Long cursorId, Date startDate, Date endDate) {
+        if (cursorId == null) cursorId = Long.MAX_VALUE;
+        List<Reward> rewards = rewardMapper.getListWithPeriod(userId, cursorId, startDate, endDate);
+        Long nextCursorId = rewards.size() < 20 ? null : rewards.get(rewards.size() - 1).getRewardId();
+        return RewardListDto.from(userId, rewards, nextCursorId);
+    }
+
+    @Transactional(readOnly = true)
     public RewardResponseDto getTotal(Long userId) {
         User user = userMapper.findByUserId(userId);
         RewardResponseDto dto = new RewardResponseDto();
