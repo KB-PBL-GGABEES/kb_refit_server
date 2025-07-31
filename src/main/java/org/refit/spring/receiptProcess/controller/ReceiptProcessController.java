@@ -99,34 +99,55 @@ public class ReceiptProcessController {
     public ResponseEntity<?> registerReceiptProcess(@RequestBody ReceiptProcessRequestDto dto,
                                                     @ApiIgnore @UserId Long userId) {
         try {
-            // 필수값 검증
-            if (dto == null || dto.getReceiptId() == null || dto.getProgressType() == null) {
+            // [1] 기본 입력값 검증
+            if (dto == null) {
                 return ResponseEntity.badRequest()
-                        .body(Collections.singletonMap("message", "필수 경비 처리 정보가 누락되었습니다."));
+                        .body(Collections.singletonMap("message", "요청 데이터가 존재하지 않습니다."));
             }
 
-            // voucher가 비어있으면 null로 세팅
-            if (dto.getVoucher() == null || dto.getVoucher().trim().isEmpty()) {
+            if (dto.getReceiptId() == null) {
+                return ResponseEntity.badRequest()
+                        .body(Collections.singletonMap("message", "영수증 ID(receiptId)는 필수 입력 항목입니다."));
+            }
+
+            if (dto.getProgressType() == null || dto.getProgressType().trim().isEmpty()) {
+                return ResponseEntity.badRequest()
+                        .body(Collections.singletonMap("message", "경비 처리 항목(progressType)은 필수입니다."));
+            }
+
+            if (dto.getProgressDetail() == null || dto.getProgressDetail().trim().isEmpty()) {
+                return ResponseEntity.badRequest()
+                        .body(Collections.singletonMap("message", "세부 내용(progressDetail)은 필수입니다."));
+            }
+
+            // [2] voucher가 비어있으면 null 처리
+            if (dto.getVoucher() != null && dto.getVoucher().trim().isEmpty()) {
                 dto.setVoucher(null);
             }
 
-            // userId → ceoId 변환
-            Long ceoId = receiptProcessService.findCeoIdByUserIdAndReceiptId(userId, dto.getReceiptId());
-            if (ceoId == null) {
+            // [3] receiptId가 실제로 존재하는지 확인
+            boolean receiptExists = receiptProcessService.receiptExists(dto.getReceiptId());
+            if (!receiptExists) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Collections.singletonMap("message", "해당 사용자에 대한 ceo 정보가 존재하지 않습니다."));
+                        .body(Collections.singletonMap("message", "존재하지 않는 영수증입니다. receiptId를 확인해주세요."));
             }
 
-            // 등록 요청
+            // [4] userId와 receiptId가 매칭되는지 확인
+            Long ceoId = receiptProcessService.findCeoIdByUserIdAndReceiptId(userId, dto.getReceiptId());
+            if (ceoId == null) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Collections.singletonMap("message", "해당 영수증은 현재 사용자에게 속하지 않습니다."));
+            }
+
+            // [5] 등록
             receiptProcessService.registerReceiptProcess(dto, ceoId);
             return ResponseEntity.noContent().build();
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Collections.singletonMap("message", "경비 처리 등록 중 오류가 발생했습니다."));
+                    .body(Collections.singletonMap("message", "서버 오류로 인해 경비 처리 등록에 실패했습니다."));
         }
     }
-
     @ApiOperation(value = "관련 이미지 파일명 DB조회", notes = "관련 이미지 파일명을 조회할 수 있습니다.")
     @GetMapping("/voucher")
     public ResponseEntity<?> getReceiptVoucher(@RequestParam("receiptId") Long receiptId) {

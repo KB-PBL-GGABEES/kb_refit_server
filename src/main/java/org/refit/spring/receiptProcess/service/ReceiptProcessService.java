@@ -138,6 +138,12 @@ public class ReceiptProcessService {
         );
     }
 
+    // receiptId가 실제로 존재하는지 확인
+
+    public boolean receiptExists(Long receiptId) {
+        return receiptProcessMapper.existsReceiptById(receiptId);
+    }
+
     // userId + receiptId로 ceoId 찾기
     public Long findCeoIdByUserIdAndReceiptId(Long userId, Long receiptId) {
         return receiptProcessMapper.findCeoIdByUserIdAndReceiptId(userId, receiptId);
