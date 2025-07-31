@@ -35,13 +35,10 @@ public class WalletController {
 //        return ResponseEntity.ok(list);
 //    }
 
-    @ApiOperation(value = "내가 착용한 뱃지 및 혜택 조회", notes = "현재 사용자가 착용한 뱃지의 리스트와 그에 해당하는 혜택을 조회할 수 있습니다.")
+    @ApiOperation(value = "내가 착용한 뱃지 및 혜택, 지갑 브랜드 조회", notes = "현재 사용자가 착용한 뱃지의 리스트와 그에 해당하는 혜택과 지갑 브랜드를 조회할 수 있습니다.")
     @GetMapping("/badge/home")
     public ResponseEntity<?> myWornBadgeList(@ApiIgnore @UserId Long userId) {
         BadgeResponseDto.wornBadgeListAndBenefitDto result = walletService.getWornBadgeListAndBenefit(userId);
-        if (result.getMyBadgeList() == null || result.getMyBadgeList().isEmpty()) {
-            return ResponseEntity.ok("현재 착용 중인 뱃지가 없습니다.");
-        }
         return ResponseEntity.ok(result);
     }
 

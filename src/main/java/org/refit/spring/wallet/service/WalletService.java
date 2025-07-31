@@ -37,26 +37,16 @@ public class WalletService {
         return BadgeResponseDto.EveryBadgeListDto.from(badgeList);
     }
 
-//    public BadgeResponseDto.BadgeListDto getBadgeList(Long userId) {
-//        List<Badge> allBadges = badgeMapper.findAll(); // 전체 뱃지 목록
-//        List<Long> ownedBadgeIds = personalBadgeMapper.findBadgeIdsByUserId(userId); // 보유한 뱃지 ID
-//
-//        Set<Long> ownedSet = ownedBadgeIds.stream().collect(Collectors.toSet());
-//
-//        List<BadgeResponseDto.BadgeListDetailDto> badgeList = allBadges.stream()
-//                .map(badge -> BadgeResponseDto.BadgeListDetailDto.from(badge, ownedSet.contains(badge.getBadgeId())))
-//                .collect(Collectors.toList());
-//
-//        return BadgeResponseDto.BadgeListDto.from(badgeList);
-//    }
 
 
     public BadgeResponseDto.wornBadgeListAndBenefitDto getWornBadgeListAndBenefit(Long userId) {
         // 1. 착용한 뱃지 목록 조회
         List<PersonalBadge> wornBadges = personalBadgeMapper.findWornBadgesByUserId(userId);
 
-        // 2. BadgeDetailDto로 변환
-        List<BadgeResponseDto.BadgeDetailDto> badgeDetailDtoList = wornBadges.stream()
+        // 2. BadgeDetailDto 변환 (없으면 빈 리스트)
+        List<BadgeResponseDto.BadgeDetailDto> badgeDetailDtoList = wornBadges.isEmpty()
+                ? null // ← 쑤의 요청대로 null로 반환
+                : wornBadges.stream()
                 .map(pb -> {
                     Badge badge = badgeMapper.findById(pb.getBadgeId());
                     return BadgeResponseDto.BadgeDetailDto.from(badge, pb);
@@ -65,15 +55,13 @@ public class WalletService {
 
         // 3. 착용 중인 지갑 조회
         PersonalWalletBrand mountedWallet = personalWalletBrandMapper.findMountedWalletByUserId(userId);
-        if (mountedWallet == null) {
-            // 지갑이 착용되어 있지 않은 경우 빈 이미지 또는 null 처리
-            return BadgeResponseDto.wornBadgeListAndBenefitDto.from(null, badgeDetailDtoList);
+
+        WalletBrand walletBrand = null;
+        if (mountedWallet != null) {
+            walletBrand = walletBrandMapper.findWalletBrandById(mountedWallet.getWalletId());
         }
 
-        // 4. 지갑 브랜드 이미지 조회
-        WalletBrand walletBrand = walletBrandMapper.findWalletBrandById(mountedWallet.getWalletId());
-
-        // 5. DTO 변환 및 반환
+        // 4. DTO 변환
         return BadgeResponseDto.wornBadgeListAndBenefitDto.from(walletBrand, badgeDetailDtoList);
     }
 

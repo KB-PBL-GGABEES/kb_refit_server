@@ -75,8 +75,8 @@ public class BadgeResponseDto {
 
         public static wornBadgeListAndBenefitDto from(WalletBrand walletBrand, List<BadgeDetailDto> myBadgeList) {
             return wornBadgeListAndBenefitDto.builder()
-                    .brandImage(walletBrand.getBrandImage())
-                    .myBadgeList(myBadgeList)
+                    .brandImage(walletBrand != null ? walletBrand.getBrandImage() : null)
+                    .myBadgeList(myBadgeList) //Null 가능
                     .build();
         }
     }
