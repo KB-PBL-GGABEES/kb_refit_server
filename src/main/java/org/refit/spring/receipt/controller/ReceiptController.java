@@ -16,12 +16,14 @@ import org.refit.spring.receipt.entity.Receipt;
 import org.refit.spring.receipt.service.ReceiptService;
 import org.refit.spring.reward.entity.Reward;
 import org.refit.spring.reward.service.RewardService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.net.URI;
 import java.sql.SQLException;
+import java.util.Date;
 
 
 @Api(tags = "영수증 API", description = "영수증 등록 및 조회 관련 API입니다.")
@@ -78,6 +80,21 @@ public class ReceiptController {
         ReceiptListDto dto;
         if (period != null && period > 0) dto = receiptService.getListMonths(userId, cursorId, period);
         else dto = receiptService.getList(userId, cursorId);
+        return ResponseEntity.ok(dto);
+    }
+
+    @ApiOperation(value = "설정된 기간 만큼의 영수증 목록 조회", notes = "시작 날짜와 종료 날짜를 선택해 기간별 조회가 가능합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "잘못된 요청"),
+            @ApiResponse(code = 500, message = "서버 내부 오류")
+    })
+    @GetMapping("/list/period")
+    public ResponseEntity<?> getListPeriod(
+            @ApiIgnore @UserId Long userId,
+            @RequestParam(required = false) Long cursorId,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate) {
+        ReceiptListDto dto = receiptService.getListPeriod(userId, cursorId, startDate, endDate);
         return ResponseEntity.ok(dto);
     }
 
