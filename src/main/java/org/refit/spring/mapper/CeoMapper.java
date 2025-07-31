@@ -1,9 +1,12 @@
 package org.refit.spring.mapper;
 
 import org.apache.ibatis.annotations.*;
-import org.refit.spring.ceo.dto.CorporateCardListlDto;
+import org.refit.spring.ceo.dto.CeoListDto;
+import org.refit.spring.ceo.dto.CorporateCardListDto;
 import org.refit.spring.ceo.entity.Ceo;
-import org.refit.spring.ceo.dto.ReceiptListlDto;
+import org.refit.spring.ceo.dto.ReceiptListDto;
+import org.refit.spring.ceo.entity.ReceiptProcess;
+import org.refit.spring.receipt.entity.Receipt;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -62,7 +65,7 @@ public interface CeoMapper {
             "    JOIN receipt_process p ON r.receipt_id = p.receipt_id\n" +
             "    WHERE r.receipt_id = #{receiptId}\n" +
             "    LIMIT 1")
-    ReceiptListlDto getReceiptList(
+    ReceiptListDto getReceiptList(
             @Param("userId") Long userId,
             @Param("receiptId") Long receiptId);
 
@@ -81,12 +84,10 @@ public interface CeoMapper {
             "    JOIN company c ON r.company_id = c.company_id\n" +
             "    JOIN receipt_process p ON r.receipt_id = p.receipt_id\n" +
             "WHERE p.process_state IN ('accepted', 'rejected')\n" +
-            "  AND r.created_at >= #{fromDate}\n" +
-            "  AND r.created_at  < #{cursor}\n" +
-            "ORDER BY r.created_at DESC LIMIT 20")
+            "  AND r.receipt_id < #{cursor}\n" +
+            "ORDER BY r.receipt_id DESC LIMIT 20")
     List<Ceo> getCompletedReceipts(
-            @Param("fromDate") LocalDateTime fromDate,
-            @Param("cursor") LocalDateTime cursor,
+            @Param("cursor") Long cursor,
             @Param("userId") Long userId);
 
     // 처리 완료된 항목 이메일 전송
@@ -151,9 +152,9 @@ public interface CeoMapper {
             "WHERE c.is_corporate = TRUE\n" +
             "  AND e.company_id = (\n" +
             "      SELECT company_id FROM employee WHERE user_id = #{userId} LIMIT 1)\n" +
-            "  AND r.created_at < #{cursor}\n" +
-            "ORDER BY r.created_at LIMIT 20")
-    List<CorporateCardListlDto> getCorporateCardReceipts(
-                    @Param("cursor") LocalDateTime cursor,
+            "  AND r.receipt_id < #{cursor}\n" +
+            "ORDER BY r.receipt_id DESC LIMIT 20")
+    List<CorporateCardListDto> getCorporateCardReceipts(
+                    @Param("cursor") Long cursor,
                     @Param("userId") Long userId);
 }

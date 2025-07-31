@@ -2,9 +2,14 @@ package org.refit.spring.ceo.service;
 
 import lombok.RequiredArgsConstructor;
 import org.refit.spring.ceo.dto.CeoListDto;
-import org.refit.spring.ceo.dto.CorporateCardListlDto;
-import org.refit.spring.ceo.dto.ReceiptListlDto;
+import org.refit.spring.ceo.dto.CorporateCardListDto;
+import org.refit.spring.ceo.dto.ReceiptCompletedListDto;
+import org.refit.spring.ceo.dto.ReceiptListDto;
+import org.refit.spring.ceo.entity.Ceo;
+import org.refit.spring.ceo.entity.CorporateCardList;
+import org.refit.spring.ceo.entity.ReceiptProcess;
 import org.refit.spring.mapper.CeoMapper;
+import org.refit.spring.receipt.entity.Receipt;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -39,20 +44,18 @@ public class CeoServiceImpl implements CeoService {
 
     // 경비 청구 항목 상세 조회
     @Override
-    public ReceiptListlDto getReceiptList(Long receipted, Long userId) {
+    public ReceiptListDto getReceiptList(Long receipted, Long userId) {
         return ceoMapper.getReceiptList(receipted, userId);
     }
 
     // 경비 처리 완료 내역 조회
     @Override
-    public List<CeoListDto> getCompletedReceipts(int period, String cursorDateTime, Long userId) {
-        LocalDateTime fromDate = LocalDateTime.now().minusMonths(period);
-        LocalDateTime cursor = (cursorDateTime == null)
-                ? LocalDateTime.now().plusDays(1)
-                : LocalDateTime.parse(cursorDateTime);
+    public List<CeoListDto> getCompletedReceipts(Long cursorId, Long userId) {
+        if(cursorId == null) cursorId = Long.MAX_VALUE;
 
-        return ceoMapper.getCompletedReceipts(fromDate, cursor, userId)
-                .stream()
+        List<Ceo> result = ceoMapper.getCompletedReceipts(cursorId, userId);
+
+        return result.stream()
                 .map(CeoListDto::of)
                 .collect(Collectors.toList());
     }
@@ -89,11 +92,11 @@ public class CeoServiceImpl implements CeoService {
 
     // 법카 내역 조회
     @Override
-    public List<CorporateCardListlDto> getCorporateCardReceipts(String cursorDateTime, Long userId) {
-        LocalDateTime cursor = (cursorDateTime == null)
-                ? LocalDateTime.now().plusDays(1)
-                : LocalDateTime.parse(cursorDateTime);
+    public List<CorporateCardListDto> getCorporateCardReceipts(Long cursorId, Long userId) {
+        if(cursorId == null) cursorId = Long.MAX_VALUE;
 
-        return ceoMapper.getCorporateCardReceipts(cursor, userId);
+        List<CorporateCardListDto> result = ceoMapper.getCorporateCardReceipts(cursorId, userId);
+
+        return result;
     }
 }
