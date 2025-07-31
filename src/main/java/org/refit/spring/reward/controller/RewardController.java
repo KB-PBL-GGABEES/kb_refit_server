@@ -30,11 +30,14 @@ public class RewardController {
             @ApiResponse(code = 400, message = "잘못된 요청"),
             @ApiResponse(code = 500, message = "서버 내부 오류")
     })
-    @GetMapping("")
+    @GetMapping("/list")
     public ResponseEntity<?> getList(
             @ApiIgnore @UserId Long userId,
-            @RequestParam(required = false) Long cursorId) {
-        RewardListDto dto = rewardService.getList(userId, cursorId);
+            @RequestParam(required = false) Long cursorId,
+            @RequestParam(required = false) Integer period) {
+        RewardListDto dto;
+        if (period != null && period > 0) dto = rewardService.getListMonths(userId, cursorId, period);
+        else dto = rewardService.getList(userId, cursorId);
         return ResponseEntity.ok(dto);
     }
 
