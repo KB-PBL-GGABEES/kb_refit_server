@@ -110,6 +110,22 @@ public class BadgeResponseDto {
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     @Builder
+    public static class EveryBadgeListDto {
+        private List<specificBadgeDetailDto> badgeList;
+
+        public static EveryBadgeListDto from(List<specificBadgeDetailDto> badgeList) {
+            return EveryBadgeListDto.builder()
+                    .badgeList(badgeList)
+                    .build();
+        }
+    }
+
+
+
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    @Builder
     public static class ToggleWornBadgeDto {
         private Long userId;
         private Long badgeId;
