@@ -15,8 +15,4 @@ public interface BadgeMapper {
 
     @Select("SELECT * FROM badge WHERE badge_id = #{badgeId}")
     Badge findById(Long badgeId);
-
-    @Insert("INSERT INTO personal_badge (is_worn, created_at, updated_at, badge_id, user_id) VALUES (0, now(), now(), #{badgeId}, #{userId})")
-    void insertPersonalBadge(@Param("badgeId") Long badgeId,
-                             @Param("userId") Long userId);
 }
