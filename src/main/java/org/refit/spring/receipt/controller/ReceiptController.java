@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.models.auth.In;
 import lombok.RequiredArgsConstructor;
 import org.refit.spring.auth.annotation.UserId;
 import org.refit.spring.auth.service.UserService;
@@ -64,7 +65,7 @@ public class ReceiptController {
         return ResponseEntity.created(location).body(dto);
     }
 
-    @ApiOperation(value = "영수증 목록 조회", notes = "전체 영수증을 조회합니다.")
+    @ApiOperation(value = "영수증 목록 조회", notes = "전체 영수증을 조회하며, period 값으로 기간별 조회가 가능합니다.")
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "잘못된 요청"),
             @ApiResponse(code = 500, message = "서버 내부 오류")
@@ -72,11 +73,13 @@ public class ReceiptController {
     @GetMapping("/list")
     public ResponseEntity<?> getList(
             @ApiIgnore @UserId Long userId,
-            @RequestParam(required = false) Long cursorId) {
-        ReceiptListDto dto = receiptService.getList(userId, cursorId);
+            @RequestParam(required = false) Long cursorId,
+            @RequestParam(required = false) Integer period) {
+        ReceiptListDto dto;
+        if (period != null && period > 0) dto = receiptService.getListMonths(userId, cursorId, period);
+        else dto = receiptService.getList(userId, cursorId);
         return ResponseEntity.ok(dto);
     }
-
 
     @ApiOperation(value = "영수증 상세 조회", notes = "영수증 아이디를 활용해 영수증에 기록된 모든 정보를 확인합니다.")
     @ApiResponses(value = {
