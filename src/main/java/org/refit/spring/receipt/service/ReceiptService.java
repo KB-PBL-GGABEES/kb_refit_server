@@ -9,6 +9,9 @@ import org.refit.spring.merchandise.entity.Merchandise;
 import org.refit.spring.receipt.dto.*;
 import org.refit.spring.receipt.entity.Receipt;
 import org.refit.spring.receipt.entity.ReceiptContent;
+import org.refit.spring.receipt.enums.ReceiptFilter;
+import org.refit.spring.receipt.enums.ReceiptSort;
+import org.refit.spring.receipt.enums.ReceiptType;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -122,28 +125,15 @@ public class ReceiptService {
     }
 
     @Transactional(readOnly = true)
-    public ReceiptListDto getList(Long userId, Long cursorId) {
+    public ReceiptListDto getFilteredList(Long userId, Long cursorId, Integer period, Date startDate, Date endDate, ReceiptType type, ReceiptSort sort, ReceiptFilter filter) {
         if (cursorId == null) cursorId = Long.MAX_VALUE;
-        List<Receipt> receipts = receiptMapper.getList(userId, cursorId);
+        List<Receipt> receipts;
+        ReceiptType finalType = (type == ReceiptType.전체) ? null : type;
+        receipts = receiptMapper.getFilteredList(userId, cursorId, period, startDate, endDate, finalType, filter, sort);
         Long nextCursorId = receipts.size() < 20 ? null : receipts.get(receipts.size() - 1).getReceiptId();
         return ReceiptListDto.from(userId, receipts, nextCursorId);
     }
 
-    @Transactional(readOnly = true)
-    public ReceiptListDto getListMonths(Long userId, Long cursorId, Integer period) {
-        if (cursorId == null) cursorId = Long.MAX_VALUE;
-        List<Receipt> receipts = receiptMapper.getListForMonths(userId, cursorId, period);
-        Long nextCursorId = receipts.size() < 20 ? null : receipts.get(receipts.size() - 1).getReceiptId();
-        return ReceiptListDto.from(userId, receipts, nextCursorId);
-    }
-
-    @Transactional(readOnly = true)
-    public ReceiptListDto getListPeriod(Long userId, Long cursorId, Date startDate, Date endDate) {
-        if (cursorId == null) cursorId = Long.MAX_VALUE;
-        List<Receipt> receipts = receiptMapper.getListWithPeriod(userId, cursorId, startDate, endDate);
-        Long nextCursorId = receipts.size() < 20 ? null : receipts.get(receipts.size() - 1).getReceiptId();
-        return ReceiptListDto.from(userId, receipts, nextCursorId);
-    }
 
     @Transactional(readOnly = true)
     public ReceiptDetailDto get(Long userId, Long cursorId, Long receiptId) {

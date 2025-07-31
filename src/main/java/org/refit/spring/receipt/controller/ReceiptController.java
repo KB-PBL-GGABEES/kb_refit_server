@@ -12,6 +12,9 @@ import org.refit.spring.receipt.dto.ReceiptListDto;
 import org.refit.spring.receipt.dto.ReceiptRequestDto;
 import org.refit.spring.receipt.dto.ReceiptResponseDto;
 import org.refit.spring.receipt.entity.Receipt;
+import org.refit.spring.receipt.enums.ReceiptFilter;
+import org.refit.spring.receipt.enums.ReceiptSort;
+import org.refit.spring.receipt.enums.ReceiptType;
 import org.refit.spring.receipt.service.ReceiptService;
 import org.refit.spring.reward.entity.Reward;
 import org.refit.spring.reward.service.RewardService;
@@ -47,7 +50,7 @@ public class ReceiptController {
         Receipt receipt = receiptService.create(receiptRequestDto, userId);
         Reward reward = rewardService.create(CARBON_POINT, receipt.getTotalPrice(), userId);
         userService.updatePoint(userId, reward.getCarbonPoint(), reward.getReward());
-        ReceiptResponseDto dto = ReceiptResponseDto.from(receipt, userId, reward.getCarbonPoint(), reward.getReward());
+        ReceiptResponseDto dto = ReceiptResponseDto.from(receipt, userId, reward.getCarbonPoint(), reward.getReward(), "none");
         URI location = URI.create("/receipt/" + receipt.getReceiptId());
 
         return ResponseEntity.created(location).body(dto);
@@ -63,12 +66,12 @@ public class ReceiptController {
         Receipt receipt = receiptService.refund(userId, receiptId);
         Reward reward = rewardService.create(-CARBON_POINT, receipt.getTotalPrice(), userId);
         userService.updatePoint(userId, reward.getCarbonPoint(), reward.getReward());
-        ReceiptResponseDto dto = ReceiptResponseDto.from(receipt, userId, reward.getCarbonPoint(), reward.getReward());
+        ReceiptResponseDto dto = ReceiptResponseDto.from(receipt, userId, reward.getCarbonPoint(), reward.getReward(), "none");
         URI location = URI.create("/receipt/" + receipt.getReceiptId());
         return ResponseEntity.created(location).body(dto);
     }
 
-    @ApiOperation(value = "영수증 목록 조회", notes = "전체 영수증을 조회하며, period 값으로 기간별 조회가 가능합니다.")
+    @ApiOperation(value = "영수증 목록 조회", notes = "전체 영수증을 조회하며, 파라미터로 필터링이 가능합니다.")
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "잘못된 요청"),
             @ApiResponse(code = 500, message = "서버 내부 오류")
@@ -77,25 +80,13 @@ public class ReceiptController {
     public ResponseEntity<?> getList(
             @ApiIgnore @UserId Long userId,
             @RequestParam(required = false) Long cursorId,
-            @RequestParam(required = false) Integer period) {
-        ReceiptListDto dto;
-        if (period != null && period > 0) dto = receiptService.getListMonths(userId, cursorId, period);
-        else dto = receiptService.getList(userId, cursorId);
-        return ResponseEntity.ok(dto);
-    }
-
-    @ApiOperation(value = "설정된 기간 만큼의 영수증 목록 조회", notes = "시작 날짜와 종료 날짜를 선택해 기간별 조회가 가능합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(code = 400, message = "잘못된 요청"),
-            @ApiResponse(code = 500, message = "서버 내부 오류")
-    })
-    @GetMapping("/list/period")
-    public ResponseEntity<?> getListPeriod(
-            @ApiIgnore @UserId Long userId,
-            @RequestParam(required = false) Long cursorId,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate) {
-        ReceiptListDto dto = receiptService.getListPeriod(userId, cursorId, startDate, endDate);
+            @RequestParam(required = false) Integer period,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate,
+            @RequestParam(required = false) ReceiptType type,
+            @RequestParam(required = false) ReceiptSort sort,
+            @RequestParam(required = false) ReceiptFilter filter) {
+        ReceiptListDto dto = receiptService.getFilteredList(userId, cursorId, period, startDate, endDate, type, sort, filter);
         return ResponseEntity.ok(dto);
     }
 
