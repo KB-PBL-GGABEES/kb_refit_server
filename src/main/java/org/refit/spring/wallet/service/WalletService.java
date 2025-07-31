@@ -230,4 +230,29 @@ public class WalletService {
         return "ok";
     }
 
+    //프리셋 뱃지 한번에 착용
+    public BadgeResponseDto.ApplyBadgePresetResultDto applyPreset(Long userId, Long presetId) {
+        //1. 프리셋 보유 검증
+        List<BadgePreset> userPresets = badgePresetMapper.findAllByUserId(userId);
+        boolean isOwner = userPresets.stream()
+                .anyMatch(p -> p.getPresetId().equals(presetId));
+        if (!isOwner) return null;
+
+        //2. 프리셋 상세 조회
+        List<BadgePresetDetail> presetDetails = badgePresetMapper.findAllByPresetId(presetId);
+        if (presetDetails.isEmpty()) return null;
+
+        //3. 현재 착용중인 뱃지 해제
+        personalBadgeMapper.unwearAllBadgesByUserId(userId);
+
+        //4. 프리셋의 personal_badge_id를 착용
+        List<Long> wornBadgeIds = new ArrayList<>();
+        for (BadgePresetDetail detail : presetDetails) {
+            personalBadgeMapper.updateIsWornByPersonalBadgeId(detail.getPersonalBadgeId(), true);
+            Long badgeId = personalBadgeMapper.findBadgeIdByPersonalBadgeId(detail.getPersonalBadgeId());
+            wornBadgeIds.add(badgeId);
+        }
+        return BadgeResponseDto.ApplyBadgePresetResultDto.from(userId, wornBadgeIds);
+    }
+
 }

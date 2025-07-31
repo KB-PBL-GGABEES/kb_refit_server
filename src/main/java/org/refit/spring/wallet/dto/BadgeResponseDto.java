@@ -157,5 +157,21 @@ public class BadgeResponseDto {
                     .build();
         }
     }
+
+    //프리셋 뱃지 한번에 착용
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    @Builder
+    public static class ApplyBadgePresetResultDto {
+        private Long userId;
+        private List<Long> wornBadgeIdList;
+        public static ApplyBadgePresetResultDto from(Long userId, List<Long> badgeIds) {
+            return ApplyBadgePresetResultDto.builder()
+                    .userId(userId)
+                    .wornBadgeIdList(badgeIds)
+                    .build();
+        }
+    }
 }
 
