@@ -68,8 +68,25 @@ public interface HospitalMapper {
             "AND cat.category_id = 1")
     List<HospitalExpenseDetailResponseDto> findHospitalExpenseDetailByUserIdAndReceiptId(
             @Param("userId") Long userId,
-            @Param("receiptId") Long receiptId);
-    
+            @Param("receiptId") Long receiptId
+    );
+
+    // 진료비 세부산정내역 PDF 파일명 DB저장
+    @Update("UPDATE hospital_process hp " +
+            "JOIN receipt r ON hp.receipt_id = r.receipt_id " +
+            "SET hp.hospital_voucher = #{hospitalVoucher} " +
+            "WHERE hp.receipt_id = #{receiptId} AND r.user_id = #{userId}")
+    void updateHospitalVoucher(@Param("receiptId") Long receiptId,
+                               @Param("hospitalVoucher") String hospitalVoucher,
+                               @Param("userId") Long userId);
+    // 진료비 세부산정내역 PDF 파일명 조회
+    @Select("SELECT hp.hospital_voucher " +
+            "FROM hospital_process hp " +
+            "JOIN receipt r ON hp.receipt_id = r.receipt_id " +
+            "WHERE hp.receipt_id = #{receiptId} AND r.user_id = #{userId}")
+    String findHospitalVoucherByReceiptId(@Param("receiptId") Long receiptId,
+                                          @Param("userId") Long userId);
+
     // 최근 병원비 조회
     @Select("SELECT EXISTS(SELECT 1 FROM receipt WHERE user_id = #{userId})")
     boolean existsUserReceipt(@Param("userId") Long userId);
@@ -78,6 +95,7 @@ public interface HospitalMapper {
             "COALESCE(SUM(r.total_price), 0) AS recentTotalPrice, " +
             "COUNT(CASE " +
             "  WHEN (hp.insurance_id IS NULL OR hp.process_state IS NULL OR hp.process_state = 'none') THEN 1 " +
+            "  ELSE NULL " +
             "END) AS insuranceBillable " +
             "FROM receipt r " +
             "JOIN company c ON r.company_id = c.company_id " +
