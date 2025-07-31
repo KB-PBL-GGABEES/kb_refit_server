@@ -25,4 +25,5 @@ public class Receipt {
     private Long companyId;
     private Long userId;
     private Long cardId;
+    private String processState;
 }
