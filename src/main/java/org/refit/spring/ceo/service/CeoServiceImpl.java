@@ -2,8 +2,8 @@ package org.refit.spring.ceo.service;
 
 import lombok.RequiredArgsConstructor;
 import org.refit.spring.ceo.dto.CeoListDto;
-import org.refit.spring.ceo.dto.CorporateCardListlDto;
-import org.refit.spring.ceo.dto.ReceiptListlDto;
+import org.refit.spring.ceo.dto.CorporateCardListDto;
+import org.refit.spring.ceo.dto.ReceiptListDto;
 import org.refit.spring.common.pagination.CursorPageRequest;
 import org.refit.spring.mapper.CeoMapper;
 import org.springframework.stereotype.Service;
@@ -41,7 +41,7 @@ public class CeoServiceImpl implements CeoService {
 
     // 경비 청구 항목 상세 조회
     @Override
-    public ReceiptListlDto getReceiptList(Long receipted, Long userId) {
+    public ReceiptListDto getReceiptList(Long receipted, Long userId) {
         return ceoMapper.getReceiptList(receipted, userId);
     }
 
@@ -50,18 +50,16 @@ public class CeoServiceImpl implements CeoService {
     public List<CeoListDto> getCompletedReceipts(int period, CursorPageRequest pageRequest, Long userId) {
         LocalDateTime fromDate = LocalDateTime.now().minusMonths(period);
 
-        LocalDateTime cursor = Optional.ofNullable(pageRequest.getCursor())
-                .map(LocalDateTime::parse)
-                .orElse(LocalDateTime.now().plusDays(1));
+        Long cursor = Optional.ofNullable(pageRequest.getCursor())
+                .orElse(null);
 
         int size = pageRequest.getSize();
         List<CeoListDto> result = ceoMapper.getCompletedReceipts(fromDate, cursor, size + 1, userId);
 
-        if(result.size() > size) result.remove(size);
+        if(result.size() > size) result.remove(result.size() - 1);
 
         return result;
     }
-
 
     // 처리 완료된 항목 이메일 전송
     @Override
@@ -95,15 +93,15 @@ public class CeoServiceImpl implements CeoService {
 
     // 법카 내역 조회
     @Override
-    public List<CorporateCardListlDto> getCorporateCardReceipts(CursorPageRequest pageRequest, Long userId) {
-        LocalDateTime cursor = Optional.ofNullable(pageRequest.getCursor())
-                .map(LocalDateTime::parse)
-                .orElse(LocalDateTime.now().plusDays(1));
+    public List<CorporateCardListDto> getCorporateCardReceipts(CursorPageRequest pageRequest, Long userId) {
+
+        Long cursor = Optional.ofNullable(pageRequest.getCursor())
+                .orElse(null);
 
         int size = pageRequest.getSize();
-        List<CorporateCardListlDto> result = ceoMapper.getCorporateCardReceipts(cursor, size + 1, userId);
+        List<CorporateCardListDto> result = ceoMapper.getCorporateCardReceipts(cursor, size + 1, userId);
 
-        if(result.size() > size) result.remove(size);
+        if(result.size() > size) result.remove(result.size() - 1);
 
         return result;
     }

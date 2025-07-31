@@ -40,6 +40,7 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+test.sql
 
 ### 민감한 설정 파일 무시 ###
 .env

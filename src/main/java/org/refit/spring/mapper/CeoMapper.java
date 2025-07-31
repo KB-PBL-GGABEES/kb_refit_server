@@ -2,9 +2,10 @@ package org.refit.spring.mapper;
 
 import org.apache.ibatis.annotations.*;
 import org.refit.spring.ceo.dto.CeoListDto;
-import org.refit.spring.ceo.dto.CorporateCardListlDto;
+import org.refit.spring.ceo.dto.CorporateCardListDto;
 import org.refit.spring.ceo.entity.Ceo;
-import org.refit.spring.ceo.dto.ReceiptListlDto;
+import org.refit.spring.ceo.dto.ReceiptListDto;
+import org.refit.spring.receipt.entity.Receipt;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -51,6 +52,7 @@ public interface CeoMapper {
     int countCompletedReceiptsThisMonth(@Param("userId") Long userId);
 
     // 경비 청구 항목 상세 조회
+
     @Select("SELECT \n" +
             "        u.user_id AS userId,\n" +
             "        u.name AS name,\n" +
@@ -63,9 +65,12 @@ public interface CeoMapper {
             "    JOIN receipt_process p ON r.receipt_id = p.receipt_id\n" +
             "    WHERE r.receipt_id = #{receiptId}\n" +
             "    LIMIT 1")
-    ReceiptListlDto getReceiptList(
+    ReceiptListDto getReceiptList(
             @Param("userId") Long userId,
             @Param("receiptId") Long receiptId);
+
+    @Select("SELECT * FROM receipt WHERE user_id = #{userId} AND receipt_id < #{cursorId} ORDER BY receipt_id DESC LIMIT 20")
+    List<Receipt> getList(@Param("userId") Long userId, @Param("cursorId") Long cursorId);
 
     // 경비 처리 완료 내역 조회
     @Select("SELECT\n" +
@@ -83,11 +88,11 @@ public interface CeoMapper {
             "    JOIN receipt_process p ON r.receipt_id = p.receipt_id\n" +
             "WHERE p.process_state IN ('accepted', 'rejected')\n" +
             "  AND r.created_at >= #{fromDate}\n" +
-            "  AND r.created_at  < #{cursor}\n" +
-            "ORDER BY r.created_at LIMIT #{size}")
+            "  AND (#{cursor} IS NULL OR r.receipt_id >= #{cursor})\n" +
+            "ORDER BY r.receipt_id LIMIT #{size}")
     List<CeoListDto> getCompletedReceipts(
             @Param("fromDate") LocalDateTime fromDate,
-            @Param("cursor") LocalDateTime cursor,
+            @Param("cursor") Long cursor,
             @Param("size") int size,
             @Param("userId") Long userId);
 
@@ -153,10 +158,10 @@ public interface CeoMapper {
             "WHERE c.is_corporate = TRUE\n" +
             "  AND e.company_id = (\n" +
             "      SELECT company_id FROM employee WHERE user_id = #{userId} LIMIT 1)\n" +
-            "  AND r.created_at < #{cursor}\n" +
-            "ORDER BY r.created_at LIMIT #{size}")
-    List<CorporateCardListlDto> getCorporateCardReceipts(
-                    @Param("cursor") LocalDateTime cursor,
+            "  AND (#{cursor} IS NULL OR r.receipt_id < #{cursor})\n" +
+            "ORDER BY r.receipt_id LIMIT #{size}")
+    List<CorporateCardListDto> getCorporateCardReceipts(
+                    @Param("cursor") Long cursor,
                     @Param("size") int size,
                     @Param("userId") Long userId);
 }
