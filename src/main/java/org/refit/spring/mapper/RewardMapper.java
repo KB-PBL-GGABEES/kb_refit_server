@@ -1,7 +1,10 @@
 package org.refit.spring.mapper;
 
 import org.apache.ibatis.annotations.*;
+import org.refit.spring.receipt.enums.ReceiptSort;
+import org.refit.spring.reward.RewardQueryProvider;
 import org.refit.spring.reward.entity.Reward;
+import org.refit.spring.reward.enums.RewardType;
 
 import java.util.Date;
 import java.util.List;
@@ -9,12 +12,22 @@ import java.util.List;
 @Mapper
 public interface RewardMapper {
 
-    @Insert("INSERT INTO reward (carbon_point, reward, created_at, user_id) VALUES (#{carbonPoint}, #{reward}, #{createdAt}, #{userId})")
+    @Insert("INSERT INTO reward (carbon_point, reward, created_at, user_id) VALUES (#{carbonPoint}, 0, #{createdAt}, #{userId})")
     @Options(useGeneratedKeys = true, keyProperty = "rewardId")
-    void create(Reward reward);
+    void createCarbon(Reward reward);
 
-    @Select("SELECT * FROM reward WHERE user_id = #{userId} AND reward_id < #{cursorId} ORDER BY reward_id DESC LIMIT 20")
-    List<Reward> getList(@Param("userId") Long userId, @Param("cursorId") Long cursorId);
+    @Insert("INSERT INTO reward (carbon_point, reward, created_at, user_id) VALUES (0, #{reward}, #{createdAt}, #{userId})")
+    @Options(useGeneratedKeys = true, keyProperty = "rewardId")
+    void createReward(Reward reward);
+
+    @SelectProvider(type = RewardQueryProvider.class, method = "buildFilteredQuery")
+    List<Reward> getList(@Param("userId") Long userId,
+                         @Param("cursorId") Long cursorId,
+                         @Param("period") Integer period,
+                         @Param("startDate") Date startDate,
+                         @Param("endDate") Date endDate,
+                         @Param("type") RewardType type,
+                         @Param("sort") ReceiptSort sort);
 
     @Select("SELECT * FROM reward WHERE user_id = #{userId} AND reward_id < #{cursorId} AND created_at >= DATE_SUB(NOW(), INTERVAL #{period} MONTH) ORDER BY reward_id DESC LIMIT 20")
     List<Reward> getListForMonths(@Param("userId") Long userId, @Param("cursorId") Long cursorId, @Param("period") int period);

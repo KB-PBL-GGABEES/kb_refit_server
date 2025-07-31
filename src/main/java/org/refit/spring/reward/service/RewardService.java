@@ -5,11 +5,13 @@ import org.refit.spring.auth.entity.User;
 import org.refit.spring.common.exception.DataMismatchException;
 import org.refit.spring.mapper.RewardMapper;
 import org.refit.spring.mapper.UserMapper;
+import org.refit.spring.receipt.enums.ReceiptSort;
 import org.refit.spring.reward.dto.RewardListDto;
 import org.refit.spring.reward.dto.RewardResponseDto;
 import org.refit.spring.reward.dto.RewardWalletRequestDto;
 import org.refit.spring.reward.dto.RewardWalletResponseDto;
 import org.refit.spring.reward.entity.Reward;
+import org.refit.spring.reward.enums.RewardType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,30 +33,16 @@ public class RewardService {
         reward.setReward((long) (totalPrice * REWARD_RATE));
         reward.setCreatedAt(new Date());
         reward.setUserId(userId);
-        rewardMapper.create(reward);
+        rewardMapper.createCarbon(reward);
+        rewardMapper.createReward(reward);
         return reward;
     }
 
     @Transactional(readOnly = true)
-    public RewardListDto getList(Long userId, Long cursorId) {
+    public RewardListDto getList(Long userId, Long cursorId, Integer period, Date startDate, Date endDate, RewardType type, ReceiptSort sort) {
         if (cursorId == null) cursorId = Long.MAX_VALUE;
-        List<Reward> rewards = rewardMapper.getList(userId, cursorId);
-        Long nextCursorId = rewards.size() < 20 ? null : rewards.get(rewards.size() - 1).getRewardId();
-        return RewardListDto.from(userId, rewards, nextCursorId);
-    }
-
-    @Transactional(readOnly = true)
-    public RewardListDto getListMonths(Long userId, Long cursorId, Integer period) {
-        if (cursorId == null) cursorId = Long.MAX_VALUE;
-        List<Reward> rewards = rewardMapper.getListForMonths(userId, cursorId, period);
-        Long nextCursorId = rewards.size() < 20 ? null : rewards.get(rewards.size() - 1).getRewardId();
-        return RewardListDto.from(userId, rewards, nextCursorId);
-    }
-
-    @Transactional(readOnly = true)
-    public RewardListDto getListPeriod(Long userId, Long cursorId, Date startDate, Date endDate) {
-        if (cursorId == null) cursorId = Long.MAX_VALUE;
-        List<Reward> rewards = rewardMapper.getListWithPeriod(userId, cursorId, startDate, endDate);
+        RewardType finalType = (type == RewardType.전체) ? null : type;
+        List<Reward> rewards = rewardMapper.getList(userId, cursorId, period, startDate, endDate, finalType, sort);
         Long nextCursorId = rewards.size() < 20 ? null : rewards.get(rewards.size() - 1).getRewardId();
         return RewardListDto.from(userId, rewards, nextCursorId);
     }
