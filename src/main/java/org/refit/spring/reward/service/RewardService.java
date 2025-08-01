@@ -7,7 +7,7 @@ import org.refit.spring.mapper.RewardMapper;
 import org.refit.spring.mapper.UserMapper;
 import org.refit.spring.receipt.enums.ReceiptSort;
 import org.refit.spring.reward.dto.RewardListDto;
-import org.refit.spring.reward.dto.RewardResponseDto;
+import org.refit.spring.reward.dto.RewardSummaryDto;
 import org.refit.spring.reward.dto.RewardWalletRequestDto;
 import org.refit.spring.reward.dto.RewardWalletResponseDto;
 import org.refit.spring.reward.entity.Reward;
@@ -50,9 +50,9 @@ public class RewardService {
     }
 
     @Transactional(readOnly = true)
-    public RewardResponseDto getTotal(Long userId) {
+    public RewardSummaryDto getTotal(Long userId) {
         User user = userMapper.findByUserId(userId);
-        RewardResponseDto dto = new RewardResponseDto();
+        RewardSummaryDto dto = new RewardSummaryDto();
         Long totalCashback = rewardMapper.getTotalCashback(userId);
         Long totalCarbon = rewardMapper.getTotalCarbon(userId);
         dto.setTotalCashback(totalCashback);

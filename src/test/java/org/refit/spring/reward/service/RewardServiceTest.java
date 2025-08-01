@@ -4,10 +4,9 @@ import lombok.extern.log4j.Log4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.refit.spring.auth.entity.User;
 import org.refit.spring.config.RootConfig;
 import org.refit.spring.reward.dto.RewardListDto;
-import org.refit.spring.reward.dto.RewardResponseDto;
+import org.refit.spring.reward.dto.RewardSummaryDto;
 import org.refit.spring.reward.dto.RewardWalletRequestDto;
 import org.refit.spring.reward.dto.RewardWalletResponseDto;
 import org.refit.spring.reward.entity.Reward;
@@ -16,7 +15,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -56,7 +54,7 @@ class RewardServiceTest {
     @DisplayName("리워드 총합 테스트")
     @Test
     void getTotal() {
-        RewardResponseDto dto = service.getTotal(1L);
+        RewardSummaryDto dto = service.getTotal(1L);
         assertNotNull(dto);
         assertTrue(dto.getTotalCarbonPoint() >= 0);
         assertTrue(dto.getTotalCashback() >= 0);
