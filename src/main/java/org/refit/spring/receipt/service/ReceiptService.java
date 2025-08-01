@@ -1,10 +1,8 @@
 package org.refit.spring.receipt.service;
 
 import lombok.RequiredArgsConstructor;
-import org.refit.spring.mapper.CeoMapper;
-import org.refit.spring.mapper.MerchandiseMapper;
-import org.refit.spring.mapper.PersonalBadgeMapper;
-import org.refit.spring.mapper.ReceiptMapper;
+import org.refit.spring.auth.entity.User;
+import org.refit.spring.mapper.*;
 import org.refit.spring.merchandise.entity.Merchandise;
 import org.refit.spring.receipt.dto.*;
 import org.refit.spring.receipt.entity.Receipt;
@@ -34,6 +32,7 @@ public class ReceiptService {
     private final MerchandiseMapper merchandiseMapper;
     private final CeoMapper ceoMapper;
     private final PersonalBadgeMapper personalBadgeMapper;
+    private final UserMapper userMapper;
 
     private final DataSource dataSource;
 
@@ -46,6 +45,7 @@ public class ReceiptService {
         updatePrice(receipt);
         receipt.setContentList(list);
         receiptMapper.update(userId, receipt);
+
         ceoMapper.insertProcess(null, userId, receipt.getReceiptId());
         return receipt;
     }
@@ -142,6 +142,9 @@ public class ReceiptService {
         receipt.setSupplyPrice(supply);
         receipt.setSurtax(total - supply);
         receipt.setUpdatedAt(new Date());
+        User user = userMapper.findByUserId(receipt.getUserId());
+        user.setTotalStarPoint((long) (user.getTotalStarPoint() + receipt.getTotalPrice() * 0.05));
+        user.setTotalCarbonPoint(user.getTotalCarbonPoint() + 100);
     }
 
     @Transactional(readOnly = true)

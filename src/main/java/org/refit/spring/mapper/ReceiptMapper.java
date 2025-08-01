@@ -87,4 +87,9 @@ public interface ReceiptMapper {
             "LEFT OUTER JOIN personal_badge p ON b.badge_id = p.badge_id AND p.user_id = #{userId} " +
             "WHERE r.receipt_id = #{receiptId} AND p.badge_id IS NULL")
     Long findBadge(@Param("userId") Long userId, @Param("receiptId") Long receiptId);
+
+    @Select("SELECT ca.category_id FROM receipt r INNER JOIN company c ON r.company_id = c.company_id " +
+            "INNER JOIN categories ca ON c.category_id = ca.category_id " +
+            "WHERE r.receipt_id = #{receiptId}")
+    Long findCaterogy(@Param("userId") Long userId, @Param("receiptId") Long receiptId);
 }
