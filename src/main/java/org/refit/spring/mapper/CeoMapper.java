@@ -59,15 +59,16 @@ public interface CeoMapper {
             "        p.progress_type AS progressType,\n" +
             "        p.progress_detail AS progressDetail,\n" +
             "        p.voucher,\n" +
-            "        r.receipt_id AS receiptId\n" +
+            "        r.receipt_id AS receiptId,\n" +
+            "        p.process_state\n" +
             "    FROM receipt r\n" +
             "    JOIN user u ON r.user_id = u.user_id\n" +
             "    JOIN receipt_process p ON r.receipt_id = p.receipt_id\n" +
             "    WHERE r.receipt_id = #{receiptId}\n" +
             "    LIMIT 1")
     ReceiptListDto getReceiptList(
-            @Param("userId") Long userId,
-            @Param("receiptId") Long receiptId);
+            @Param("receiptId") Long receiptId,
+            @Param("userId") Long userId);
 
     // 경비 처리 완료 내역 조회
     @Select("SELECT\n" +

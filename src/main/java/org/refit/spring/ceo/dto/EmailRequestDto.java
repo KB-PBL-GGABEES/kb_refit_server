@@ -1,8 +1,12 @@
 package org.refit.spring.ceo.dto;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 @Data
+@ApiModel(description = "경비 처리 완료 항목 이메일 보내기 DTO")
 public class EmailRequestDto {
+    @ApiModelProperty(value = "이메일 주소", example = "test@naver.com")
     private String email;
 }

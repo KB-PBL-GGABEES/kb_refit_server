@@ -2,7 +2,6 @@ package org.refit.spring.ceo.service;
 
 import org.refit.spring.ceo.dto.CeoListDto;
 import org.refit.spring.ceo.dto.CorporateCardListDto;
-import org.refit.spring.ceo.dto.ReceiptCompletedListDto;
 import org.refit.spring.ceo.dto.ReceiptListDto;
 
 import java.util.List;
