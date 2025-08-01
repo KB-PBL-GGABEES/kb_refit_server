@@ -26,8 +26,8 @@ public class RewardQueryProvider {
             else if (type == RewardType.CASHBACK) sql.append(" AND reward > 0");
         }
 
-        if (sort == ReceiptSort.LATEST) sql.append(" ORDER BY reward_id DESC");
-        else sql.append(" ORDER BY reward_id ASC");
+        if (sort == ReceiptSort.LATEST) sql.append(" ORDER BY created_at DESC");
+        else sql.append(" ORDER BY created_at ASC");
         sql.append(" LIMIT 20");
 
         return sql.toString();
