@@ -11,7 +11,7 @@ import java.util.Date;
 public class InsuranceClaimRequestDto {
     private String processState;
     private Long receiptId;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd", timezone = "Asia/Seoul")
     private Date sickedDate;
     private String visitedReason;
     private Long insuranceId;
