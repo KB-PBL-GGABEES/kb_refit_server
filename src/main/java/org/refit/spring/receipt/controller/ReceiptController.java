@@ -51,6 +51,7 @@ public class ReceiptController {
         Reward reward = rewardService.create(CARBON_POINT, receipt.getTotalPrice(), userId);
         userService.updatePoint(userId, reward.getCarbonPoint(), reward.getReward());
         ReceiptResponseDto dto = ReceiptResponseDto.from(receipt, userId, reward.getCarbonPoint(), reward.getReward(), "none");
+        receiptService.checkAndInsertBadge(userId, receipt.getReceiptId());
         URI location = URI.create("/receipt/" + receipt.getReceiptId());
 
         return ResponseEntity.created(location).body(dto);
