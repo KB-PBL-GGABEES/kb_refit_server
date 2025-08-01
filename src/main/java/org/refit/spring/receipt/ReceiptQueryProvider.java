@@ -35,8 +35,8 @@ public class ReceiptQueryProvider {
         }
 
 
-        if (sort == ReceiptSort.LATEST) sql.append(" ORDER BY r.receipt_id DESC");
-        else sql.append(" ORDER BY r.receipt_id ASC");
+        if (sort == ReceiptSort.LATEST) sql.append(" ORDER BY r.created_at DESC");
+        else sql.append(" ORDER BY r.created_at ASC");
         sql.append(" LIMIT 20");
 
         return sql.toString();
