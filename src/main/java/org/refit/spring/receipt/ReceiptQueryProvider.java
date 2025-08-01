@@ -10,8 +10,13 @@ public class ReceiptQueryProvider {
     public static String buildFilteredQuery(Map<String, Object> params) {
         StringBuilder sql = new StringBuilder("SELECT r.*, rp.process_state FROM receipt r LEFT OUTER JOIN receipt_process rp ON rp.receipt_id = r.receipt_id WHERE r.user_id = #{userId}");
 
-        sql.append(" AND r.receipt_id < #{cursorId}");
-
+        ReceiptSort sort = (ReceiptSort) params.get("sort");
+        if (sort == null) {
+            sort = ReceiptSort.최신순;
+            params.put("sort", sort);
+        }
+        if (sort == ReceiptSort.최신순) sql.append(" AND r.receipt_id < #{cursorId}");
+        else sql.append(" AND r.receipt_id > #{cursorId}");
         Integer period = (Integer) params.get("period");
         if (period != null && period > 0) sql.append(" AND r.created_at >= DATE_SUB(NOW(), INTERVAL #{period} MONTH)");
         else if (params.get("startDate") != null && params.get("endDate") != null) {
@@ -29,11 +34,7 @@ public class ReceiptQueryProvider {
             else sql.append(" AND (rp.process_state IS NULL or rp.process_state != 'accepted') ");
         }
 
-        ReceiptSort sort = (ReceiptSort) params.get("sort");
-        if (sort == null) {
-            sort = ReceiptSort.최신순;
-            params.put("sort", sort);
-        }
+
         if (sort == ReceiptSort.최신순) sql.append(" ORDER BY r.receipt_id DESC");
         else sql.append(" ORDER BY r.receipt_id ASC");
         sql.append(" LIMIT 20");
