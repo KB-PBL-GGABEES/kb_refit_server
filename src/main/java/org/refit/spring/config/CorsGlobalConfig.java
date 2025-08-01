@@ -16,7 +16,8 @@ public class CorsGlobalConfig {
         config.setAllowedOrigins(Arrays.asList(
                 "http://localhost:3000",
                 "http://localhost:3001",
-                "https://kb-refit-client.vercel.app"
+                "https://kb-refit-client.vercel.app",
+                "https://kb-refit-client-ceo.vercel.app"
         ));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(Arrays.asList("Content-Type", "Authorization"));
