@@ -1,7 +1,6 @@
 package org.refit.spring.receipt.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 import org.refit.spring.receipt.dto.ReceiptContentDto;
