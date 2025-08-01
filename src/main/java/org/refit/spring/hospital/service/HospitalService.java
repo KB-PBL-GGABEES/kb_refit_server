@@ -67,9 +67,19 @@ public class HospitalService {
     }
 
     // 진료비 세부산정내역 PDF 파일명 DB저장
+    @Transactional
     public void updateHospitalVoucher(Long userId, HospitalVoucherRequestDto dto) {
+        String state = hospitalMapper.findProcessStateByReceiptId(dto.getReceiptId());
+
+        // 없다면 먼저 insert
+        if (state == null) {
+            hospitalMapper.insertEmptyHospitalProcess(dto.getReceiptId());
+        }
+
+        // 그 다음에 update 실행
         hospitalMapper.updateHospitalVoucher(dto.getReceiptId(), dto.getHospitalVoucher(), userId);
     }
+
 
 
     // 진료비 세부산정내역 PDF 파일명 조회
