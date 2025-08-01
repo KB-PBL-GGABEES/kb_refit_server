@@ -1,14 +1,19 @@
 package org.refit.spring.ceo.service;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.ibatis.annotations.Param;
 import org.refit.spring.ceo.dto.CeoListDto;
 import org.refit.spring.ceo.dto.CorporateCardListDto;
 import org.refit.spring.ceo.dto.ReceiptListDto;
 import org.refit.spring.ceo.entity.Ceo;
+import org.refit.spring.ceo.enums.ProcessState;
+import org.refit.spring.ceo.enums.RejectState;
+import org.refit.spring.ceo.enums.Sort;
 import org.refit.spring.mapper.CeoMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -46,10 +51,12 @@ public class CeoServiceImpl implements CeoService {
 
     // 경비 처리 완료 내역 조회
     @Override
-    public List<CeoListDto> getCompletedReceipts(Long cursorId, Long userId) {
-        if(cursorId == null) cursorId = Long.MAX_VALUE;
+    public List<CeoListDto> getCompletedReceipts(Long userId, Long cursorId, Integer period, Date startDate, Date endDate, ProcessState processState, Sort sort) {
+        if (cursorId == null) {
+            cursorId = (sort == Sort.Oldest) ? 0L : Long.MAX_VALUE;
+        }
 
-        List<Ceo> result = ceoMapper.getCompletedReceipts(cursorId, userId);
+        List<Ceo> result = ceoMapper.getCompletedReceipts(userId, cursorId, period, startDate, endDate, processState, sort);
 
         return result.stream()
                 .map(CeoListDto::of)
@@ -88,10 +95,12 @@ public class CeoServiceImpl implements CeoService {
 
     // 법카 내역 조회
     @Override
-    public List<CorporateCardListDto> getCorporateCardReceipts(Long cursorId, Long userId) {
-        if(cursorId == null) cursorId = Long.MAX_VALUE;
+    public List<CorporateCardListDto> getCorporateCardReceipts(Long userId, Long cursorId, Integer period, Date startDate, Date endDate, RejectState rejectState, Sort sort) {
+        if (cursorId == null) {
+            cursorId = (sort == Sort.Oldest) ? 0L : Long.MAX_VALUE;
+        }
 
-        List<CorporateCardListDto> result = ceoMapper.getCorporateCardReceipts(cursorId, userId);
+        List<CorporateCardListDto> result = ceoMapper.getCorporateCardReceipts(userId, cursorId, period, startDate, endDate, rejectState, sort);
 
         return result;
     }

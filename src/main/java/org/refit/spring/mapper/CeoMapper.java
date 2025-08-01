@@ -1,14 +1,16 @@
 package org.refit.spring.mapper;
 
 import org.apache.ibatis.annotations.*;
-import org.refit.spring.ceo.dto.CeoListDto;
+import org.refit.spring.ceo.CeoReceiptQueryProvider;
+import org.refit.spring.ceo.CorporateCardQueryProvider;
 import org.refit.spring.ceo.dto.CorporateCardListDto;
 import org.refit.spring.ceo.entity.Ceo;
 import org.refit.spring.ceo.dto.ReceiptListDto;
-import org.refit.spring.ceo.entity.ReceiptProcess;
-import org.refit.spring.receipt.entity.Receipt;
+import org.refit.spring.ceo.enums.ProcessState;
+import org.refit.spring.ceo.enums.RejectState;
+import org.refit.spring.ceo.enums.Sort;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @Mapper
@@ -71,25 +73,15 @@ public interface CeoMapper {
             @Param("userId") Long userId);
 
     // 경비 처리 완료 내역 조회
-    @Select("SELECT\n" +
-            "    r.receipt_id,\n" +
-            "    c.company_name,\n" +
-            "    r.created_at AS receipt_date_time,\n" +
-            "    r.total_price,\n" +
-            "    CASE\n" +
-            "        WHEN p.process_state = 'accepted' THEN '승인'\n" +
-            "        WHEN p.process_state = 'rejected' THEN '거절'\n" +
-            "        ELSE p.process_state\n" +
-            "    END AS process_state\n" +
-            "FROM receipt r\n" +
-            "    JOIN company c ON r.company_id = c.company_id\n" +
-            "    JOIN receipt_process p ON r.receipt_id = p.receipt_id\n" +
-            "WHERE p.process_state IN ('accepted', 'rejected')\n" +
-            "  AND r.receipt_id < #{cursor}\n" +
-            "ORDER BY r.receipt_id DESC LIMIT 20")
+    @SelectProvider(type = CeoReceiptQueryProvider.class, method = "buildFilteredQuery")
     List<Ceo> getCompletedReceipts(
-            @Param("cursor") Long cursor,
-            @Param("userId") Long userId);
+            @Param("userId") Long userId,
+            @Param("cursorId") Long cursorId,
+            @Param("period") Integer period,
+            @Param("startDate") Date startDate,
+            @Param("endDate") Date endDate,
+            @Param("processState") ProcessState processState,
+            @Param("sort") Sort sort);
 
     // 처리 완료된 항목 이메일 전송
     @Select("SELECT COUNT(*)\n" +
@@ -137,25 +129,13 @@ public interface CeoMapper {
     Long getCorporateCardCostLastMonth(@Param("ceoId") Long ceoId);
 
     // 법카 내역 조회
-    @Select("SELECT \n" +
-            "    r.receipt_id,\n" +
-            "    r.total_price,\n" +
-            "    r.created_at AS receipt_date_time,\n" +
-            "    cp.company_name,\n" +
-            "    rp.process_state,\n" +
-            "    r.card_id, \n" +
-            "    c.is_corporate AS corporate \n" +
-            "FROM receipt r\n" +
-            "JOIN card c ON r.card_id = c.card_id\n" +
-            "JOIN employee e ON r.user_id = e.user_id\n" +
-            "JOIN company cp ON r.company_id = cp.company_id\n" +
-            "LEFT JOIN receipt_process rp ON r.receipt_id = rp.receipt_id\n" +
-            "WHERE c.is_corporate = TRUE\n" +
-            "  AND e.company_id = (\n" +
-            "      SELECT company_id FROM employee WHERE user_id = #{userId} LIMIT 1)\n" +
-            "  AND r.receipt_id < #{cursor}\n" +
-            "ORDER BY r.receipt_id DESC LIMIT 20")
+    @SelectProvider(type = CorporateCardQueryProvider.class, method = "buildFilteredQuery")
     List<CorporateCardListDto> getCorporateCardReceipts(
-                    @Param("cursor") Long cursor,
-                    @Param("userId") Long userId);
+            @Param("userId") Long userId,
+            @Param("cursorId") Long cursorId,
+            @Param("period") Integer period,
+            @Param("startDate") Date startDate,
+            @Param("endDate") Date endDate,
+            @Param("rejectState") RejectState rejectState,
+            @Param("sort") Sort sort);
 }
