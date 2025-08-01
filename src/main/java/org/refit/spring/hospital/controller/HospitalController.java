@@ -25,30 +25,58 @@ public class HospitalController {
     private final HospitalService hospitalService;
 
     // 병원 영수증 목록 조회 (커서 기반 페이지네이션)
+
     @ApiOperation(value = "의료비 납입 내역 조회", notes = "의료비 납입 내역을 조회할 수 있습니다.")
     @GetMapping("/list")
     public ResponseEntity<?> getHospitalExpenses(@ApiIgnore @UserId Long userId,
-            @RequestParam(value = "cursorDate", required = false)
-            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date cursorDate) {
-
-        List<HospitalExpenseResponseDto> list = hospitalService.getHospitalExpenses(userId, cursorDate);
-
-        if (list == null || list.isEmpty()) {
-            Map<String, String> error = new HashMap<>();
-            error.put("message", "해당 유저의 병원 영수증 데이터가 없습니다.");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
-        }
-
-        // 다음 커서 계산
-        Date nextCursor = (list.size() < 2) ? null : list.get(list.size() - 1).getCreatedAt();
-        String nextCursorDateStr = (nextCursor != null) ? new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(nextCursor) : null;
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("data", list);
-        response.put("nextCursorDate", nextCursorDateStr);
-
-        return ResponseEntity.ok(response);
+                                                 @RequestParam(value = "cursorId", required = false) Long cursorId) {
+        HospitalListDto dto = hospitalService.getHospitalExpenses(userId, cursorId);
+        return ResponseEntity.ok(dto);
     }
+
+    @ApiOperation(value = "최근 N개월 내 의료비 납입 내역 조회", notes = "최근 N개월 내의 병원 영수증을 조회할 수 있습니다.")
+    @GetMapping("/list/months")
+    public ResponseEntity<?> getHospitalExpensesWithinMonths(@ApiIgnore @UserId Long userId,
+                                                             @RequestParam(value = "cursorId", required = false) Long cursorId,
+                                                             @RequestParam(value = "period") Integer period) {
+        HospitalListDto dto = hospitalService.getListMonths(userId, cursorId, period);
+        return ResponseEntity.ok(dto);
+    }
+
+    @ApiOperation(value = "기간 필터로 의료비 납입 내역 조회", notes = "시작일과 종료일 사이의 병원 영수증 목록을 조회합니다.")
+    @GetMapping("/list/period")
+    public ResponseEntity<?> getHospitalExpensesByPeriod(@ApiIgnore @UserId Long userId,
+                                                         @RequestParam(value = "cursorId", required = false) Long cursorId,
+                                                         @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
+                                                         @RequestParam("endDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate) {
+        HospitalListDto dto = hospitalService.getListPeriod(userId, cursorId, startDate, endDate);
+        return ResponseEntity.ok(dto);
+    }
+
+//    @ApiOperation(value = "의료비 납입 내역 조회", notes = "의료비 납입 내역을 조회할 수 있습니다.")
+//    @GetMapping("/list")
+//    public ResponseEntity<?> getHospitalExpenses(@ApiIgnore @UserId Long userId,
+//            @RequestParam(value = "cursorDate", required = false)
+//            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date cursorDate) {
+//
+//        List<HospitalExpenseResponseDto> list = hospitalService.getHospitalExpenses(userId, cursorDate);
+//
+//        if (list == null || list.isEmpty()) {
+//            Map<String, String> error = new HashMap<>();
+//            error.put("message", "해당 유저의 병원 영수증 데이터가 없습니다.");
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+//        }
+//
+//        // 다음 커서 계산
+//        Date nextCursor = (list.size() < 2) ? null : list.get(list.size() - 1).getCreatedAt();
+//        String nextCursorDateStr = (nextCursor != null) ? new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(nextCursor) : null;
+//
+//        Map<String, Object> response = new HashMap<>();
+//        response.put("data", list);
+//        response.put("nextCursorDate", nextCursorDateStr);
+//
+//        return ResponseEntity.ok(response);
+//    }
 
     // 병원 영수증 상세 조회
     @ApiOperation(value = "의료비 납입 내역 상세 조회", notes = "의료비 납입 내역을 상세 조회할 수 있습니다.")
@@ -145,7 +173,7 @@ public class HospitalController {
     }
     // 보험 청구_POST
     @ApiOperation(value = "보험 청구 요청", notes = "보험 청구 페이지에서 보험 청구를 요청할 수 있습니다.")
-    @PostMapping("/insurance/claim")
+    @PatchMapping("/insurance/claim")
     public ResponseEntity<?> claimInsurance(@ApiIgnore @UserId Long userId,
                                             @RequestBody InsuranceClaimRequestDto dto) {
         try {
@@ -153,7 +181,7 @@ public class HospitalController {
 
             Map<String, String> successMap = new HashMap<>();
             successMap.put("message", "보험 청구가 완료되었습니다.");
-            return ResponseEntity.status(HttpStatus.CREATED).body(successMap);
+            return ResponseEntity.ok(successMap);
 
         } catch (IllegalArgumentException e) {
             Map<String, String> errorMap = new HashMap<>();
