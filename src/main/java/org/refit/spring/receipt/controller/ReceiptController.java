@@ -133,6 +133,6 @@ public class ReceiptController {
     public ResponseEntity<?> changeState(@ApiIgnore @UserId Long userId,
                                          @RequestBody Long receiptProcessId) {
         receiptService.changeState(userId, receiptProcessId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 }

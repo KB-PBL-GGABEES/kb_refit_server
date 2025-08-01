@@ -1,6 +1,8 @@
 package org.refit.spring.receipt.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 import org.refit.spring.receipt.dto.ReceiptContentDto;
 
@@ -12,8 +14,11 @@ import java.util.List;
 @AllArgsConstructor
 
 public class Receipt {
+    @ApiModelProperty(value = "영수증 아이디", example = "1")
     private Long receiptId;
+    @ApiModelProperty(value = "총 가격", example = "12300")
     private Long totalPrice;
+    @ApiModelProperty(value = "공급가액", example = "11181")
     private Long supplyPrice;
     private Long surtax;
     private String transactionType;
