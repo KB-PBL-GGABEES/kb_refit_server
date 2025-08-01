@@ -9,12 +9,17 @@ import org.refit.spring.auth.annotation.UserId;
 import org.refit.spring.ceo.dto.*;
 import org.refit.spring.ceo.dto.CeoListDto;
 import org.refit.spring.ceo.dto.EmailRequestDto;
+import org.refit.spring.ceo.enums.ProcessState;
+import org.refit.spring.ceo.enums.RejectState;
+import org.refit.spring.ceo.enums.Sort;
 import org.refit.spring.ceo.service.CeoService;
 import org.refit.spring.ceo.dto.ReceiptListDto;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,11 +74,15 @@ public class CeoController {
             @ApiResponse(code = 500, message = "서버 내부 오류")
     })
     public ResponseEntity<Map<String, Object>> getCompletedReceipts(
-            @RequestParam(required = false) Integer period,
+            @ApiIgnore @UserId Long userId,
             @RequestParam(required = false) Long cursorId,
-            @ApiIgnore @UserId Long userId) {
+            @RequestParam(required = false) Integer period,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate,
+            @RequestParam(required = false) ProcessState processState,
+            @RequestParam(required = false) Sort sort) {
 
-        List<CeoListDto> list = ceoService.getCompletedReceipts(cursorId, userId);
+        List<CeoListDto> list = ceoService.getCompletedReceipts(userId, cursorId, period, startDate, endDate, processState, sort);
 
         Long nextCursorId = list.size() < 20 ? null : list.get(list.size() - 1).getReceiptId();
 
@@ -149,11 +158,15 @@ public class CeoController {
             @ApiResponse(code = 500, message = "서버 내부 오류")
     })
     public ResponseEntity<Map<String, Object>> getCorporateCard(
-            @RequestParam(required = false) Integer period,
+            @ApiIgnore @UserId Long userId,
             @RequestParam(required = false) Long cursorId,
-            @ApiIgnore @UserId Long userId) {
+            @RequestParam(required = false) Integer period,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate,
+            @RequestParam(required = false) RejectState rejectState,
+            @RequestParam(required = false) Sort sort) {
 
-        List<CorporateCardListDto> list = ceoService.getCorporateCardReceipts(cursorId, userId);
+        List<CorporateCardListDto> list = ceoService.getCorporateCardReceipts(userId, cursorId, period, startDate, endDate, rejectState, sort);
 
         Long nextCursorId = list.size() < 20 ? null : list.get(list.size() - 1).getReceiptId();
 
