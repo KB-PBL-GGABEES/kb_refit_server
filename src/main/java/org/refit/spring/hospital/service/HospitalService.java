@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.refit.spring.hospital.dto.*;
 import org.refit.spring.mapper.HospitalMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -15,12 +16,45 @@ public class HospitalService {
     private final HospitalMapper hospitalMapper;
 
     // 병원 영수증 목록 조회
-    public List<HospitalExpenseResponseDto> getHospitalExpenses(Long userId, Date cursorDate) {
-        if (cursorDate == null) {
-            return hospitalMapper.findFirstPage(userId);
-        }
-        return hospitalMapper.findByCursorDate(userId, cursorDate);
+    @Transactional(readOnly = true)
+    public HospitalListDto getHospitalExpenses(Long userId, Long cursorId) {
+        if (cursorId == null) cursorId = Long.MAX_VALUE;
+        List<HospitalExpenseResponseDto> list = hospitalMapper.findByCursorId(userId, cursorId);
+        Long nextCursorId = (list.size() < 10) ? null : list.get(list.size() - 1).getReceiptId();
+
+        return HospitalListDto.from(list, nextCursorId);
     }
+
+    // 2. 최근 n개월 내 병원 영수증 조회
+    @Transactional(readOnly = true)
+    public HospitalListDto getListMonths(Long userId, Long cursorId, Integer period) {
+        if (cursorId == null) cursorId = Long.MAX_VALUE;
+
+        List<HospitalExpenseResponseDto> list = hospitalMapper.findByCursorIdWithinMonths(userId, cursorId, period);
+        Long nextCursorId = (list.size() < 10) ? null : list.get(list.size() - 1).getReceiptId();
+
+        return HospitalListDto.from(list, nextCursorId);
+    }
+
+    // 3. 시작일 ~ 종료일 기간 필터로 병원 영수증 조회
+    @Transactional(readOnly = true)
+    public HospitalListDto getListPeriod(Long userId, Long cursorId, Date startDate, Date endDate) {
+        if (cursorId == null) cursorId = Long.MAX_VALUE;
+
+        List<HospitalExpenseResponseDto> list = hospitalMapper.findByCursorIdWithPeriod(userId, cursorId, startDate, endDate);
+        Long nextCursorId = (list.size() < 10) ? null : list.get(list.size() - 1).getReceiptId();
+
+        return HospitalListDto.from(list, nextCursorId);
+    }
+
+
+
+//    public List<HospitalExpenseResponseDto> getHospitalExpenses(Long userId, Date cursorDate) {
+//        if (cursorDate == null) {
+//            return hospitalMapper.findFirstPage(userId);
+//        }
+//        return hospitalMapper.findByCursorDate(userId, cursorDate);
+//    }
 
     // 병원 영수증 상세 조회
     public HospitalExpenseDetailResponseDto findHospitalExpenseDetail(Long userId, Long receiptId) {
