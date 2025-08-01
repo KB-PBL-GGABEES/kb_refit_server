@@ -40,7 +40,9 @@ public class RewardService {
 
     @Transactional(readOnly = true)
     public RewardListDto getList(Long userId, Long cursorId, Integer period, Date startDate, Date endDate, RewardType type, ReceiptSort sort) {
-        if (cursorId == null) cursorId = Long.MAX_VALUE;
+        if (cursorId == null) {
+            cursorId = (sort == ReceiptSort.최신순 || sort == null) ? Long.MAX_VALUE : 0L;
+        }
         RewardType finalType = (type == RewardType.전체) ? null : type;
         List<Reward> rewards = rewardMapper.getList(userId, cursorId, period, startDate, endDate, finalType, sort);
         Long nextCursorId = rewards.size() < 20 ? null : rewards.get(rewards.size() - 1).getRewardId();
