@@ -15,7 +15,7 @@ import java.util.List;
 public interface CeoMapper {
 
     // 영수 처리 항목에 추가
-    @Insert("INSERT INTO receipt_process (process_state, ceo_id, created_at, receipt_id) VALUES ('none', #{ceoId}, now(), #{receiptId})")
+    @Insert("INSERT INTO receipt_process (process_state, ceo_id, created_at, updated_at, receipt_id) VALUES ('none', #{ceoId}, now(), now(), #{receiptId})")
     void insertProcess(@Param("ceoId") Long ceoId, @Param("userId") Long userId, @Param("receiptId") Long receiptId);
 
     @Select("SELECT ceo_id FROM company WHERE company_id = #{companyId}")
