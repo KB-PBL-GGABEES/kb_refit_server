@@ -1,7 +1,6 @@
 package org.refit.spring.mapper;
 
 import org.apache.ibatis.annotations.*;
-//import org.refit.spring.receipt.ReceiptQueryProvider;
 import org.refit.spring.receipt.ReceiptQueryProvider;
 import org.refit.spring.receipt.entity.Receipt;
 import org.refit.spring.receipt.entity.ReceiptContent;
@@ -31,7 +30,7 @@ public interface ReceiptMapper {
                                   @Param("period") Integer period,
                                   @Param("startDate") Date startDate,
                                   @Param("endDate") Date endDate,
-                                  @Param("type")ReceiptType type,
+                                  @Param("type") ReceiptType type,
                                   @Param("filter") ReceiptFilter filter,
                                   @Param("sort") ReceiptSort sort);
 
