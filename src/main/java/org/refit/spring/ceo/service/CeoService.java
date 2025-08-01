@@ -3,7 +3,11 @@ package org.refit.spring.ceo.service;
 import org.refit.spring.ceo.dto.CeoListDto;
 import org.refit.spring.ceo.dto.CorporateCardListDto;
 import org.refit.spring.ceo.dto.ReceiptListDto;
+import org.refit.spring.ceo.enums.ProcessState;
+import org.refit.spring.ceo.enums.RejectState;
+import org.refit.spring.ceo.enums.Sort;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +22,7 @@ public interface CeoService {
     ReceiptListDto getReceiptList(Long receipted, Long userId);
 
     // 경비 처리 완료 내역 조회
-    List<CeoListDto> getCompletedReceipts(Long cursorId, Long userId);
+    List<CeoListDto> getCompletedReceipts(Long userId, Long cursorId, Integer period, Date startDate, Date endDate, ProcessState processState, Sort sort);
 
     // 처리 완료된 항목 이메일 전송
     int countCompletedReceipts(Long userId);
@@ -31,5 +35,5 @@ public interface CeoService {
     Map<String, Object> getCorporateCardCost(Long userId);
 
     // 법카 내역 조회
-    List<CorporateCardListDto> getCorporateCardReceipts(Long cursorId, Long userId);
+    List<CorporateCardListDto> getCorporateCardReceipts(Long userId, Long cursorId, Integer period, Date startDate, Date endDate, RejectState rejectState, Sort sort);
 }
