@@ -8,12 +8,9 @@ import lombok.RequiredArgsConstructor;
 import org.refit.spring.auth.annotation.UserId;
 import org.refit.spring.ceo.dto.*;
 import org.refit.spring.ceo.dto.CeoListDto;
-import org.refit.spring.ceo.dto.CorporateCardListlDto;
 import org.refit.spring.ceo.dto.EmailRequestDto;
-import org.refit.spring.ceo.dto.ReceiptListlDto;
 import org.refit.spring.ceo.service.CeoService;
 import org.refit.spring.receipt.dto.ReceiptListDto;
-import org.refit.spring.receipt.entity.Receipt;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -43,6 +40,7 @@ public class CeoController {
         int countCompletedReceiptsThisMonth = ceoService.countCompletedReceiptsThisMonth(userId);
 
         return ResponseEntity.ok(Map.of(
+                "userId", userId,
                 "경비 처리가 필요한 내역 개수", countPendingReceipts,
                 "이번 달 경비 처리 완료 내역 개수", countCompletedReceiptsThisMonth,
                 "pendingReceipts", list
@@ -57,7 +55,7 @@ public class CeoController {
             @ApiResponse(code = 500, message = "서버 내부 오류")
     })
     public ResponseEntity<ReceiptListDto> getReceiptList(
-            @RequestParam("userId") Long receipted,
+            @RequestParam("receiptId") Long receipted,
             @ApiIgnore @UserId Long userId) {
 
         return ResponseEntity.ok(ceoService.getReceiptList(receipted, userId));

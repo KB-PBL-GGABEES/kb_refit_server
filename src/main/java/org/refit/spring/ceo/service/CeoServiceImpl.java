@@ -3,13 +3,9 @@ package org.refit.spring.ceo.service;
 import lombok.RequiredArgsConstructor;
 import org.refit.spring.ceo.dto.CeoListDto;
 import org.refit.spring.ceo.dto.CorporateCardListDto;
-import org.refit.spring.ceo.dto.ReceiptCompletedListDto;
 import org.refit.spring.ceo.dto.ReceiptListDto;
 import org.refit.spring.ceo.entity.Ceo;
-import org.refit.spring.ceo.entity.CorporateCardList;
-import org.refit.spring.ceo.entity.ReceiptProcess;
 import org.refit.spring.mapper.CeoMapper;
-import org.refit.spring.receipt.entity.Receipt;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;

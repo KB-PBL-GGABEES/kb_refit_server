@@ -1,5 +1,7 @@
 package org.refit.spring.ceo.dto;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,22 +12,32 @@ import org.refit.spring.ceo.entity.ReceiptList;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReceiptListlDto {
-    private Long userid;            // 사장님
-    private String name;            // 사장님 이름
-    private String progressType;    // 경비 처리 항목
-    private String progressDetail;  // 세부 내용
-    private String voucher;         // 증빙 이미지 파일명
-    private Long receiptId;         // 영수증
+@ApiModel(description = "경비 청구 항목 상세 DTO")
+public class ReceiptListDto {
+    @ApiModelProperty(value = "사장님 ID", example = "1")
+    private Long userid;
+    @ApiModelProperty(value = "사장님 이름", example = "조승연")
+    private String name;
+    @ApiModelProperty(value = "경비 처리 항목", example = "업무 추진")
+    private String progressType;
+    @ApiModelProperty(value = "세부 내용", example = "업무 추진 간 타사 협력을 위한 카페 방문")
+    private String progressDetail;
+    @ApiModelProperty(value = "증빙 이미지 파일명", example = "샘플 이미지 파일명")
+    private String voucher;
+    @ApiModelProperty(value = "영수증 ID", example = "1")
+    private Long receiptId;
+    @ApiModelProperty(value = "영수 처리 상태", example = "none")
+    private String processState;
 
-    public static ReceiptListlDto of(ReceiptList vo) {
-        ReceiptListlDto receiptList = ReceiptListlDto.builder()
+    public static ReceiptListDto of(ReceiptList vo) {
+        ReceiptListDto receiptList = ReceiptListDto.builder()
                 .userid(vo.getUserid())
                 .name(vo.getName())
                 .progressType(vo.getProgressType())
                 .progressDetail(vo.getProgressDetail())
                 .voucher(vo.getVoucher())
                 .receiptId(vo.getReceiptId())
+                .processState(vo.getProcessState())
                 .build();
 
         return receiptList;

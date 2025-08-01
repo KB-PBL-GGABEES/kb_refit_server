@@ -9,7 +9,6 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-
 public class Receipt {
     private Long receiptId;
     private Long totalPrice;

@@ -9,15 +9,14 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReceiptProcess {
-    private Long receiptProcessId;
-    private String processState;
+public class Company {
+    private Long companyId;
     private Long ceoId;
-    private String progressType;
-    private String progressDetail;
+    private String companyName;
+    private String ceoName;
+    private String address;
+    private Date openedDate;
     private Date createdAt;
     private Date updatedAt;
-    private String rejectedReason;
-    private String voucher;
-    private Long receiptId;
+    private Long categoryId;
 }

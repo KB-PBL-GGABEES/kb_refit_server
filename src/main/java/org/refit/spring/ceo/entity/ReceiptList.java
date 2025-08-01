@@ -16,4 +16,5 @@ public class ReceiptList {
     private String progressDetail;  // 세부 내용
     private String voucher;         // 증빙 이미지 파일명
     private Long receiptId;         // 영수증
+    private String processState;    // 영수증 상태
 }
