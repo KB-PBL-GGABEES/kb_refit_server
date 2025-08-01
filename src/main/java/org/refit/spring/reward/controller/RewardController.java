@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.refit.spring.auth.annotation.UserId;
 import org.refit.spring.receipt.enums.ReceiptSort;
 import org.refit.spring.reward.dto.RewardListDto;
-import org.refit.spring.reward.dto.RewardResponseDto;
+import org.refit.spring.reward.dto.RewardSummaryDto;
 import org.refit.spring.reward.dto.RewardWalletRequestDto;
 import org.refit.spring.reward.dto.RewardWalletResponseDto;
 import org.refit.spring.reward.enums.RewardType;
@@ -52,10 +52,10 @@ public class RewardController {
             @ApiResponse(code = 400, message = "잘못된 요청"),
             @ApiResponse(code = 500, message = "서버 내부 오류")
     })
-    @GetMapping("/getPointSummary")
+    @GetMapping("/summary")
     public ResponseEntity<?> getTotalPoint(
             @ApiIgnore @UserId Long userId) {
-        RewardResponseDto dto = rewardService.getTotal(userId);
+        RewardSummaryDto dto = rewardService.getTotal(userId);
         return ResponseEntity.ok(dto);
     }
 

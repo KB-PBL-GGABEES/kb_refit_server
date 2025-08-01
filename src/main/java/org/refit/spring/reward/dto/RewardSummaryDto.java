@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RewardResponseDto {
+public class RewardSummaryDto {
     private Long totalCashback;
     private String category;
     private Long totalCarbonPoint;
