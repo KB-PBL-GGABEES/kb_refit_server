@@ -103,7 +103,7 @@ class ReceiptServiceTest {
     @Test
     void getRejected() {
         Long userId = 1L;
-        RejectedListDto result = service.getRejected(userId);
+        RejectedReceiptDto result = service.getRejected(userId);
         log.info(result.getList());
     }
 }

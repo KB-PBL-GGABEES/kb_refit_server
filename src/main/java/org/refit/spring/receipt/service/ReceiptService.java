@@ -203,9 +203,24 @@ public class ReceiptService {
         return dto;
     }
 
-    public RejectedListDto getRejected(Long userId) {
-        List<Receipt> list = receiptMapper.findRejected(userId);
-        return new RejectedListDto(list);
+    public List<RejectedReceiptDto> getRejected(Long userId) {
+        List<RejectedReceiptDto> rejectedList = receiptMapper.findRejected(userId);
+        for (RejectedReceiptDto dto: rejectedList) {
+            List<ReceiptContent> contents = receiptMapper.findContentsByReceiptId(userId, dto.getReceiptId());
+            List<ReceiptContentDto> contentDtoList = new ArrayList<>();
+            for (ReceiptContent content: contents) {
+                Merchandise merchandise = merchandiseMapper.findByMerchandiseId(content.getMerchandiseId());
+                ReceiptContentDto contentDto = new ReceiptContentDto();
+                contentDto.setMerchandiseId(content.getMerchandiseId());
+                contentDto.setAmount(content.getAmount());
+                contentDto.setMerchandiseName(merchandise.getMerchandiseName());
+                contentDto.setMerchandisePrice(merchandise.getMerchandisePrice());
+
+                contentDtoList.add(contentDto);
+            }
+            dto.setContentList(contentDtoList);
+        }
+        return rejectedList;
     }
 
     public void changeState(Long userId, Long receiptProcessId) {

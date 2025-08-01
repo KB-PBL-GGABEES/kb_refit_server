@@ -2,6 +2,7 @@ package org.refit.spring.mapper;
 
 import org.apache.ibatis.annotations.*;
 import org.refit.spring.receipt.ReceiptQueryProvider;
+import org.refit.spring.receipt.dto.RejectedReceiptDto;
 import org.refit.spring.receipt.entity.Receipt;
 import org.refit.spring.receipt.entity.ReceiptContent;
 import org.refit.spring.receipt.enums.ReceiptFilter;
@@ -61,13 +62,13 @@ public interface ReceiptMapper {
     @Select("SELECT is_corporate FROM card WHERE user_id = #{userId} AND card_id = #{cardId}")
     Integer getCorporate(@Param("userId") Long userId, @Param("cardId") Long cardId);
 
-    @Select("SELECT r.* FROM receipt_process rp " +
+    @Select("SELECT r.*, rp.process_state, rp.receipt_process_id FROM receipt_process rp " +
             "INNER JOIN receipt r ON rp.receipt_id = r.receipt_id " +
             "INNER JOIN card c  ON r.card_id = c.card_id " +
             "INNER JOIN user u ON c.user_id = u.user_id " +
             "WHERE c.user_id = #{userId} AND c.is_corporate = 1 AND rp.process_state = 'rejected' " +
-            "ORDER BY receipt_process_id ASC")
-    List<Receipt> findRejected(@Param("userId") Long userId);
+            "ORDER BY rp.created_at ASC")
+    List<RejectedReceiptDto> findRejected(@Param("userId") Long userId);
 
     @Update("UPDATE receipt_process rp SET rp.process_state = 'deposit' " +
             "WHERE rp.receipt_process_id = #{receiptProcessId} " +
