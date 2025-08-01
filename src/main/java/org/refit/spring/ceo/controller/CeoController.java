@@ -10,7 +10,7 @@ import org.refit.spring.ceo.dto.*;
 import org.refit.spring.ceo.dto.CeoListDto;
 import org.refit.spring.ceo.dto.EmailRequestDto;
 import org.refit.spring.ceo.service.CeoService;
-import org.refit.spring.receipt.dto.ReceiptListDto;
+import org.refit.spring.ceo.dto.ReceiptListDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
