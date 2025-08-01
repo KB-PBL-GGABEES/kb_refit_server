@@ -79,10 +79,7 @@ public class WalletController {
         WalletResponseDto.WalletBrandListDto result = walletService.getWalletList(userId);
         return ResponseEntity.ok(result);
     }
-//    public ResponseEntity<WalletResponseDto.WalletBrandListDto> getWalletStore(@ApiIgnore @UserId Long userId) {
-//        WalletResponseDto.WalletBrandListDto result = walletService.getWalletList(userId);
-//        return ResponseEntity.ok(result);
-//    }
+
 
     @ApiOperation(value = "지갑 브랜드 상세 조회", notes = "전자지갑 브랜드 디자인의 상세 정보를 확인할 수 있습니다.")
     @GetMapping("/brand/detail/{walletId}")

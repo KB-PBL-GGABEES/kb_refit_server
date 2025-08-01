@@ -38,5 +38,8 @@ public interface PersonalBadgeMapper {
 
     @Insert("INSERT personal_badge (is_worn, created_at, updated_at, badge_id, user_id) VALUES (0, now(), now(), #{badgeId}, #{userId})")
     void insertBadge(@Param("badgeId") Long badgeId, @Param("userId") Long userId);
+
+    @Select("SELECT * FROM personal_badge WHERE personal_badge_id = #{personalBadgeId}")
+    PersonalBadge findById(Long personalBadgeId);
 }
 

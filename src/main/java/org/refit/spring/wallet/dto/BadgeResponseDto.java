@@ -157,13 +157,34 @@ public class BadgeResponseDto {
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     @Builder
+    public static class BadgePresetDetailDto {
+        private Long personalBadgeId;
+        private Long badgeId;
+        private String badgeImage;
+        private String badgeTitle;
+
+        public static BadgePresetDetailDto from(Badge badge, PersonalBadge personalBadge) {
+            return BadgePresetDetailDto.builder()
+                    .personalBadgeId(personalBadge.getPersonalBadgeId())
+                    .badgeId(badge.getBadgeId())
+                    .badgeImage(badge.getBadgeImage())
+                    .badgeTitle(badge.getBadgeTitle())
+                    .build();
+        }
+    }
+
+
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    @Builder
     public static class BadgePresetListDto {
         private Long presetId;
         private String presetName;
         private boolean isApplied;
-        List<BadgePresetDto> badgePresetList;
+        List<BadgePresetDetailDto> badgePresetList;
 
-        public static BadgePresetListDto from(BadgePreset badgePreset, List<BadgePresetDto> presetList) {
+        public static BadgePresetListDto from(BadgePreset badgePreset, List<BadgePresetDetailDto> presetList) {
             return BadgePresetListDto.builder()
                     .presetId(badgePreset.getPresetId())
                     .presetName(badgePreset.getPresetName())
