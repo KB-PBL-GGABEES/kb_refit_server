@@ -147,9 +147,9 @@ public class ReceiptService {
     @Transactional(readOnly = true)
     public ReceiptListDto getFilteredList(Long userId, Long cursorId, Integer period, Date startDate, Date endDate, ReceiptType type, ReceiptSort sort, ReceiptFilter filter) {
         if (cursorId == null) {
-            cursorId = (sort == ReceiptSort.최신순 || sort == null) ? Long.MAX_VALUE : 0L;
+            cursorId = (sort == ReceiptSort.LATEST || sort == null) ? Long.MAX_VALUE : 0L;
         }
-        ReceiptType finalType = (type == ReceiptType.전체) ? null : type;
+        ReceiptType finalType = (type == ReceiptType.ALL) ? null : type;
         List<Receipt> receipts = receiptMapper.getFilteredList(userId, cursorId, period, startDate, endDate, finalType, filter, sort);
         Long nextCursorId = receipts.size() < 20 ? null : receipts.get(receipts.size() - 1).getReceiptId();
         return ReceiptListDto.from(userId, receipts, nextCursorId);
