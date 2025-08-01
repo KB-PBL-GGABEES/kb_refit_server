@@ -29,12 +29,6 @@ public interface RewardMapper {
                          @Param("type") RewardType type,
                          @Param("sort") ReceiptSort sort);
 
-    @Select("SELECT * FROM reward WHERE user_id = #{userId} AND reward_id < #{cursorId} AND created_at >= DATE_SUB(NOW(), INTERVAL #{period} MONTH) ORDER BY reward_id DESC LIMIT 20")
-    List<Reward> getListForMonths(@Param("userId") Long userId, @Param("cursorId") Long cursorId, @Param("period") int period);
-
-    @Select("SELECT * FROM reward WHERE user_id = #{userId} AND reward_id < #{cursorId} AND created_at >= #{startDate} AND created_at < DATE_ADD(#{endDate}, INTERVAL 1 DAY) ORDER BY reward_id DESC LIMIT 20")
-    List<Reward> getListWithPeriod(@Param("userId") Long userId, @Param("cursorId") Long cursorId, @Param("startDate") Date startDate, @Param("endDate") Date endDate);
-
     @Select("SELECT IFNULL(SUM(reward), 0) FROM reward WHERE user_id = #{userId}")
     Long getTotalCashback(@Param("userId") Long userId);
 

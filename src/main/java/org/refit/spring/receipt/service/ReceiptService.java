@@ -46,8 +46,7 @@ public class ReceiptService {
         updatePrice(receipt);
         receipt.setContentList(list);
         receiptMapper.update(userId, receipt);
-        Long ceoId = ceoMapper.findCeoId(firstMerchandise.getCompanyId());
-        ceoMapper.insertProcess(ceoId, userId, receipt.getReceiptId());
+        ceoMapper.insertProcess(null, userId, receipt.getReceiptId());
         return receipt;
     }
 
@@ -66,6 +65,27 @@ public class ReceiptService {
         refundReceipt.setUserId(userId);
         refundReceipt.setCardId(nowReceipt.getCardId());
         receiptMapper.create(refundReceipt);
+
+        List<ReceiptContent> originalContents = receiptMapper.findContentsByReceiptId(userId, receiptId);
+        List<ReceiptContentDto> refundContentList = new ArrayList<>();
+        for (ReceiptContent content: originalContents) {
+            ReceiptContent refundContent = new ReceiptContent();
+            refundContent.setAmount(-content.getAmount());
+            refundContent.setMerchandiseId(content.getMerchandiseId());
+            refundContent.setReceiptId(refundReceipt.getReceiptId());
+            refundContent.setCreatedAt(new Date());
+            receiptMapper.createReceiptContent(refundContent);
+
+            Merchandise merchandise = merchandiseMapper.findByMerchandiseId(content.getMerchandiseId());
+            ReceiptContentDto dto = new ReceiptContentDto();
+            dto.setMerchandiseId(merchandise.getMerchandiseId());
+            dto.setMerchandiseName(merchandise.getMerchandiseName());
+            dto.setMerchandisePrice(merchandise.getMerchandisePrice());
+            dto.setAmount(-content.getAmount());
+
+            refundContentList.add(dto);
+        }
+        refundReceipt.setContentList(refundContentList);
 
         return refundReceipt;
     }
