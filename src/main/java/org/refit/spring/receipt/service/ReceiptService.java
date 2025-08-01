@@ -33,6 +33,7 @@ public class ReceiptService {
     private final CeoMapper ceoMapper;
     private final PersonalBadgeMapper personalBadgeMapper;
     private final UserMapper userMapper;
+    private final HospitalMapper hospitalMapper;
 
     private final DataSource dataSource;
 
@@ -45,8 +46,9 @@ public class ReceiptService {
         updatePrice(receipt);
         receipt.setContentList(list);
         receiptMapper.update(userId, receipt);
-
-        ceoMapper.insertProcess(null, userId, receipt.getReceiptId());
+        Long category = receiptMapper.findCaterogy(userId, receipt.getReceiptId());
+        if (category == 1) hospitalMapper.insertProcess(userId, receipt.getReceiptId());
+        else ceoMapper.insertProcess(null, userId, receipt.getReceiptId());
         return receipt;
     }
 
