@@ -202,9 +202,6 @@ public interface HospitalMapper {
 
 
     // 보험 청구_POST
-//    @Insert("INSERT INTO hospital_process (process_state, sicked_date, visited_reason, receipt_id, insurance_id) " +
-//            "VALUES ('inProgress', #{sickedDate}, #{visitedReason}, #{receiptId}, #{insuranceId})")
-//    void insertInsuranceClaim(InsuranceClaimRequestDto dto);
     @Update("UPDATE hospital_process " +
             "SET process_state = 'inProgress', " +
             "sicked_date = #{sickedDate}, " +
@@ -214,6 +211,3 @@ public interface HospitalMapper {
     void insertInsuranceClaim(InsuranceClaimRequestDto dto);
 
 }
-//
-//update -> controller -> 패치로바꾸고
-//병원영수증이랑 영수처리
