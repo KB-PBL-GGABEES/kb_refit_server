@@ -66,7 +66,7 @@ public interface ReceiptMapper {
             "INNER JOIN card c  ON r.card_id = c.card_id " +
             "INNER JOIN user u ON c.user_id = u.user_id " +
             "WHERE c.user_id = #{userId} AND c.is_corporate = 1 AND rp.process_state = 'rejected' " +
-            "ORDER BY receipt_process_id DESC")
+            "ORDER BY receipt_process_id ASC")
     List<Receipt> findRejected(@Param("userId") Long userId);
 
     @Update("UPDATE receipt_process rp SET rp.process_state = 'deposit' " +
