@@ -14,4 +14,5 @@ public class HospitalExpenseResponseDto {
     private String storeName;
     private String processState;
     private Long totalPrice;
+    private Long receiptId;
 }

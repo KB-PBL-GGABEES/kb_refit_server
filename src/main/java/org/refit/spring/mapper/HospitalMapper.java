@@ -10,39 +10,99 @@ import java.util.Date;
 public interface HospitalMapper {
 
     // 의료비 납입내역 조회
-
-    // 첫 페이지: cursorDate 없이 최신순 20개
+    // 기본 커서 기반 병원 영수증 목록 조회 (최근 순, LIMIT 10)
     @Select("SELECT " +
             "r.created_at AS createdAt, " +
             "c.company_name AS storeName, " +
             "hp.process_state AS processState, " +
-            "r.total_price AS totalPrice " +
-            "FROM hospital_process hp " +
-            "JOIN receipt r ON hp.receipt_id = r.receipt_id " +
+            "r.total_price AS totalPrice, " +
+            "r.receipt_id AS receiptId " +
+            "FROM receipt r " +
             "JOIN company c ON r.company_id = c.company_id " +
             "JOIN categories cat ON c.category_id = cat.category_id " +
+            "LEFT JOIN hospital_process hp ON r.receipt_id = hp.receipt_id " +
             "WHERE r.user_id = #{userId} " +
             "AND cat.category_id = 1 " +
-            "ORDER BY r.created_at DESC " +
-            "LIMIT 2")
-    List<HospitalExpenseResponseDto> findFirstPage(@Param("userId") Long userId);
-
-    // 커서 이후 페이지: created_at < cursorDate
+            "AND r.receipt_id < #{cursorId} " +
+            "ORDER BY r.receipt_id DESC " +
+            "LIMIT 10")
+    List<HospitalExpenseResponseDto> findByCursorId(@Param("userId") Long userId,
+                                                    @Param("cursorId") Long cursorId);
+    // 최근 N개월 이내의 병원 영수증 목록 조회 (커서 기반)
     @Select("SELECT " +
             "r.created_at AS createdAt, " +
             "c.company_name AS storeName, " +
             "hp.process_state AS processState, " +
-            "r.total_price AS totalPrice " +
-            "FROM hospital_process hp " +
-            "JOIN receipt r ON hp.receipt_id = r.receipt_id " +
+            "r.total_price AS totalPrice, " +
+            "r.receipt_id AS receiptId " +
+            "FROM receipt r " +
             "JOIN company c ON r.company_id = c.company_id " +
             "JOIN categories cat ON c.category_id = cat.category_id " +
+            "LEFT JOIN hospital_process hp ON r.receipt_id = hp.receipt_id " +
             "WHERE r.user_id = #{userId} " +
             "AND cat.category_id = 1 " +
-            "AND r.created_at < #{cursorDate} " +
-            "ORDER BY r.created_at DESC " +
-            "LIMIT 2")
-    List<HospitalExpenseResponseDto> findByCursorDate(@Param("userId") Long userId, @Param("cursorDate") Date cursorDate);
+            "AND r.receipt_id < #{cursorId} " +
+            "AND r.created_at >= DATE_SUB(NOW(), INTERVAL #{period} MONTH) " +  // 최근 N개월 조건
+            "ORDER BY r.receipt_id DESC " +
+            "LIMIT 10")
+    List<HospitalExpenseResponseDto> findByCursorIdWithinMonths(@Param("userId") Long userId,
+                                                                @Param("cursorId") Long cursorId,
+                                                                @Param("period") Integer period);
+    // 시작일 ~ 종료일 사이 병원 영수증 목록 조회 (커서 기반)
+    @Select("SELECT " +
+            "r.created_at AS createdAt, " +
+            "c.company_name AS storeName, " +
+            "hp.process_state AS processState, " +
+            "r.total_price AS totalPrice, " +
+            "r.receipt_id AS receiptId " +
+            "FROM receipt r " +
+            "JOIN company c ON r.company_id = c.company_id " +
+            "JOIN categories cat ON c.category_id = cat.category_id " +
+            "LEFT JOIN hospital_process hp ON r.receipt_id = hp.receipt_id " +
+            "WHERE r.user_id = #{userId} " +
+            "AND cat.category_id = 1 " +
+            "AND r.receipt_id < #{cursorId} " +
+            "AND r.created_at BETWEEN #{startDate} AND #{endDate} " +
+            "ORDER BY r.receipt_id DESC " +
+            "LIMIT 10")
+    List<HospitalExpenseResponseDto> findByCursorIdWithPeriod(@Param("userId") Long userId,
+                                                              @Param("cursorId") Long cursorId,
+                                                              @Param("startDate") Date startDate,
+                                                              @Param("endDate") Date endDate);
+
+
+//    // 첫 페이지: cursorDate 없이 최신순 20개
+//    @Select("SELECT " +
+//            "r.created_at AS createdAt, " +
+//            "c.company_name AS storeName, " +
+//            "hp.process_state AS processState, " +
+//            "r.total_price AS totalPrice " +
+//            "FROM hospital_process hp " +
+//            "JOIN receipt r ON hp.receipt_id = r.receipt_id " +
+//            "JOIN company c ON r.company_id = c.company_id " +
+//            "JOIN categories cat ON c.category_id = cat.category_id " +
+//            "WHERE r.user_id = #{userId} " +
+//            "AND cat.category_id = 1 " +
+//            "ORDER BY r.created_at DESC " +
+//            "LIMIT 2")
+//    List<HospitalExpenseResponseDto> findFirstPage(@Param("userId") Long userId);
+//
+//    // 커서 이후 페이지: created_at < cursorDate
+//    @Select("SELECT " +
+//            "r.created_at AS createdAt, " +
+//            "c.company_name AS storeName, " +
+//            "hp.process_state AS processState, " +
+//            "r.total_price AS totalPrice " +
+//            "FROM hospital_process hp " +
+//            "JOIN receipt r ON hp.receipt_id = r.receipt_id " +
+//            "JOIN company c ON r.company_id = c.company_id " +
+//            "JOIN categories cat ON c.category_id = cat.category_id " +
+//            "WHERE r.user_id = #{userId} " +
+//            "AND cat.category_id = 1 " +
+//            "AND r.created_at < #{cursorDate} " +
+//            "ORDER BY r.created_at DESC " +
+//            "LIMIT 2")
+//    List<HospitalExpenseResponseDto> findByCursorDate(@Param("userId") Long userId, @Param("cursorDate") Date cursorDate);
 
     // 의료비 납입 내역 상세 조회
     @Select("SELECT " +
@@ -142,8 +202,18 @@ public interface HospitalMapper {
 
 
     // 보험 청구_POST
-    @Insert("INSERT INTO hospital_process (process_state, sicked_date, visited_reason, receipt_id, insurance_id) " +
-            "VALUES ('inProgress', #{sickedDate}, #{visitedReason}, #{receiptId}, #{insuranceId})")
+//    @Insert("INSERT INTO hospital_process (process_state, sicked_date, visited_reason, receipt_id, insurance_id) " +
+//            "VALUES ('inProgress', #{sickedDate}, #{visitedReason}, #{receiptId}, #{insuranceId})")
+//    void insertInsuranceClaim(InsuranceClaimRequestDto dto);
+    @Update("UPDATE hospital_process " +
+            "SET process_state = 'inProgress', " +
+            "sicked_date = #{sickedDate}, " +
+            "visited_reason = #{visitedReason}, " +
+            "insurance_id = #{insuranceId} " +
+            "WHERE receipt_id = #{receiptId}")
     void insertInsuranceClaim(InsuranceClaimRequestDto dto);
 
 }
+//
+//update -> controller -> 패치로바꾸고
+//병원영수증이랑 영수처리
