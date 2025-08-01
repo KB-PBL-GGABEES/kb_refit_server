@@ -12,10 +12,10 @@ public class ReceiptQueryProvider {
 
         ReceiptSort sort = (ReceiptSort) params.get("sort");
         if (sort == null) {
-            sort = ReceiptSort.최신순;
+            sort = ReceiptSort.LATEST;
             params.put("sort", sort);
         }
-        if (sort == ReceiptSort.최신순) sql.append(" AND r.receipt_id < #{cursorId}");
+        if (sort == ReceiptSort.LATEST) sql.append(" AND r.receipt_id < #{cursorId}");
         else sql.append(" AND r.receipt_id > #{cursorId}");
         Integer period = (Integer) params.get("period");
         if (period != null && period > 0) sql.append(" AND r.created_at >= DATE_SUB(NOW(), INTERVAL #{period} MONTH)");
@@ -23,9 +23,9 @@ public class ReceiptQueryProvider {
             sql.append(" AND r.created_at >= #{startDate} AND r.created_at < DATE_ADD(#{endDate}, INTERVAL 1 DAY)");
         }
         ReceiptType type = (ReceiptType) params.get("type");
-        if (type != null && type != ReceiptType.전체) {
-            if (type == ReceiptType.승인) sql.append(" AND r.transaction_type = '카드 결제' ");
-            else if (type == ReceiptType.취소) sql.append(" AND r.transaction_type = '환불' ");
+        if (type != null && type != ReceiptType.ALL) {
+            if (type == ReceiptType.APPROVED) sql.append(" AND r.transaction_type = '카드 결제' ");
+            else if (type == ReceiptType.CANCELED) sql.append(" AND r.transaction_type = '환불' ");
         }
 
         ReceiptFilter filter = (ReceiptFilter) params.get("filter");
@@ -35,7 +35,7 @@ public class ReceiptQueryProvider {
         }
 
 
-        if (sort == ReceiptSort.최신순) sql.append(" ORDER BY r.receipt_id DESC");
+        if (sort == ReceiptSort.LATEST) sql.append(" ORDER BY r.receipt_id DESC");
         else sql.append(" ORDER BY r.receipt_id ASC");
         sql.append(" LIMIT 20");
 
