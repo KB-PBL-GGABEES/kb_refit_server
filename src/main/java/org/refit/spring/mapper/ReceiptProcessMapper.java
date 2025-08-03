@@ -1,13 +1,13 @@
 package org.refit.spring.mapper;
 
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 import org.refit.spring.receiptProcess.dto.CheckCompanyResponseDto;
 import org.refit.spring.receiptProcess.dto.ReceiptProcessCheckDto;
+import org.refit.spring.receiptProcess.dto.ReceiptProcessRequestDto;
 import org.refit.spring.receiptProcess.dto.ReceiptSelectDto;
 
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 @Mapper
@@ -28,13 +28,28 @@ public interface ReceiptProcessMapper {
     ReceiptProcessCheckDto findCompanyInfoByReceiptId(@Param("receiptId") Long receiptId);
 
     // 사업자 정보 확인 요청
-    @Insert("INSERT INTO company (company_id, ceo_Id, company_name, ceo_name, address, opened_date, created_at, updated_at, category_id) " +
-            "VALUES (#{companyId}, #{ceoId}, #{companyName}, #{ceoName}, #{address}, #{openedDate}, NOW(), NOW(), 0)")
-    void insertVerifiedCompany(CheckCompanyResponseDto dto);
+    @Insert("INSERT INTO company (company_id, company_name, ceo_name, opened_date, address, created_at, updated_at, category_id, ceo_id) " +
+            "VALUES (#{companyId}, #{companyName}, #{ceoName}, #{openedDate}, #{address}, NOW(), NOW(), #{categoryId}, #{ceoId})")
+    void insertVerifiedCompany(
+            @Param("companyId") Long companyId,
+            @Param("companyName") String companyName,
+            @Param("ceoName") String ceoName,
+            @Param("openedDate") Date openedDate,
+            @Param("address") String address,
+            @Param("categoryId") Integer categoryId, // 추가
+            @Param("ceoId") Long ceoId
+    );
+
+    // 사업자 정보 저장 후 선택화면에 뜨게하기
+    @Insert("INSERT IGNORE INTO employee (user_id, company_id, start_date) VALUES (#{userId}, #{companyId}, #{startDate})")
+    void insertEmployeeIfNotExists(@Param("userId") Long userId,
+                                   @Param("companyId") Long companyId,
+                                   @Param("startDate") Date startDate);
+
 
     // 영수 처리 요청
-    @Insert("INSERT INTO receipt_process (process_state, ceo_id, progress_type, progress_detail, voucher, receipt_id, created_at) " +
-            "VALUES ('inProgress', #{ceoId}, #{progressType}, #{progressDetail}, #{voucher}, #{receiptId}, NOW())")
+    @Insert("INSERT INTO receipt_process (process_state, ceo_id, progress_type, progress_detail, voucher, receipt_id, created_at, updated_at) " +
+            "VALUES ('inProgress', #{ceoId}, #{progressType}, #{progressDetail}, #{voucher}, #{receiptId}, NOW(), NOW())")
     void insertReceiptProcess(
             @Param("ceoId") Long ceoId,
             @Param("progressType") String progressType,
@@ -42,10 +57,26 @@ public interface ReceiptProcessMapper {
             @Param("voucher") String voucher,
             @Param("receiptId") Long receiptId
     );
+    // UPDATE (등록 내용 전체 갱신용)
+    @Update("UPDATE receipt_process " +
+            "SET progress_type = #{progressType}, " +
+            "progress_detail = #{progressDetail}, " +
+            "voucher = #{voucher}, " +
+            "updated_at = NOW() " +
+            "WHERE receipt_id = #{receiptId}")
+    void updateReceiptProcess(ReceiptProcessRequestDto dto);
+
+
+    // 상태만 변경
+    @Update("UPDATE receipt_process " +
+            "SET process_state = #{processState}, updated_at = NOW() " +
+            "WHERE receipt_id = #{receiptId}")
+    void updateProcessState(@Param("receiptId") Long receiptId,
+                            @Param("processState") String processState);
 
     // receiptId가 실제로 존재하는지 확인
-    @Select("SELECT COUNT(*) > 0 FROM receipt WHERE receipt_id = #{receiptId}")
-    boolean existsReceiptById(@Param("receiptId") Long receiptId);
+    @Select("SELECT COUNT(*) > 0 FROM receipt_process WHERE receipt_id = #{receiptId}")
+    boolean existsReceiptProcessByReceiptId(@Param("receiptId") Long receiptId);
 
     // userId와 receiptId로 ceoId 찾기
     @Select("SELECT c.ceo_id " +
