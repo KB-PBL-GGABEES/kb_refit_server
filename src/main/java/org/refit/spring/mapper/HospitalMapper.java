@@ -205,7 +205,7 @@ public interface HospitalMapper {
                                 @Param("insuranceId") Long insuranceId);
 
 
-    // 보험 청구_POST
+    // 보험 청구_Update
     @Update("UPDATE hospital_process " +
             "SET process_state = 'inProgress', " +
             "sicked_date = #{sickedDate}, " +
@@ -213,5 +213,7 @@ public interface HospitalMapper {
             "insurance_id = #{insuranceId} " +
             "WHERE receipt_id = #{receiptId}")
     void insertInsuranceClaim(InsuranceClaimRequestDto dto);
+
+
 
 }

@@ -10,8 +10,7 @@ import lombok.*;
 @Builder
 public class CheckCompanyResponseDto {
         private boolean isValid;
-        // 아래는 valid == 01일 때만 포함됨
-        private Long companyId;
-        private String companyName;
-        private String address;
+        private String companyId;
+        private String ceoName;
+        private String openedDate;
 }

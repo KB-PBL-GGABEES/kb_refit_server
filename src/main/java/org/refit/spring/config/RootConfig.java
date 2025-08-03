@@ -1,5 +1,6 @@
 package org.refit.spring.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -70,8 +71,15 @@ public class RootConfig {
         return manager;
     }
 
+    //OpenAPI 등 외부 HTTP API 서버에 요청을 보낼 수 있도록 Spring에서 제공하는 HTTP 클라이언트인 RestTemplate을 빈으로 등록
     @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();
+    }
+
+    //외부 API 응답(JSON 문자열)을 Java 객체 또는 JsonNode로 파싱하기 위해 ObjectMapper를 빈으로 등록
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
     }
 }
