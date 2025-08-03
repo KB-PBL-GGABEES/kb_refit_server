@@ -171,7 +171,7 @@ public class HospitalController {
 
         return ResponseEntity.ok(result);
     }
-    // 보험 청구_POST
+    // 보험 청구_PATCH
     @ApiOperation(value = "보험 청구 요청", notes = "보험 청구 페이지에서 보험 청구를 요청할 수 있습니다.")
     @PatchMapping("/insurance/claim")
     public ResponseEntity<?> claimInsurance(@ApiIgnore @UserId Long userId,

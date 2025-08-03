@@ -1,9 +1,12 @@
 package org.refit.spring.receiptProcess.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpHeaders;
 import org.refit.spring.mapper.ReceiptProcessMapper;
 import org.refit.spring.receiptProcess.dto.*;
@@ -16,8 +19,11 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 
-import java.util.List;
-import java.util.Map;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -28,7 +34,7 @@ public class ReceiptProcessService {
     private final ReceiptProcessMapper receiptProcessMapper;
     // 외부 OpenAPI 호출용 HTTP 클라이언트
     private final RestTemplate restTemplate;
-
+    private final ObjectMapper objectMapper;
     @Value("${openapi.api-key}")
     // application.properties에서 주입받는 OpenAPI 인증 키
     private String apiKey;
@@ -37,80 +43,82 @@ public class ReceiptProcessService {
     // OpenAPI 요청 URL
     private String validateUrl;
 
-    /**
-     * 사업자 진위 여부를 확인하는 메서드
-     * - OpenAPI에 POST 요청을 보내고, 응답에서 valid 값이 "01"이면 진위 확인 성공
-     * - 사업자 번호, 상호명, 주소를 추출하여 CheckCompanyResponseDto로 응답
-     * - 실패 또는 예외 상황이면 isValid=false로 응답
-     */
-    public CheckCompanyResponseDto verifyCompany(CheckCompanyRequestDto requestDto) {
-        // 1. OpenAPI URL 구성 (인증키와 응답형식 추가)
-        String url = UriComponentsBuilder.fromHttpUrl(validateUrl)
-                .queryParam("serviceKey", apiKey)
-                .queryParam("returnType", "JSON")
-                .toUriString();
 
-        // 2. HTTP 헤더 설정 (Content-Type: application/json)
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        // 3. 요청 바디 생성 (사용자 입력을 OpenAPI 형식으로 변환)
-        HttpEntity<OpenApiValidateRequestDto> entity =
-                new HttpEntity<>(OpenApiValidateRequestDto.from(requestDto), headers);
+    public CheckCompanyResponseDto verifyAndSave(CheckCompanyRequestDto dto, Long ceoId) {
 
         try {
-            // 4. OpenAPI에 POST 요청 전송
-            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+            String url = validateUrl + "?serviceKey=" + apiKey + "&returnType=JSON";
+
+            OpenApiValidateRequestDto.Business business = new OpenApiValidateRequestDto.Business(
+                    dto.getCompanyId(),
+                    new SimpleDateFormat("yyyyMMdd").format(dto.getOpenedDate()),
+                    dto.getCeoName()
+            );
+
+            Map<String, Object> body = new HashMap<>();
+            body.put("businesses", Collections.singletonList(business));
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
+
+            ResponseEntity<String> response = restTemplate.exchange(
                     url,
                     HttpMethod.POST,
                     entity,
-                    // Map으로 응답 받기
-                    new ParameterizedTypeReference<Map<String, Object>>() {}
+                    String.class
             );
 
-            // 5. 응답 성공 & 바디 존재 확인
-            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-                // 6. "data" 필드 추출 (사업자 리스트)
-                List<Map<String, Object>> dataList = (List<Map<String, Object>>) response.getBody().get("data");
-                if (dataList != null && !dataList.isEmpty()) {
-                    // 첫 번째 사업자 정보
-                    Map<String, Object> data = dataList.get(0);
-                    // 진위 확인 결과
-                    String valid = (String) data.get("valid");
+            JsonNode root = objectMapper.readTree(response.getBody());
+            JsonNode data = root.get("data").get(0);
+            String valid = data.get("valid").asText();
 
-                    // 7. valid="01" → 진위 확인 성공
-                    if ("01".equals(valid)) {
-                        Long companyId = Long.valueOf((String) data.get("b_no")); // 사업자번호
-                        String companyName = (String) data.getOrDefault("b_nm", "상호명 없음"); // 상호명
-                        String address = (String) data.getOrDefault("addr", "주소 없음"); // 주소
+            if ("01".equals(valid)) {
+                JsonNode param = data.get("request_param");
+                Long companyId = Long.valueOf(param.get("b_no").asText());
+                String ceoName = param.get("p_nm").asText();
+                String startDt = param.get("start_dt").asText();
+                String companyName = ceoName + " 상호명";
 
-                        // 8. 성공 응답 생성
-                        return CheckCompanyResponseDto.builder()
-                                .isValid(true)
-                                .companyId(companyId)
-                                .companyName(companyName)
-                                .address(address)
-                                .build();
-                    }
+                Date openedDate = new SimpleDateFormat("yyyyMMdd").parse(startDt);
 
-                    // 9. valid="02" → 진위 확인 실패
-                    return CheckCompanyResponseDto.builder()
-                            .isValid(false)
-                            .build();
+                // 주소는 임시로 계속사업자 정보로 넣음 (실제 주소는 status.b_stt 아님)
+                String address = data.get("status").get("b_stt").asText();
+
+                try {
+                    receiptProcessMapper.insertVerifiedCompany(
+                            companyId, companyName, ceoName, openedDate, address, 19, ceoId
+                    );
+                } catch (DuplicateKeyException e) {
+                    System.out.println("⚠️ 이미 존재하는 회사(companyId)입니다.");
                 }
+
+                // ✅ (2) employee INSERT
+                try {
+                    receiptProcessMapper.insertEmployeeIfNotExists(ceoId, companyId, new Date());
+                } catch (Exception e) {
+                }
+
+                return CheckCompanyResponseDto.builder()
+                        .isValid(true)
+                        .companyId(param.get("b_no").asText())
+                        .ceoName(ceoName)
+                        .openedDate(startDt)
+                        .build();
+            } else {
+                return CheckCompanyResponseDto.builder()
+                        .isValid(false)
+                        .companyId(dto.getCompanyId())
+                        .ceoName(dto.getCeoName())
+                        .openedDate(new SimpleDateFormat("yyyyMMdd").format(dto.getOpenedDate()))
+                        .build();
             }
 
         } catch (Exception e) {
-            // 10. 예외 발생 시 로그 출력 및 실패 응답 처리
-            log.error("사업자 진위 확인 중 예외 발생", e);
+            throw new RuntimeException("사업자 진위 확인 실패", e);
         }
-
-        // 11. 정상 응답이 아니거나 예외 발생 시: 진위 확인 실패 처리
-        return CheckCompanyResponseDto.builder()
-                .isValid(false)
-                .build();
     }
-
 
     // 사업장 선택 조회
     public List<ReceiptSelectDto> getCompanySelectionListByUserId(Long userId) {
@@ -122,26 +130,43 @@ public class ReceiptProcessService {
         return receiptProcessMapper.findCompanyInfoByReceiptId(receiptId);
     }
 
-    // 사업자 정보 확인 요청
-    public void registerVerifiedCompany(CheckCompanyResponseDto dto) {
-        receiptProcessMapper.insertVerifiedCompany(dto);
-    }
 
     // 영수 처리 요청
-    public void registerReceiptProcess(ReceiptProcessRequestDto dto, Long ceoId) {
-        receiptProcessMapper.insertReceiptProcess(
-                ceoId,
-                dto.getProgressType(),
-                dto.getProgressDetail(),
-                dto.getVoucher(),
-                dto.getReceiptId()
-        );
+    public void upsertReceiptProcess(ReceiptProcessRequestDto dto, Long userId) {
+        // 1. receiptId 유효성 검사
+        if (dto.getReceiptId() == null) {
+            throw new IllegalArgumentException("receiptId는 필수입니다.");
+        }
+
+        // 2. 해당 영수증이 userId 소유인지 확인 (ceo 권한 검증)
+        Long ceoId = receiptProcessMapper.findCeoIdByUserIdAndReceiptId(userId, dto.getReceiptId());
+        if (ceoId == null) {
+            throw new IllegalArgumentException("해당 영수증은 현재 사용자에게 속하지 않습니다.");
+        }
+
+        // 3. receipt_process 존재 여부 확인
+        boolean exists = receiptProcessMapper.existsReceiptProcessByReceiptId(dto.getReceiptId());
+
+        // 4. 분기 처리
+        if (exists) {
+            // update: progressType, detail, voucher 등 변경
+            receiptProcessMapper.updateReceiptProcess(dto);
+        } else {
+            // insert: 최초 등록 (process_state = 'inProgress')
+            receiptProcessMapper.insertReceiptProcess(
+                    ceoId,
+                    dto.getProgressType(),
+                    dto.getProgressDetail(),
+                    dto.getVoucher(),
+                    dto.getReceiptId()
+            );
+        }
     }
 
     // receiptId가 실제로 존재하는지 확인
 
     public boolean receiptExists(Long receiptId) {
-        return receiptProcessMapper.existsReceiptById(receiptId);
+        return receiptProcessMapper.existsReceiptProcessByReceiptId(receiptId);
     }
 
     // userId + receiptId로 ceoId 찾기

@@ -109,7 +109,7 @@ public class HospitalService {
         return hospitalMapper.findHospitalVisitInfo(userId, receiptId);
     }
 
-    // 보험 청구_POST
+    // 보험 청구_PATCH
     public void insertInsuranceClaim(InsuranceClaimRequestDto dto, Long userId) {
         // 1. 이미 hospital_process 존재하는지 확인
         String existingState = hospitalMapper.findProcessStateByReceiptId(dto.getReceiptId());
