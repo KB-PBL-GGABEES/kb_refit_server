@@ -90,5 +90,7 @@ public interface ReceiptProcessMapper {
     @Select("SELECT voucher FROM receipt_process WHERE receipt_id = #{receiptId}")
     String findVoucherFileNameByReceiptId(@Param("receiptId") Long receiptId);
 
+    @Select("SELECT rejected_reason FROM receipt_process WHERE receipt_id = #{receiptId}")
+    String findReason(@Param("receiptId") Long receiptId);
 
 }
