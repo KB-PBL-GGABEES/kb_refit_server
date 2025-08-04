@@ -119,7 +119,7 @@ public class ReceiptController {
     })
     @GetMapping("/rejectedList")
     public ResponseEntity<?> getRejected(@ApiIgnore @UserId Long userId) {
-        RejectReceiptListDto dto = receiptService.getRejected(userId);
+        RejectedReceiptListDto dto = receiptService.getRejected(userId);
         return ResponseEntity.ok(dto);
     }
 
