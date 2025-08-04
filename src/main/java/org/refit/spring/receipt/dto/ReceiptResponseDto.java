@@ -20,6 +20,7 @@ public class ReceiptResponseDto {
     private Long reward;
     private String processState;
     private String createdAt;
+    private String companyName;
 
     public static ReceiptResponseDto from(Receipt receipt, Long userId, Long carbon, Long price, String processState) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -33,7 +34,8 @@ public class ReceiptResponseDto {
                 carbon,
                 price,
                 processState != null ? processState : "none",
-                sdf.format(receipt.getCreatedAt())
+                sdf.format(receipt.getCreatedAt()),
+                receipt.getCompanyName()
         );
     }
 }

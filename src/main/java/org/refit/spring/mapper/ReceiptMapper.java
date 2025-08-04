@@ -1,6 +1,7 @@
 package org.refit.spring.mapper;
 
 import org.apache.ibatis.annotations.*;
+import org.refit.spring.ceo.entity.Ceo;
 import org.refit.spring.receipt.ReceiptQueryProvider;
 import org.refit.spring.receipt.dto.RejectedReceiptDto;
 import org.refit.spring.receipt.entity.Receipt;
@@ -27,13 +28,13 @@ public interface ReceiptMapper {
 
     @SelectProvider(type = ReceiptQueryProvider.class, method = "buildFilteredQuery")
     List<Receipt> getFilteredList(@Param("userId") Long userId,
-                                  @Param("cursorId") Long cursorId,
-                                  @Param("period") Integer period,
-                                  @Param("startDate") Date startDate,
-                                  @Param("endDate") Date endDate,
-                                  @Param("type") ReceiptType type,
-                                  @Param("filter") ReceiptFilter filter,
-                                  @Param("sort") ReceiptSort sort);
+                              @Param("cursorId") Long cursorId,
+                              @Param("period") Integer period,
+                              @Param("startDate") Date startDate,
+                              @Param("endDate") Date endDate,
+                              @Param("type") ReceiptType type,
+                              @Param("filter") ReceiptFilter filter,
+                              @Param("sort") ReceiptSort sort);
 
     @Select("SELECT * FROM receipt_content rc JOIN receipt r ON rc.receipt_id = r.receipt_id WHERE r.user_id = #{userId} AND rc.receipt_id = #{receiptId}")
     List<ReceiptContent> findContentsByReceiptId(@Param("userId") Long userId, @Param("receiptId") Long receiptId);
@@ -62,8 +63,9 @@ public interface ReceiptMapper {
     @Select("SELECT is_corporate FROM card WHERE user_id = #{userId} AND card_id = #{cardId}")
     Integer getCorporate(@Param("userId") Long userId, @Param("cardId") Long cardId);
 
-    @Select("SELECT r.*, rp.process_state, rp.receipt_process_id FROM receipt_process rp " +
+    @Select("SELECT r.*, co.company_name AS company_name, rp.process_state, rp.receipt_process_id FROM receipt_process rp " +
             "INNER JOIN receipt r ON rp.receipt_id = r.receipt_id " +
+            "INNER JOIN company co ON co.company_id = r.company_id " +
             "INNER JOIN card c  ON r.card_id = c.card_id " +
             "INNER JOIN user u ON c.user_id = u.user_id " +
             "WHERE c.user_id = #{userId} AND c.is_corporate = 1 AND rp.process_state = 'rejected' " +
