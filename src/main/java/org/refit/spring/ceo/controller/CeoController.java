@@ -13,7 +13,7 @@ import org.refit.spring.ceo.enums.ProcessState;
 import org.refit.spring.ceo.enums.RejectState;
 import org.refit.spring.ceo.enums.Sort;
 import org.refit.spring.ceo.service.CeoService;
-import org.refit.spring.ceo.dto.ReceiptListDto;
+import org.refit.spring.ceo.dto.ReceiptProcessApplicantDto;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,19 +38,22 @@ public class CeoController {
             @ApiResponse(code = 500, message = "서버 내부 오류")
     })
     @GetMapping("/pending")
-    public ResponseEntity<PendingDetailDto> getPendingDetail(@UserId Long userId) {
+    public ResponseEntity<PendingDetailDto> getPendingDetail(
+            @ApiIgnore @UserId Long userId) {
         return ResponseEntity.ok(ceoService.getPendingDetail(userId));
     }
 
-    @ApiOperation(value = "경비 청구 항목 상세 조회", notes = "경비 청구 항목의 상세 정보를 보여줍니다.")
-    @GetMapping("/receiptList")
+    @ApiOperation(value = "경비 처리 항목 상세 조회", notes = "경비 청구 항목의 상세 정보를 보여줍니다.")
+    @GetMapping("/receiptProcessDetail")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "경비 청구 항목 상세 조회 성공"),
             @ApiResponse(code = 400, message = "잘못된 요청"),
             @ApiResponse(code = 500, message = "서버 내부 오류")
     })
-    public ResponseEntity<ReceiptListDto> getReceiptList(@RequestParam Long receiptId, @UserId Long userId) {
-        return ResponseEntity.ok(ceoService.getReceiptList(receiptId, userId));
+    public ResponseEntity<ReceiptProcessDetailDto> getReceiptList(
+            @ApiIgnore @UserId Long userId,
+            @RequestParam Long receiptId) {
+        return ResponseEntity.ok(ceoService.getReceiptList(userId, receiptId));
     }
 
     @ApiOperation(value = "경비 처리 완료 내역 조회", notes = "경비 처리가 완료된(승인/반려) 내역을 가져옵니다.")
@@ -87,7 +90,9 @@ public class CeoController {
             @ApiResponse(code = 400, message = "잘못된 요청"),
             @ApiResponse(code = 500, message = "서버 내부 오류")
     })
-    public ResponseEntity<EmailSendDto> sendEmail(@RequestBody EmailSendDto request, @UserId Long userId) {
+    public ResponseEntity<EmailSendDto> sendEmail(
+            @RequestBody EmailSendDto request,
+            @ApiIgnore @UserId Long userId) {
         return ResponseEntity.ok(ceoService.sendEmail(request.getEmail(), userId));
     }
 
@@ -100,7 +105,7 @@ public class CeoController {
     })
     public ResponseEntity<ReceiptProcessDto> receiptProcess(
             @RequestBody Map<String, Object> requestBody,
-            @UserId Long userId
+            @ApiIgnore @UserId Long userId
     ) {
         Long receiptProcessId = Long.valueOf(requestBody.get("receiptProcessId").toString());
         String progressState = requestBody.get("progressState").toString();
@@ -111,25 +116,6 @@ public class CeoController {
         );
     }
 
-//    public ResponseEntity<Map<String, Object>> receiptProcessing(
-//            @RequestBody Map<String, Object> requestBody,
-//            @ApiIgnore @UserId Long userId) {
-//
-//        Long receiptProcessId = Long.valueOf(requestBody.get("receiptProcessId").toString());
-//        String progressState = requestBody.get("progressState").toString();
-//
-//        String rejectedReason = (requestBody.get("rejectedReason") != null)
-//                ? requestBody.get("rejectedReason").toString()
-//                : null;
-//
-//        ceoService.receiptProcessing(receiptProcessId, progressState, rejectedReason, userId);
-//
-//        return ResponseEntity.ok(Map.of(
-//                "message", "영수 처리 완료",
-//                "processStatus", progressState
-//        ));
-//    }
-
     @ApiOperation(value = "한달 법카 금액 조회", notes = "법카의 이번 달 사용액과 지난달 사용액을 가져옵니다.")
     @GetMapping("/corporateCardCost")
     @ApiResponses(value = {
@@ -137,14 +123,10 @@ public class CeoController {
             @ApiResponse(code = 400, message = "잘못된 요청"),
             @ApiResponse(code = 500, message = "서버 내부 오류")
     })
-    public ResponseEntity<CorporateCardTotalPriceDto> getCorporateCardTotalPrice(@UserId Long userId) {
+    public ResponseEntity<CorporateCardTotalPriceDto> getCorporateCardTotalPrice(
+            @ApiIgnore @UserId Long userId) {
         return ResponseEntity.ok(ceoService.getCorporateCardTotalPrice(userId));
     }
-
-//    public ResponseEntity<Map<String, Object>> getCorporateCardCost(
-//            @ApiIgnore @UserId Long userId) {
-//        return ResponseEntity.ok(ceoService.getCorporateCardCost(userId));
-//    }
 
     @ApiOperation(value = "법카 내역 조회", notes = "법카의 사용 내역을 보여줍니다.")
     @GetMapping("/corporateCard")

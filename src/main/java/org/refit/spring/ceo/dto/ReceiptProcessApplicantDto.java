@@ -12,8 +12,8 @@ import org.refit.spring.ceo.entity.ReceiptList;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ApiModel(description = "경비 청구 항목 상세 DTO")
-public class ReceiptListDto {
+@ApiModel(description = "영수처리 신청자 상세 정보 DTO")
+public class ReceiptProcessApplicantDto {
     @ApiModelProperty(value = "신청자 ID", example = "1")
     private Long userid;
     @ApiModelProperty(value = "신청자 이름", example = "조승연")
@@ -24,20 +24,14 @@ public class ReceiptListDto {
     private String documentDetail;
     @ApiModelProperty(value = "증빙 이미지 파일명", example = "샘플 이미지 파일명")
     private String imageFileName;
-    @ApiModelProperty(value = "영수증 ID", example = "1")
-    private Long receiptId;
-    @ApiModelProperty(value = "영수 처리 상태", example = "none")
-    private String processState;
 
-    public static ReceiptListDto of(ReceiptList vo) {
-        ReceiptListDto receiptList = ReceiptListDto.builder()
+    public static ReceiptProcessApplicantDto of(ReceiptList vo) {
+        ReceiptProcessApplicantDto receiptList = ReceiptProcessApplicantDto.builder()
                 .userid(vo.getUserid())
                 .name(vo.getName())
                 .documentType(vo.getDocumentType())
                 .documentDetail(vo.getDocumentDetail())
                 .imageFileName(vo.getImageFileName())
-                .receiptId(vo.getReceiptId())
-                .processState(vo.getProcessState())
                 .build();
 
         return receiptList;

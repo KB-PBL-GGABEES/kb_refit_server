@@ -7,17 +7,29 @@ import org.refit.spring.ceo.enums.ProcessState;
 import org.refit.spring.ceo.enums.RejectState;
 import org.refit.spring.ceo.enums.Sort;
 import org.refit.spring.mapper.CeoMapper;
+import org.refit.spring.mapper.MerchandiseMapper;
+import org.refit.spring.mapper.ReceiptMapper;
+import org.refit.spring.merchandise.entity.Merchandise;
+import org.refit.spring.receipt.dto.ReceiptContentDetailDto;
+import org.refit.spring.receipt.dto.ReceiptDetailDto;
+import org.refit.spring.receipt.entity.Receipt;
+import org.refit.spring.receipt.entity.ReceiptContent;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class CeoServiceImpl implements CeoService {
     private final CeoMapper ceoMapper;
+    private final ReceiptMapper receiptMapper;
+    private final MerchandiseMapper merchandiseMapper;
+
 
     // 경비 처리가 필요한 내역 조회
     @Override
@@ -35,8 +47,56 @@ public class CeoServiceImpl implements CeoService {
 
     // 경비 청구 항목 상세 조회
     @Override
-    public ReceiptListDto getReceiptList(Long receipted, Long userId) {
-        return ceoMapper.getReceiptList(receipted, userId);
+    public ReceiptProcessDetailDto getReceiptList(Long userId, Long receiptId) {
+        // 영수증 조회
+        Receipt receipt = receiptMapper.get(userId, receiptId);
+        if (receipt == null) throw new NoSuchElementException("영수증 없음");
+
+        List<ReceiptContent> contents = receiptMapper.findContentsByReceiptId(userId, receiptId);
+        List<ReceiptContentDetailDto> contentDtoList = new ArrayList<>();
+        for (ReceiptContent content: contents) {
+            Merchandise merchandise = merchandiseMapper.findByMerchandiseId(content.getMerchandiseId());
+            ReceiptContentDetailDto dto = new ReceiptContentDetailDto();
+            dto.setMerchandiseId(merchandise.getMerchandiseId());
+            dto.setMerchandiseName(merchandise.getMerchandiseName());
+            dto.setMerchandisePrice(merchandise.getMerchandisePrice());
+            dto.setAmount(content.getAmount());
+            contentDtoList.add(dto);
+        }
+
+        ReceiptDetailDto detail = new ReceiptDetailDto(receipt.getUserId(),
+                receipt.getReceiptId(),
+                receipt.getCompanyId(),
+                receiptMapper.getCompanyName(receipt.getCompanyId()),
+                receiptMapper.getCompanyAddress(receipt.getCompanyId()),
+                contentDtoList,
+                receipt.getTotalPrice(),
+                receipt.getSupplyPrice(),
+                receipt.getSurtax(),
+                receipt.getTransactionType(),
+                receipt.getCreatedAt(),
+                receiptMapper.getState(receiptId),
+                receiptMapper.getCardNumber(userId, receipt.getCardId()),
+                receiptMapper.getCorporate(userId, receipt.getCardId()));
+
+        detail.setUserId(receipt.getUserId());
+        detail.setReceiptId(receipt.getReceiptId());
+        detail.setCompanyId(receipt.getCompanyId());
+        detail.setCompanyName(receiptMapper.getCompanyName(receipt.getCompanyId()));
+        detail.setAddress(receiptMapper.getCompanyAddress(receipt.getCompanyId()));
+        detail.setReceiptContents(contentDtoList);
+        detail.setTotalPrice(receipt.getTotalPrice());
+        detail.setSupplyPrice(receipt.getSupplyPrice());
+        detail.setSurtax(receipt.getSurtax());
+        detail.setTransactionType(receipt.getTransactionType());
+        detail.setCreatedAt(receipt.getCreatedAt());
+        detail.setProcessState(receiptMapper.getState(receiptId));
+        detail.setCardNumber(receiptMapper.getCardNumber(userId, receipt.getCardId()));
+        detail.setIsCorporate(receiptMapper.getCorporate(userId, receipt.getCardId()));
+
+        ReceiptProcessApplicantDto info = ceoMapper.getReceiptProcessDetail(receiptId, userId);
+
+        return new ReceiptProcessDetailDto(detail, info);
     }
 
     // 경비 처리 완료 내역 조회
