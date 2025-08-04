@@ -5,10 +5,13 @@ import org.refit.spring.ceo.CeoReceiptQueryProvider;
 import org.refit.spring.ceo.CorporateCardQueryProvider;
 import org.refit.spring.ceo.dto.CorporateCardListDto;
 import org.refit.spring.ceo.entity.Ceo;
-import org.refit.spring.ceo.dto.ReceiptListDto;
+import org.refit.spring.ceo.dto.ReceiptProcessApplicantDto;
 import org.refit.spring.ceo.enums.ProcessState;
 import org.refit.spring.ceo.enums.RejectState;
 import org.refit.spring.ceo.enums.Sort;
+import org.refit.spring.receipt.dto.ReceiptContentDetailDto;
+import org.refit.spring.receipt.dto.ReceiptDetailDto;
+import org.refit.spring.receipt.entity.Receipt;
 
 import java.util.Date;
 import java.util.List;
@@ -37,7 +40,7 @@ public interface CeoMapper {
             "  AND EXISTS (\n" +
             "    SELECT 1 FROM employee e\n" +
             "    WHERE e.user_id = r.user_id\n" +
-            "      AND e.company_id = (\n" +
+            "      AND e.company_id IN (\n" +
             "        SELECT company_id FROM company WHERE ceo_id = #{userId})\n)" +
             "        ORDER BY r.receipt_id")
     List<Ceo> getPendingReceipts(@Param("userId") Long userId);
@@ -50,7 +53,7 @@ public interface CeoMapper {
             "  AND EXISTS (\n" +
             "    SELECT 1 FROM employee e\n" +
             "    WHERE e.user_id = r.user_id\n" +
-            "      AND e.company_id = (\n" +
+            "      AND e.company_id IN (\n" +
             "        SELECT company_id FROM company WHERE ceo_id = #{userId}))")
     int countPendingReceipts(@Param("userId") Long userId);
 
@@ -64,19 +67,17 @@ public interface CeoMapper {
             "  AND EXISTS (\n" +
             "    SELECT 1 FROM employee e\n" +
             "    WHERE e.user_id = r.user_id\n" +
-            "      AND e.company_id = (\n" +
+            "      AND e.company_id IN (\n" +
             "        SELECT company_id FROM company WHERE ceo_id = #{userId}))")
     int countCompletedReceiptsThisMonth(@Param("userId") Long userId);
 
-    // 경비 청구 항목 상세 조회
+    // 영수처리 신청자 상세 조회
     @Select("SELECT \n" +
             "        u.user_id,\n" +
             "        u.name,\n" +
             "        p.progress_type AS documentType,\n" +
             "        p.progress_detail AS documentDetail,\n" +
-            "        p.voucher AS imageFileName,\n" +
-            "        r.receipt_id,\n" +
-            "        p.process_state\n" +
+            "        p.voucher AS imageFileName\n" +
             "    FROM receipt r\n" +
             "    JOIN user u ON r.user_id = u.user_id\n" +
             "    JOIN receipt_process p ON r.receipt_id = p.receipt_id\n" +
@@ -84,11 +85,22 @@ public interface CeoMapper {
             "AND EXISTS (\n" +
             "  SELECT 1 FROM employee e\n" +
             "  WHERE e.user_id = r.user_id\n" +
-            "    AND e.company_id = (\n" +
+            "    AND e.company_id IN (\n" +
             "      SELECT company_id FROM company WHERE ceo_id = #{userId}))")
-    ReceiptListDto getReceiptList(
+    ReceiptProcessApplicantDto getReceiptProcessDetail(
             @Param("receiptId") Long receiptId,
             @Param("userId") Long userId);
+    
+    // 영수증 내역 상세 조회
+//    @Select("SELECT * FROM receipt WHERE user_id = #{userId} AND receipt_id = #{receiptId}")
+//    Receipt get(@Param("userId") Long userId, @Param("receiptId") Long receiptId);
+
+    // 구매항목 상세 조회
+    @Select("SELECT rc.merchandise_id, m.merchandise_name, m.merchandise_price, rc.amount " +
+            "FROM receipt_content rc " +
+            "JOIN merchandise m ON rc.merchandise_id = m.merchandise_id " +
+            "WHERE rc.receipt_id = #{receiptId}")
+    List<ReceiptContentDetailDto> getReceiptContents(@Param("receiptId") Long receiptId);
 
     // 경비 처리 완료 내역 조회
     @SelectProvider(type = CeoReceiptQueryProvider.class, method = "buildFilteredQuery")
@@ -109,7 +121,7 @@ public interface CeoMapper {
             "  AND EXISTS (\n" +
             "    SELECT 1 FROM employee e\n" +
             "    WHERE e.user_id = r.user_id\n" +
-            "      AND e.company_id = (\n" +
+            "      AND e.company_id IN (\n" +
             "        SELECT company_id FROM company WHERE ceo_id = #{userId}))")
     int countCompletedReceipts(@Param("userId") Long userId
     );
@@ -126,29 +138,27 @@ public interface CeoMapper {
                             @Param("userId") Long userId);
 
     // 이번 달 법카 사용 금액 조회
-    @Select("SELECT SUM(r.total_price) AS totalPrice\n" +
-            "    FROM receipt r\n" +
-            "    JOIN card c ON r.card_id = c.card_id\n" +
-            "    JOIN employee e ON r.user_id = e.user_id\n" +
-            "    WHERE c.is_corporate = TRUE\n" +
-            "      AND e.company_id = (\n" +
-            "          SELECT company_id FROM employee WHERE user_id = #{ceoId} LIMIT 1\n" +
-            "      )\n" +
-            "      AND MONTH(r.created_at) = MONTH(CURDATE())\n" +
-            "      AND YEAR(r.created_at) = YEAR(CURDATE())")
+    @Select("SELECT SUM(r.total_price) AS totalPrice " +
+            "FROM receipt r " +
+            "JOIN card c ON r.card_id = c.card_id " +
+            "JOIN employee e ON r.user_id = e.user_id " +
+            "JOIN employee emp ON emp.company_id = e.company_id " +
+            "WHERE c.is_corporate = TRUE " +
+            "AND emp.user_id = #{ceoId} " +
+            "AND MONTH(r.created_at) = MONTH(CURDATE()) " +
+            "AND YEAR(r.created_at) = YEAR(CURDATE())")
     Long getCorporateCardCostThisMonth(@Param("ceoId") Long ceoId);
 
     // 지난달 법카 사용 금액 조회
-    @Select("SELECT SUM(r.total_price) AS lastMonth\n" +
-            "    FROM receipt r\n" +
-            "    JOIN card c ON r.card_id = c.card_id\n" +
-            "    JOIN employee e ON r.user_id = e.user_id\n" +
-            "    WHERE c.is_corporate = TRUE\n" +
-            "      AND e.company_id = (\n" +
-            "          SELECT company_id FROM employee WHERE user_id = #{ceoId} LIMIT 1\n" +
-            "      )\n" +
-            "      AND MONTH(r.created_at) = MONTH(DATE_SUB(CURDATE(), INTERVAL 1 MONTH))\n" +
-            "      AND YEAR(r.created_at) = YEAR(DATE_SUB(CURDATE(), INTERVAL 1 MONTH))")
+    @Select("SELECT SUM(r.total_price) AS lastMonth " +
+            "FROM receipt r " +
+            "JOIN card c ON r.card_id = c.card_id " +
+            "JOIN employee e ON r.user_id = e.user_id " +
+            "JOIN employee emp ON emp.company_id = e.company_id " +
+            "WHERE c.is_corporate = TRUE " +
+            "AND emp.user_id = #{ceoId} " +
+            "AND MONTH(r.created_at) = MONTH(DATE_SUB(CURDATE(), INTERVAL 1 MONTH)) " +
+            "AND YEAR(r.created_at) = YEAR(DATE_SUB(CURDATE(), INTERVAL 1 MONTH))")
     Long getCorporateCardCostLastMonth(@Param("ceoId") Long ceoId);
 
     // 법카 내역 조회

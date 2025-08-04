@@ -22,7 +22,7 @@ public class CeoReceiptQueryProvider {
         sql.append(" AND EXISTS (");
         sql.append(" SELECT 1 FROM employee e");
         sql.append(" WHERE e.user_id = r.user_id");
-        sql.append(" AND e.company_id = (SELECT company_id FROM company WHERE ceo_id = #{userId}))");
+        sql.append(" AND e.company_id IN (SELECT company_id FROM company WHERE ceo_id = #{userId}))");
 
         // 필터 (전체, 경비 승인, 경비 기각)
         ProcessState processState = (ProcessState) params.get("processState");

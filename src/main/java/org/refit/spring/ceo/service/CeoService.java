@@ -11,11 +11,10 @@ import java.util.List;
 public interface CeoService {
 
     // 경비 처리가 필요한 내역 조회
-    // 처리가 필요한 경비, 이번 달 총 처리한 경비
     PendingDetailDto getPendingDetail(Long userId);
 
     // 경비 청구 항목 상세 조회
-    ReceiptListDto getReceiptList(Long receipted, Long userId);
+    ReceiptProcessDetailDto getReceiptList(Long userId, Long receipted);
 
     // 경비 처리 완료 내역 조회
     List<ReceiptDto> getCompletedReceipts(Long userId, Long cursorId, Integer period, Date startDate, Date endDate, ProcessState processState, Sort sort);
