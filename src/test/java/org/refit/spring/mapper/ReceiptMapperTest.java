@@ -4,6 +4,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.refit.spring.config.RootConfig;
+import org.refit.spring.mapper.ReceiptMapper;
+import org.refit.spring.receipt.dto.ReceiptTotalDto;
 import org.refit.spring.receipt.entity.Receipt;
 import org.refit.spring.receipt.entity.ReceiptContent;
 import org.springframework.beans.factory.annotation.Autowired;
