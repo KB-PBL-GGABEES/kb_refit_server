@@ -11,7 +11,7 @@
     @AllArgsConstructor
     @Builder
     public class CheckCompanyRequestDto {
-        private String companyId;     // 문자열로 받는 게 OpenAPI 응답과 맞춤
+        private Long companyId;     // 문자열로 받는 게 OpenAPI 응답과 맞춤
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMdd", timezone = "Asia/Seoul")
         private Date openedDate;
         private String ceoName;

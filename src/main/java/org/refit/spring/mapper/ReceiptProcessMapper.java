@@ -27,13 +27,14 @@ public interface ReceiptProcessMapper {
 
 
     // 사업자 진위 확인
-    @Select("SELECT company_id, company_name, ceo_name, opened_date FROM company WHERE company_id = #{companyId}")
+    @Select("SELECT company_id AS companyId, company_name AS companyName, ceo_name AS ceoName, opened_date AS openedDate FROM company WHERE company_id = #{companyId}")
+    @Results(id = "companyResultMap", value = {
+            @Result(property = "companyId", column = "companyId"),
+            @Result(property = "companyName", column = "companyName"),
+            @Result(property = "ceoName", column = "ceoName"),
+            @Result(property = "openedDate", column = "openedDate", javaType = java.util.Date.class)
+    })
     CheckCompanyResponseDto findCompanyInfoByCompanyId(@Param("companyId") Long companyId);
-
-    @Insert("INSERT IGNORE INTO employee (user_id, company_id, start_date) VALUES (#{userId}, #{companyId}, #{startDate})")
-        void insertEmployeeIfNotExists(@Param("userId") Long userId,
-                                       @Param("companyId") Long companyId,
-                                       @Param("startDate") Date startDate);
 
 
     // 영수 처리 요청
