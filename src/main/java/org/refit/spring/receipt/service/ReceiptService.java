@@ -47,8 +47,10 @@ public class ReceiptService {
         receipt.setContentList(list);
         receiptMapper.update(userId, receipt);
         Long category = receiptMapper.findCaterogy(userId, receipt.getReceiptId());
-        if (category == 1) hospitalMapper.insertProcess(userId, receipt.getReceiptId());
-        else ceoMapper.insertProcess(null, userId, receipt.getReceiptId());
+//        if (category == 1) hospitalMapper.insertEmptyHospitalProcess(receipt.getReceiptId());
+//        else ceoMapper.insertProcess(null, userId, receipt.getReceiptId());
+        ceoMapper.insertProcess(null, userId, receipt.getReceiptId());
+
         return receipt;
     }
 
@@ -144,9 +146,11 @@ public class ReceiptService {
         receipt.setSupplyPrice(supply);
         receipt.setSurtax(total - supply);
         receipt.setUpdatedAt(new Date());
-        User user = userMapper.findByUserId(receipt.getUserId());
-        user.setTotalStarPoint((long) (user.getTotalStarPoint() + receipt.getTotalPrice() * 0.05));
-        user.setTotalCarbonPoint(user.getTotalCarbonPoint() + 100);
+        if (personalBadgeMapper.checkIsWorn(receipt.getUserId(), receipt.getReceiptId())) {
+            User user = userMapper.findByUserId(receipt.getUserId());
+            user.setTotalStarPoint((long) (user.getTotalStarPoint() + receipt.getTotalPrice() * 0.05));
+            user.setTotalCarbonPoint(user.getTotalCarbonPoint() + 100);
+        }
     }
 
     @Transactional(readOnly = true)
