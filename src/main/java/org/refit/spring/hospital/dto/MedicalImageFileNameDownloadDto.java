@@ -9,5 +9,5 @@ import lombok.Setter;
 @NoArgsConstructor
 public class MedicalImageFileNameDownloadDto {
     private Long receiptId;
-    private String hospitalVoucher;
+    private String medicalImageFileName;
 }
