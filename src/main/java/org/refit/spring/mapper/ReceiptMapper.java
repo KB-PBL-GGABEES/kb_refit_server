@@ -94,4 +94,7 @@ public interface ReceiptMapper {
             "INNER JOIN categories ca ON c.category_id = ca.category_id " +
             "WHERE r.receipt_id = #{receiptId}")
     Long findCaterogy(@Param("userId") Long userId, @Param("receiptId") Long receiptId);
+
+    @Select("SELECT ceo_name FROM company WHERE company_id = #{companyId}")
+    String findCeoName(@Param("companyId") Long companyId);
 }

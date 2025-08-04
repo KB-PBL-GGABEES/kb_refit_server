@@ -191,6 +191,7 @@ public class ReceiptService {
                 receipt.getReceiptId(),
                 receipt.getCompanyId(),
                 receiptMapper.getCompanyName(receipt.getCompanyId()),
+                receiptMapper.findCeoName(receipt.getCompanyId()),
                 receiptMapper.getCompanyAddress(receipt.getCompanyId()),
                 contentDtoList,
                 receipt.getTotalPrice(),
