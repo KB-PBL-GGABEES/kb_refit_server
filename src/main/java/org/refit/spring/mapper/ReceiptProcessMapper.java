@@ -1,10 +1,7 @@
 package org.refit.spring.mapper;
 
 import org.apache.ibatis.annotations.*;
-import org.refit.spring.receiptProcess.dto.CheckCompanyResponseDto;
-import org.refit.spring.receiptProcess.dto.ReceiptProcessCheckDto;
-import org.refit.spring.receiptProcess.dto.ReceiptProcessRequestDto;
-import org.refit.spring.receiptProcess.dto.ReceiptSelectDto;
+import org.refit.spring.receiptProcess.dto.*;
 
 import java.time.LocalDate;
 import java.util.Date;
@@ -27,24 +24,16 @@ public interface ReceiptProcessMapper {
             "WHERE r.receipt_id = #{receiptId}")
     ReceiptProcessCheckDto findCompanyInfoByReceiptId(@Param("receiptId") Long receiptId);
 
-    // 사업자 정보 확인 요청
-    @Insert("INSERT INTO company (company_id, company_name, ceo_name, opened_date, address, created_at, updated_at, category_id, ceo_id) " +
-            "VALUES (#{companyId}, #{companyName}, #{ceoName}, #{openedDate}, #{address}, NOW(), NOW(), #{categoryId}, #{ceoId})")
-    void insertVerifiedCompany(
-            @Param("companyId") Long companyId,
-            @Param("companyName") String companyName,
-            @Param("ceoName") String ceoName,
-            @Param("openedDate") Date openedDate,
-            @Param("address") String address,
-            @Param("categoryId") Integer categoryId, // 추가
-            @Param("ceoId") Long ceoId
-    );
 
-    // 사업자 정보 저장 후 선택화면에 뜨게하기
+
+    // 사업자 진위 확인
+    @Select("SELECT company_id, company_name, ceo_name, opened_date FROM company WHERE company_id = #{companyId}")
+    CheckCompanyResponseDto findCompanyInfoByCompanyId(@Param("companyId") Long companyId);
+
     @Insert("INSERT IGNORE INTO employee (user_id, company_id, start_date) VALUES (#{userId}, #{companyId}, #{startDate})")
-    void insertEmployeeIfNotExists(@Param("userId") Long userId,
-                                   @Param("companyId") Long companyId,
-                                   @Param("startDate") Date startDate);
+        void insertEmployeeIfNotExists(@Param("userId") Long userId,
+                                       @Param("companyId") Long companyId,
+                                       @Param("startDate") Date startDate);
 
 
     // 영수 처리 요청

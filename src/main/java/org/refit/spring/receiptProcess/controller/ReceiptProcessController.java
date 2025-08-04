@@ -27,25 +27,6 @@ public class ReceiptProcessController {
     private final ReceiptProcessService receiptProcessService;
 
 
-//    @ApiOperation(value = "사업자 진위 확인", notes = "OpenAPI를 통해 사업자 등록 정보를 진위 확인합니다.")
-//    @PostMapping("/checkValid")
-//    // 요청 본문으로 CheckCompanyRequestDto를 받고, 다양한 응답 형태를 위해 제네릭 타입은 와일드카드로 지정
-//    public ResponseEntity<?> checkCompany(@RequestBody CheckCompanyRequestDto requestDto) {
-//        // Service 계층을 호출하여 OpenAPI를 통한 진위 확인 결과를 받아옴
-//        CheckCompanyResponseDto response = receiptProcessService.verifyCompany(requestDto);
-//
-//        // 진위 확인 성공 시 (valid = "01")
-//        if (response.isValid()) {
-//            // HTTP 200 OK와 함께 사업자 정보 응답
-//            return ResponseEntity.ok(response);
-//        } else {
-//            // 진위 확인 실패 시 (valid = "02" 또는 기타 실패 케이스)
-//            // HTTP 404 Not Found 상태코드와 함께 사용자에게 표시할 메시지를 JSON 형태로 반환
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-//                    .body(Collections.singletonMap("message", "사업자 정보를 확인할 수 없습니다."));
-//        }
-//    }
-
     @ApiOperation(value = "사업장 선택 조회", notes = "사업장을 조회할 수 있습니다.")
     @GetMapping("/select")
     public ResponseEntity<?> getCompanySelectionList(@ApiIgnore @UserId Long userId) {
@@ -78,24 +59,31 @@ public class ReceiptProcessController {
         }
     }
 
-    @ApiOperation(value = "사업자 정보 진위 확인", notes = "국세청 OpenAPI를 통해 사업자 정보를 확인하고, 유효한 경우 DB에 저장합니다.")
+    @ApiOperation(value = "사업자 진위확인 및 직원 등록", notes = "사업자번호를 OpenAPI로 확인 후 유효하면 직원으로 등록")
     @PostMapping("/checkCompany")
     public ResponseEntity<?> verifyCompany(@ApiIgnore @UserId Long userId,
                                            @RequestBody CheckCompanyRequestDto dto) {
-
         try {
             if (dto.getCompanyId() == null || dto.getCeoName() == null || dto.getOpenedDate() == null) {
-                return ResponseEntity.badRequest()
-                        .body(Collections.singletonMap("message", "필수 정보(companyId, ceoName, openedDate)가 누락되었습니다."));
+                Map<String, String> response = new HashMap<>();
+                response.put("message", "필수 정보(companyId, ceoName, openedDate)가 누락되었습니다.");
+                return ResponseEntity.badRequest().body(response);
             }
 
-            CheckCompanyResponseDto result = receiptProcessService.verifyAndSave(dto, userId);
+            CheckCompanyResponseDto result = receiptProcessService.verifyAndRegisterEmployee(dto, userId);
+            if (!result.isValid()) {
+                Map<String, String> response = new HashMap<>();
+                response.put("message", "유효하지 않은 사업자번호입니다.");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+
             return ResponseEntity.ok(result);
 
         } catch (Exception e) {
-            log.error("사업자 진위 확인 중 오류 발생", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Collections.singletonMap("error", "사업자 진위 확인 처리 중 오류가 발생했습니다."));
+            log.error("사업자 진위확인 중 오류", e);
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "진위확인 처리 중 서버 오류가 발생했습니다.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 
