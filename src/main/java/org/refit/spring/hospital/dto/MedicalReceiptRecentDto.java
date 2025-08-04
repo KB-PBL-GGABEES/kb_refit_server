@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class HospitalReceiptRecentDto {
+public class MedicalReceiptRecentDto {
     private Long recentTotalPrice;
     private Long insuranceBillable;
 }

@@ -8,11 +8,9 @@ import java.util.Date;
 
 @Getter
 @Setter
-public class HospitalReceiptListDto {
+public class MedicalCheckDto {
+    private String hospitalName;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date createdAt;
-    private String storeName;
-    private String processState;
-    private Long totalPrice;
-    private Long receiptId;
 }
+
