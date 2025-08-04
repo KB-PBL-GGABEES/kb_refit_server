@@ -2,8 +2,13 @@ package org.refit.spring.wallet.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.refit.spring.auth.annotation.UserId;
+import org.refit.spring.reward.dto.RewardWalletRequestDto;
+import org.refit.spring.reward.dto.RewardWalletResponseDto;
+import org.refit.spring.reward.service.RewardService;
 import org.refit.spring.wallet.dto.BadgeRequestDto;
 import org.refit.spring.wallet.dto.BadgeResponseDto;
 import org.refit.spring.wallet.dto.WalletResponseDto;
@@ -12,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +29,7 @@ import java.util.Map;
 public class WalletController {
 
     private final WalletService walletService;
+    private final RewardService rewardService;
 
     @ApiOperation(value = "뱃지 도감 조회", notes = "전체 뱃지 도감 리스트와 현재 보유 여부를 확인할 수 있습니다.")
     @GetMapping("/badge")
@@ -144,5 +151,20 @@ public class WalletController {
             return ResponseEntity.noContent().build();//204
         }
         return ResponseEntity.ok(result);
+    }
+
+
+    @ApiOperation(value = "지갑 상점 구매", notes = "상점에서 포인트로 지갑을 구매하면 포인트가 차감되고 보유 지갑 브랜드 테이블에 추가됩니다.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "잘못된 요청"),
+            @ApiResponse(code = 500, message = "서버 내부 오류")
+    })
+    @PostMapping("/purchase")
+    public ResponseEntity<?> getWallet(
+            @ApiIgnore @UserId Long userId,
+            @RequestBody RewardWalletRequestDto rewardWalletRequestDto) {
+        RewardWalletResponseDto dto = rewardService.purchaseWallet(userId, rewardWalletRequestDto);
+        URI location = URI.create("/reward/" + dto.getWalletId());
+        return ResponseEntity.created(location).body(dto);
     }
 }
