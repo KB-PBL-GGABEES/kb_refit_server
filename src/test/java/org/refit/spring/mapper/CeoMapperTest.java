@@ -5,7 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.refit.spring.ceo.dto.CorporateCardListDto;
-import org.refit.spring.ceo.dto.ReceiptListDto;
+import org.refit.spring.ceo.dto.ReceiptProcessApplicantDto;
 import org.refit.spring.ceo.entity.Ceo;
 import org.refit.spring.ceo.enums.ProcessState;
 import org.refit.spring.ceo.enums.RejectState;
@@ -82,11 +82,11 @@ class CeoMapperTest {
 
     @Test
     @DisplayName("getReceiptList - 경비 청구 항목 상세 조회")
-    void getReceiptList() {
+    void getReceiptProcessDetail() {
         Long userId = 1L;
         Long receiptId = 1L;
 
-        ReceiptListDto dto = ceoMapper.getReceiptList(userId, receiptId);
+        ReceiptProcessApplicantDto dto = ceoMapper.getReceiptProcessDetail(userId, receiptId);
 
         if(dto != null) {
             log.info("getReceiptList - 조회 결과\n" + dto);
