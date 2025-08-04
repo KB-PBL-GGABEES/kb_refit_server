@@ -33,7 +33,12 @@ public interface CeoMapper {
             "        FROM receipt r\n" +
             "            JOIN company c ON r.company_id = c.company_id\n" +
             "            JOIN receipt_process p ON r.receipt_id = p.receipt_id\n" +
-            "        WHERE p.process_state = 'none'\n" +
+            "WHERE p.process_state = 'inProgress'\n" +
+            "  AND EXISTS (\n" +
+            "    SELECT 1 FROM employee e\n" +
+            "    WHERE e.user_id = r.user_id\n" +
+            "      AND e.company_id = (\n" +
+            "        SELECT company_id FROM company WHERE ceo_id = #{userId})\n)" +
             "        ORDER BY r.receipt_id")
     List<Ceo> getPendingReceipts(@Param("userId") Long userId);
 
@@ -41,17 +46,26 @@ public interface CeoMapper {
     @Select("SELECT COUNT(*) " +
             "FROM receipt r " +
             "JOIN receipt_process p ON r.receipt_id = p.receipt_id " +
-            "WHERE p.process_state = 'none' AND r.user_id = #{userId}")
+            "WHERE p.process_state = 'inProgress'\n" +
+            "  AND EXISTS (\n" +
+            "    SELECT 1 FROM employee e\n" +
+            "    WHERE e.user_id = r.user_id\n" +
+            "      AND e.company_id = (\n" +
+            "        SELECT company_id FROM company WHERE ceo_id = #{userId}))")
     int countPendingReceipts(@Param("userId") Long userId);
 
     // 이번 달 경비 처리 완료 내역 개수
     @Select("SELECT COUNT(*) " +
             "FROM receipt r " +
             "JOIN receipt_process p ON r.receipt_id = p.receipt_id " +
-            "WHERE p.process_state IN ('accepted', 'rejected') " +
-            "AND MONTH(r.created_at) = MONTH(CURDATE()) " +
-            "AND YEAR(r.created_at) = YEAR(CURDATE()) " +
-            "AND r.user_id = #{userId}")
+            "WHERE p.process_state IN ('accepted', 'rejected')\n" +
+            "  AND MONTH(r.created_at) = MONTH(CURDATE())\n" +
+            "  AND YEAR(r.created_at) = YEAR(CURDATE())\n" +
+            "  AND EXISTS (\n" +
+            "    SELECT 1 FROM employee e\n" +
+            "    WHERE e.user_id = r.user_id\n" +
+            "      AND e.company_id = (\n" +
+            "        SELECT company_id FROM company WHERE ceo_id = #{userId}))")
     int countCompletedReceiptsThisMonth(@Param("userId") Long userId);
 
     // 경비 청구 항목 상세 조회
@@ -67,7 +81,11 @@ public interface CeoMapper {
             "    JOIN user u ON r.user_id = u.user_id\n" +
             "    JOIN receipt_process p ON r.receipt_id = p.receipt_id\n" +
             "    WHERE r.receipt_id = #{receiptId}\n" +
-            "    LIMIT 1")
+            "AND EXISTS (\n" +
+            "  SELECT 1 FROM employee e\n" +
+            "  WHERE e.user_id = r.user_id\n" +
+            "    AND e.company_id = (\n" +
+            "      SELECT company_id FROM company WHERE ceo_id = #{userId}))")
     ReceiptListDto getReceiptList(
             @Param("receiptId") Long receiptId,
             @Param("userId") Long userId);
@@ -87,7 +105,12 @@ public interface CeoMapper {
     @Select("SELECT COUNT(*)\n" +
             "FROM receipt r\n" +
             "JOIN receipt_process p ON r.receipt_id = p.receipt_id\n" +
-            "WHERE p.process_state IN ('accepted', 'rejected')")
+            "WHERE p.process_state IN ('accepted', 'rejected')\n" +
+            "  AND EXISTS (\n" +
+            "    SELECT 1 FROM employee e\n" +
+            "    WHERE e.user_id = r.user_id\n" +
+            "      AND e.company_id = (\n" +
+            "        SELECT company_id FROM company WHERE ceo_id = #{userId}))")
     int countCompletedReceipts(@Param("userId") Long userId
     );
 
