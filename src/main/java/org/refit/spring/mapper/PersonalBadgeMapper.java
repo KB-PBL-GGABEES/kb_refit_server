@@ -41,5 +41,12 @@ public interface PersonalBadgeMapper {
 
     @Select("SELECT * FROM personal_badge WHERE personal_badge_id = #{personalBadgeId}")
     PersonalBadge findById(Long personalBadgeId);
+
+    @Select("SELECT COUNT(*) > 0 FROM personal_badge p " +
+            "INNER JOIN badge b ON p.badge_id = b.badge_id " +
+            "INNER JOIN company c ON b.category_id = c.category_id " +
+            "INNER JOIN receipt r ON r.company_id = c. company_id " +
+            "WHERE p.user_id = #{userId} AND p.is_worn = true AND r.receipt_id = #{receiptId}")
+    boolean checkIsWorn(@Param("userId") Long userId, @Param("receiptId") Long receiptId);
 }
 
