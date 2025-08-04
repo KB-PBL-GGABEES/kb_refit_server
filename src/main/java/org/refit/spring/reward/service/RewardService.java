@@ -3,6 +3,7 @@ package org.refit.spring.reward.service;
 import lombok.RequiredArgsConstructor;
 import org.refit.spring.auth.entity.User;
 import org.refit.spring.common.exception.DataMismatchException;
+import org.refit.spring.mapper.PersonalBadgeMapper;
 import org.refit.spring.mapper.RewardMapper;
 import org.refit.spring.mapper.UserMapper;
 import org.refit.spring.receipt.enums.ReceiptSort;
@@ -26,11 +27,15 @@ public class RewardService {
     private static final double REWARD_RATE = 0.05;
     private final RewardMapper rewardMapper;
     private final UserMapper userMapper;
+    private final PersonalBadgeMapper personalBadgeMapper;
 
-    public Reward create(Long carbon, Long totalPrice, Long userId) {
+    public Reward create(Long carbon, Long totalPrice, Long userId, Long receiptId) {
         Reward reward = new Reward();
         reward.setCarbonPoint(carbon);
-        reward.setReward((long) (totalPrice * REWARD_RATE));
+        if (personalBadgeMapper.checkIsWorn(userId, receiptId)) {
+            reward.setReward((long) (totalPrice * REWARD_RATE));
+        }
+        else reward.setReward(0L);
         reward.setCreatedAt(new Date());
         reward.setUserId(userId);
         rewardMapper.createCarbon(reward);

@@ -48,7 +48,7 @@ public class ReceiptController {
     @PostMapping("/create")
     public ResponseEntity<?> create(@ApiIgnore @UserId Long userId, @RequestBody ReceiptRequestDto receiptRequestDto) throws SQLException {
         Receipt receipt = receiptService.create(receiptRequestDto, userId);
-        Reward reward = rewardService.create(CARBON_POINT, receipt.getTotalPrice(), userId);
+        Reward reward = rewardService.create(CARBON_POINT, receipt.getTotalPrice(), userId, receipt.getReceiptId());
         userService.updatePoint(userId, reward.getCarbonPoint(), reward.getReward());
         ReceiptResponseDto dto = ReceiptResponseDto.from(receipt, userId, reward.getCarbonPoint(), reward.getReward(), "none");
         receiptService.checkAndInsertBadge(userId, receipt.getReceiptId());
@@ -65,7 +65,7 @@ public class ReceiptController {
     @PostMapping("/refund")
     public ResponseEntity<?> refund(@ApiIgnore @UserId Long userId, @RequestParam("receiptId") Long receiptId) {
         Receipt receipt = receiptService.refund(userId, receiptId);
-        Reward reward = rewardService.create(-CARBON_POINT, receipt.getTotalPrice(), userId);
+        Reward reward = rewardService.create(-CARBON_POINT, receipt.getTotalPrice(), userId, receiptId);
         userService.updatePoint(userId, reward.getCarbonPoint(), reward.getReward());
         ReceiptResponseDto dto = ReceiptResponseDto.from(receipt, userId, reward.getCarbonPoint(), reward.getReward(), "none");
         URI location = URI.create("/receipt/" + receipt.getReceiptId());
