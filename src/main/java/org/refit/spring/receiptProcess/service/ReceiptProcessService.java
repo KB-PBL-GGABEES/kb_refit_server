@@ -65,13 +65,12 @@ public class ReceiptProcessService {
                     url, HttpMethod.POST, entity, String.class
             );
 
-            System.out.println("🛰 OpenAPI 응답 body: " + response.getBody());
-
             JsonNode root = objectMapper.readTree(response.getBody());
             JsonNode dataList = root.get("data");
             if (dataList == null || !dataList.isArray() || dataList.size() == 0) {
                 throw new RuntimeException("OpenAPI 응답에서 사업자 데이터가 존재하지 않습니다.");
             }
+
             JsonNode data = dataList.get(0);
             String valid = data.get("valid").asText();
 
@@ -85,28 +84,27 @@ public class ReceiptProcessService {
                         .build();
             }
 
-            // 3. company 테이블에서 회사 조회
-            CheckCompanyResponseDto company = receiptProcessMapper.findCompanyInfoByCompanyId(dto.getCompanyId());
-
-            if (company == null ||
-                    company.getCompanyName() == null ||
-                    company.getCeoName() == null ||
-                    company.getOpenedDate() == null) {
-                throw new IllegalStateException("회사 정보가 시스템에 등록되어 있지 않거나 필수 값이 누락되어 있습니다.");
+            // 3. 유효한 경우: companyName은 optional (DB 조회 실패해도 문제 없음)
+            String companyName = null;
+            try {
+                CheckCompanyResponseDto company = receiptProcessMapper.findCompanyInfoByCompanyId(dto.getCompanyId());
+                if (company != null) {
+                    companyName = company.getCompanyName();
+                }
+            } catch (Exception ignored) {
+                // 무시
             }
 
-            // 4. 회사 정보 응답
+            // 4. valid 성공 응답
             return CheckCompanyResponseDto.builder()
                     .isValid(true)
                     .companyId(dto.getCompanyId())
-                    .companyName(company.getCompanyName())
-                    .ceoName(company.getCeoName())
-                    .openedDate(company.getOpenedDate())
+                    .companyName(companyName)
+                    .ceoName(dto.getCeoName())
+                    .openedDate(dto.getOpenedDate())
                     .build();
 
         } catch (Exception e) {
-            System.out.println("💥 예외 발생! 메시지: " + e.getMessage());
-            e.printStackTrace();
             throw new RuntimeException("사업자 진위 확인 처리 중 오류", e);
         }
     }
