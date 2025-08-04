@@ -13,7 +13,7 @@ public class CorporateCardQueryProvider {
         // 법카 내역 조회
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT ");
-        sql.append(" r.receipt_id, r.total_price, r.created_at AS receipt_date_time, cp.company_name, rp.process_state, r.card_id, c.is_corporate AS corporate");
+        sql.append(" r.receipt_id, r.total_price, r.created_at, cp.company_name, rp.process_state, r.card_id, c.is_corporate AS corporate");
         sql.append(" FROM receipt r");
         sql.append(" JOIN card c ON r.card_id = c.card_id");
         sql.append(" JOIN employee e ON r.user_id = e.user_id");
