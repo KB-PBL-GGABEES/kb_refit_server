@@ -14,9 +14,9 @@ import org.refit.spring.ceo.entity.ReceiptList;
 @AllArgsConstructor
 @ApiModel(description = "경비 청구 항목 상세 DTO")
 public class ReceiptListDto {
-    @ApiModelProperty(value = "사장님 ID", example = "1")
+    @ApiModelProperty(value = "신청자 ID", example = "1")
     private Long userid;
-    @ApiModelProperty(value = "사장님 이름", example = "조승연")
+    @ApiModelProperty(value = "신청자 이름", example = "조승연")
     private String name;
     @ApiModelProperty(value = "경비 처리 항목", example = "업무 추진")
     private String documentType;
