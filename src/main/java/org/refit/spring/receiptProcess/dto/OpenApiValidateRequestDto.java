@@ -47,7 +47,7 @@ public class OpenApiValidateRequestDto {
         return OpenApiValidateRequestDto.builder()
                 .businesses(Collections.singletonList(
                         Business.builder()
-                                .b_no(dto.getCompanyId())
+                                .b_no(String.valueOf(dto.getCompanyId()))
                                 .start_dt(new java.text.SimpleDateFormat("yyyyMMdd").format(dto.getOpenedDate()))
                                 .p_nm(dto.getCeoName())
                                 .build()
