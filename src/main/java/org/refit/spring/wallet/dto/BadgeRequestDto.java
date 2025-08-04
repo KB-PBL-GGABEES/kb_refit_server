@@ -1,5 +1,6 @@
 package org.refit.spring.wallet.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,6 +9,8 @@ import org.refit.spring.wallet.entity.BadgePreset;
 public class BadgeRequestDto {
     @Getter
     @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
     public static class UpdateWornBadgeDto {
         private Long previousBadgeId;
         private Long updateBadgeId;

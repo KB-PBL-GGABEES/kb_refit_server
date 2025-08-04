@@ -161,7 +161,6 @@ public class WalletService {
         PersonalWalletBrand personal = personalWalletBrandMapper.findByUserIdAndWalletId(userId, walletId);
 
         boolean isOwned = (personal != null);
-//        boolean isMounted = (isOwned && personal.isMounted());
 
         return WalletResponseDto.WalletBrandDetailDto.from(brand, user, personal != null ? personal : new PersonalWalletBrand(), isOwned);
     }
@@ -169,7 +168,7 @@ public class WalletService {
     public WalletResponseDto.ToggleMountedWalletDto toggleMountedWallet(Long userId, Long walletId) {
         PersonalWalletBrand target = personalWalletBrandMapper.findByUserIdAndWalletId(userId, walletId);
         if (target == null) {
-            return null; // ← 이게 핵심!
+            return null;
         }
 
         // 1. 기존에 착용한 지갑 해제 (is_mounted = true → false)
@@ -211,26 +210,6 @@ public class WalletService {
     }
 
     //프리셋 조회
-//    public List<BadgeResponseDto.BadgePresetListDto> getMyBadgePresets(Long userId) {
-//        // 1. 프리셋 메타 정보 가져오기
-//        List<BadgePreset> badgePresets = badgePresetMapper.findAllByUserId(userId);
-//
-//        // 2. 각 프리셋에 대해 디테일 정보 가져오기 및 변환
-//        return badgePresets.stream()
-//                .map(preset -> {
-//                    // 해당 preset에 포함된 personalBadgeId들 조회
-//                    List<BadgePresetDetail> details = badgePresetMapper.findAllByPresetId(preset.getPresetId());
-//
-//                    // DTO로 변환
-//                    List<BadgeResponseDto.BadgePresetDto> badgeDtoList = details.stream()
-//                            .map(BadgeResponseDto.BadgePresetDto::from)
-//                            .collect(Collectors.toList());
-//
-//                    // 최종 응답 DTO로 조립
-//                    return BadgeResponseDto.BadgePresetListDto.from(preset, badgeDtoList);
-//                })
-//                .collect(Collectors.toList());
-//    }
     public List<BadgeResponseDto.BadgePresetListDto> getMyBadgePresets(Long userId) {
         // 1. 프리셋 메타 정보 가져오기
         List<BadgePreset> badgePresets = badgePresetMapper.findAllByUserId(userId);

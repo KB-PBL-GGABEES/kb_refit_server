@@ -29,24 +29,6 @@ public class WalletResponseDto {
         }
     }
 
-//    @Getter
-//    @NoArgsConstructor(access = AccessLevel.PROTECTED)
-//    @AllArgsConstructor(access = AccessLevel.PRIVATE)
-//    @Builder
-//    public static class WalletBrandListDto {
-//        private Long userId;
-//        private Long starPoint;
-//        private List<WalletBrandDto> walletBrandDtoList;
-//
-//        public static WalletBrandListDto from(List<WalletBrandDto> brandList, User user) {
-//            return WalletBrandListDto.builder()
-//                    .userId(user.getUserId())
-//                    .starPoint(user.getTotalStarPoint())
-//                    .walletBrandDtoList(brandList)
-//                    .build();
-//        }
-//    }
-
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor(access = AccessLevel.PRIVATE)

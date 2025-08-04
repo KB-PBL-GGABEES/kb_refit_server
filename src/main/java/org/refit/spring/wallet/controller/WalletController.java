@@ -8,6 +8,7 @@ import org.refit.spring.wallet.dto.BadgeRequestDto;
 import org.refit.spring.wallet.dto.BadgeResponseDto;
 import org.refit.spring.wallet.dto.WalletResponseDto;
 import org.refit.spring.wallet.service.WalletService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -30,10 +31,6 @@ public class WalletController {
         BadgeResponseDto.EveryBadgeListDto list = walletService.getBadgeList(userId);
         return ResponseEntity.ok(list);
     }
-//    public ResponseEntity<BadgeResponseDto.BadgeListDto> getBadgeList(@ApiIgnore @UserId Long userId) {
-//        BadgeResponseDto.BadgeListDto list = walletService.getBadgeList(userId);
-//        return ResponseEntity.ok(list);
-//    }
 
     @ApiOperation(value = "내가 착용한 뱃지 및 혜택, 지갑 브랜드 조회", notes = "현재 사용자가 착용한 뱃지의 리스트와 그에 해당하는 혜택과 지갑 브랜드를 조회할 수 있습니다.")
     @GetMapping("/badge/home")
