@@ -3,6 +3,7 @@ package org.refit.spring.mapper;
 import org.apache.ibatis.annotations.*;
 import org.refit.spring.ceo.entity.Ceo;
 import org.refit.spring.receipt.ReceiptQueryProvider;
+import org.refit.spring.receipt.dto.ReceiptDetailDto;
 import org.refit.spring.receipt.dto.RejectedReceiptDto;
 import org.refit.spring.receipt.entity.Receipt;
 import org.refit.spring.receipt.entity.ReceiptContent;

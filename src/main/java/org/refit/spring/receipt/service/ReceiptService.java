@@ -16,14 +16,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.sql.DataSource;
+import javax.swing.text.html.Option;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -200,10 +198,10 @@ public class ReceiptService {
                 receipt.getSurtax(),
                 receipt.getTransactionType(),
                 receipt.getCreatedAt(),
-                receiptMapper.getState(receiptId),
+                Optional.ofNullable(receiptMapper.getState(receiptId)).orElse("none"),
                 receiptMapper.getCardNumber(userId, receipt.getCardId()),
-                receiptMapper.getCorporate(userId, receipt.getCardId()),
-                receiptProcessMapper.findReason(receiptId)
+                Optional.ofNullable(receiptMapper.getCorporate(userId, receipt.getCardId())).orElse(0),
+                Optional.ofNullable(receiptProcessMapper.findReason(receiptId)).orElse("")
         );
     }
 
