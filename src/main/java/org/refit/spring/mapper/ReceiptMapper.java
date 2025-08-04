@@ -74,14 +74,14 @@ public interface ReceiptMapper {
     List<RejectedReceiptDto> findRejected(@Param("userId") Long userId);
 
     @Update("UPDATE receipt_process rp SET rp.process_state = 'deposit' " +
-            "WHERE rp.receipt_process_id = #{receiptProcessId} " +
+            "WHERE rp.receipt_id = #{receiptId} " +
             "AND EXISTS (SELECT 1 FROM receipt r " +
             "INNER JOIN card c ON r.card_id = c.card_id " +
             "WHERE c.user_id = #{userId} " +
             "AND r.receipt_id = rp.receipt_id " +
             "AND rp.process_state = 'rejected')")
     Integer updateProcessState(@Param("userId") Long userId,
-                            @Param("receiptProcessId") Long receiptProcessId);
+                            @Param("receiptId") Long receiptId);
 
     @Select("SELECT b.badge_id FROM receipt r " +
             "INNER JOIN company c ON r.company_id = c.company_id " +
