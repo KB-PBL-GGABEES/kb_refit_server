@@ -32,7 +32,7 @@ public class HospitalController {
     @GetMapping("/list")
     public ResponseEntity<?> getHospitalExpenses(@ApiIgnore @UserId Long userId,
                                                  @RequestParam(value = "cursorId", required = false) Long cursorId) {
-        HospitalReceiptListCursorDto dto = hospitalService.getHospitalExpenses(userId, cursorId);
+        MedicalReceiptListCursorDto dto = hospitalService.getHospitalExpenses(userId, cursorId);
         return ResponseEntity.ok(dto);
     }
 
@@ -41,7 +41,7 @@ public class HospitalController {
     public ResponseEntity<?> getHospitalExpensesWithinMonths(@ApiIgnore @UserId Long userId,
                                                              @RequestParam(value = "cursorId", required = false) Long cursorId,
                                                              @RequestParam(value = "period") Integer period) {
-        HospitalReceiptListCursorDto dto = hospitalService.getListMonths(userId, cursorId, period);
+        MedicalReceiptListCursorDto dto = hospitalService.getListMonths(userId, cursorId, period);
         return ResponseEntity.ok(dto);
     }
 
@@ -51,7 +51,7 @@ public class HospitalController {
                                                          @RequestParam(value = "cursorId", required = false) Long cursorId,
                                                          @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
                                                          @RequestParam("endDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate) {
-        HospitalReceiptListCursorDto dto = hospitalService.getListPeriod(userId, cursorId, startDate, endDate);
+        MedicalReceiptListCursorDto dto = hospitalService.getListPeriod(userId, cursorId, startDate, endDate);
         return ResponseEntity.ok(dto);
     }
 
@@ -69,7 +69,7 @@ public class HospitalController {
 
         System.out.println("=== [Controller] cursorId: " + cursorId + " / sort: " + sort);
 
-        HospitalReceiptListCursorDto dto = hospitalService.getFilteredList(
+        MedicalReceiptListCursorDto dto = hospitalService.getFilteredList(
                 userId, cursorId, period, startDate, endDate, type, filter, sort
         );
 
@@ -84,7 +84,7 @@ public class HospitalController {
             @RequestParam("receiptId") Long receiptId)
     {
 
-        HospitalReceiptDetailDto result = hospitalService.findHospitalExpenseDetail(userId, receiptId);
+        MedicalReceiptDetailDto result = hospitalService.findHospitalExpenseDetail(userId, receiptId);
 
         if (result == null) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -98,7 +98,7 @@ public class HospitalController {
     @ApiOperation(value = "진료비 세부산정내역 파일명 저장", notes = "프론트에서 보낸 파일명을 DB에 저장합니다.")
     @PostMapping("/voucher")
     public ResponseEntity<?> saveHospitalVoucher(@ApiIgnore @UserId Long userId,
-                                                 @RequestBody HospitalImageFileNameDownloadDto dto) {
+                                                 @RequestBody MedicalImageFileNameDownloadDto dto) {
 
         if (dto.getReceiptId() == null || dto.getHospitalVoucher() == null || dto.getHospitalVoucher().isEmpty()) {
             return ResponseEntity.badRequest().body(Collections.singletonMap("message", "필수 정보 누락"));
@@ -116,7 +116,7 @@ public class HospitalController {
     public ResponseEntity<?> getHospitalVoucher(@ApiIgnore @UserId Long userId,
                                                 @RequestParam("receiptId") Long receiptId) {
 
-        HospitalImageFileNameCheckDto result = hospitalService.findHospitalVoucher(userId, receiptId);
+        MedicalImageFileNameCheckDto result = hospitalService.findHospitalVoucher(userId, receiptId);
 
         if (result == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -130,7 +130,7 @@ public class HospitalController {
     @ApiOperation(value = "최근 병원비 및 보험청구 가능 건수", notes = "최근 3년간 병원비 총액과 보험청구 가능한 건수를 조회합니다.")
     @GetMapping("/recent")
     public ResponseEntity<?> getHospitalRecentInfo(@ApiIgnore @UserId Long userId) {
-        HospitalReceiptRecentDto result = hospitalService.getHospitalRecentInfo(userId);
+        MedicalReceiptRecentDto result = hospitalService.getHospitalRecentInfo(userId);
 
         if (result == null) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -161,7 +161,7 @@ public class HospitalController {
             @ApiIgnore @UserId Long userId,
             @RequestParam Long receiptId) {
 
-        HospitalVisitCheckDto result = hospitalService.getHospitalVisitInfo(userId, receiptId);
+        MedicalCheckDto result = hospitalService.getHospitalVisitInfo(userId, receiptId);
 
         if (result == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
