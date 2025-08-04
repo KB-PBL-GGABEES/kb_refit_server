@@ -44,69 +44,33 @@ public class ReceiptProcessService {
     private String validateUrl;
 
 
-    public CheckCompanyResponseDto verifyAndSave(CheckCompanyRequestDto dto, Long ceoId) {
-
+    public CheckCompanyResponseDto verifyAndRegisterEmployee(CheckCompanyRequestDto dto, Long userId) {
         try {
+            // 1. OpenAPI 요청
             String url = validateUrl + "?serviceKey=" + apiKey + "&returnType=JSON";
 
-            OpenApiValidateRequestDto.Business business = new OpenApiValidateRequestDto.Business(
-                    dto.getCompanyId(),
-                    new SimpleDateFormat("yyyyMMdd").format(dto.getOpenedDate()),
-                    dto.getCeoName()
-            );
+            Map<String, Object> business = new HashMap<>();
+            business.put("b_no", dto.getCompanyId());
+            business.put("start_dt", new SimpleDateFormat("yyyyMMdd").format(dto.getOpenedDate()));
+            business.put("p_nm", dto.getCeoName());
 
             Map<String, Object> body = new HashMap<>();
             body.put("businesses", Collections.singletonList(business));
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-
             HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
 
             ResponseEntity<String> response = restTemplate.exchange(
-                    url,
-                    HttpMethod.POST,
-                    entity,
-                    String.class
+                    url, HttpMethod.POST, entity, String.class
             );
 
             JsonNode root = objectMapper.readTree(response.getBody());
             JsonNode data = root.get("data").get(0);
             String valid = data.get("valid").asText();
 
-            if ("01".equals(valid)) {
-                JsonNode param = data.get("request_param");
-                Long companyId = Long.valueOf(param.get("b_no").asText());
-                String ceoName = param.get("p_nm").asText();
-                String startDt = param.get("start_dt").asText();
-                String companyName = ceoName + " 상호명";
-
-                Date openedDate = new SimpleDateFormat("yyyyMMdd").parse(startDt);
-
-                // 주소는 임시로 계속사업자 정보로 넣음 (실제 주소는 status.b_stt 아님)
-                String address = data.get("status").get("b_stt").asText();
-
-                try {
-                    receiptProcessMapper.insertVerifiedCompany(
-                            companyId, companyName, ceoName, openedDate, address, 19, ceoId
-                    );
-                } catch (DuplicateKeyException e) {
-                    System.out.println("⚠️ 이미 존재하는 회사(companyId)입니다.");
-                }
-
-                // ✅ (2) employee INSERT
-                try {
-                    receiptProcessMapper.insertEmployeeIfNotExists(ceoId, companyId, new Date());
-                } catch (Exception e) {
-                }
-
-                return CheckCompanyResponseDto.builder()
-                        .isValid(true)
-                        .companyId(param.get("b_no").asText())
-                        .ceoName(ceoName)
-                        .openedDate(startDt)
-                        .build();
-            } else {
+            // 2. 유효하지 않으면 바로 반환
+            if (!"01".equals(valid)) {
                 return CheckCompanyResponseDto.builder()
                         .isValid(false)
                         .companyId(dto.getCompanyId())
@@ -115,8 +79,28 @@ public class ReceiptProcessService {
                         .build();
             }
 
+            // 3. company 테이블에서 회사 조회
+            Long companyId = Long.valueOf(dto.getCompanyId());
+            CheckCompanyResponseDto company = receiptProcessMapper.findCompanyInfoByCompanyId(companyId);
+
+            if (company == null) {
+                throw new IllegalStateException("회사 정보가 시스템에 등록되어 있지 않습니다.");
+            }
+
+            // 4. employee 테이블에 유저 등록
+            receiptProcessMapper.insertEmployeeIfNotExists(userId, companyId, new Date());
+
+            // 5. 응답 리턴
+            return CheckCompanyResponseDto.builder()
+                    .isValid(true)
+                    .companyId(String.valueOf(companyId))
+                    .companyName(company.getCompanyName())
+                    .ceoName(company.getCeoName())
+                    .openedDate(new SimpleDateFormat("yyyyMMdd").format(company.getOpenedDate()))
+                    .build();
+
         } catch (Exception e) {
-            throw new RuntimeException("사업자 진위 확인 실패", e);
+            throw new RuntimeException("사업자 진위 확인 처리 중 오류", e);
         }
     }
 
