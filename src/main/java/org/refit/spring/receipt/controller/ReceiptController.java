@@ -31,43 +31,10 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class ReceiptController {
     private final ReceiptService receiptService;
-    private final RewardService rewardService;
 
-    private final UserService userService;
 
-    private static final Long CARBON_POINT = 100L;
 
-    @ApiOperation(value = "영수증 등록", notes = "결제 시 영수증이 생성됩니다.")
-    @ApiResponses(value = {
-            @ApiResponse(code = 400, message = "잘못된 요청"),
-            @ApiResponse(code = 500, message = "서버 내부 오류")
-    })
-    @PostMapping("/create")
-    public ResponseEntity<?> create(@ApiIgnore @UserId Long userId, @RequestBody ReceiptRequestDto receiptRequestDto) throws SQLException {
-        Receipt receipt = receiptService.create(receiptRequestDto, userId);
-        Reward reward = rewardService.create(CARBON_POINT, receipt.getTotalPrice(), userId, receipt.getReceiptId());
-        userService.updatePoint(userId, reward.getCarbonPoint(), reward.getReward());
-        ReceiptResponseDto dto = ReceiptResponseDto.from(receipt, userId, reward.getCarbonPoint(), reward.getReward(), "none");
-        receiptService.checkAndInsertBadge(userId, receipt.getReceiptId());
-        URI location = URI.create("/receipt/" + receipt.getReceiptId());
 
-        return ResponseEntity.created(location).body(dto);
-    }
-
-    @ApiOperation(value = "환불 영수증 등록", notes = "결제 시 생성된 영수증 아이디를 이용해 환불 영수증을 생성합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(code = 400, message = "잘못된 요청"),
-            @ApiResponse(code = 500, message = "서버 내부 오류")
-    })
-    @PostMapping("/refund")
-    public ResponseEntity<?> refund(@ApiIgnore @UserId Long userId, @RequestParam("receiptId") Long receiptId) {
-        Receipt receipt = receiptService.refund(userId, receiptId);
-        Reward reward = rewardService.create(-CARBON_POINT, receipt.getTotalPrice(), userId, receiptId);
-        userService.updatePoint(userId, reward.getCarbonPoint(), reward.getReward());
-        ReceiptResponseDto dto = ReceiptResponseDto.from(receipt, userId, reward.getCarbonPoint(), reward.getReward(), "none");
-        URI location = URI.create("/receipt/" + receipt.getReceiptId());
-        return ResponseEntity.created(location).body(dto);
-    }
 
     @ApiOperation(value = "영수증 목록 조회", notes = "전체 영수증을 조회하며, 파라미터로 필터링이 가능합니다.")
     @ApiResponses(value = {
