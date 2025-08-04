@@ -42,7 +42,7 @@ public class ReceiptService {
         List<ReceiptContentRequestsDto> requestList = dto.getContentsList();
         Merchandise firstMerchandise = merchandiseMapper.findByMerchandiseId(requestList.get(0).getMerchandiseId());
         Receipt receipt = initReceipt(dto.getCardId(), firstMerchandise.getCompanyId(), userId);
-        List<ReceiptContentDto> list = makeContents(dto.getContentsList(), receipt);
+        List<ReceiptContentDetailDto> list = makeContents(dto.getContentsList(), receipt);
         updatePrice(receipt);
         receipt.setContentList(list);
         receiptMapper.update(userId, receipt);
@@ -71,7 +71,7 @@ public class ReceiptService {
         receiptMapper.create(refundReceipt);
 
         List<ReceiptContent> originalContents = receiptMapper.findContentsByReceiptId(userId, receiptId);
-        List<ReceiptContentDto> refundContentList = new ArrayList<>();
+        List<ReceiptContentDetailDto> refundContentList = new ArrayList<>();
         for (ReceiptContent content: originalContents) {
             ReceiptContent refundContent = new ReceiptContent();
             refundContent.setAmount(-content.getAmount());
@@ -81,7 +81,7 @@ public class ReceiptService {
             receiptMapper.createReceiptContent(refundContent);
 
             Merchandise merchandise = merchandiseMapper.findByMerchandiseId(content.getMerchandiseId());
-            ReceiptContentDto dto = new ReceiptContentDto();
+            ReceiptContentDetailDto dto = new ReceiptContentDetailDto();
             dto.setMerchandiseId(merchandise.getMerchandiseId());
             dto.setMerchandiseName(merchandise.getMerchandiseName());
             dto.setMerchandisePrice(merchandise.getMerchandisePrice());
@@ -109,8 +109,8 @@ public class ReceiptService {
         return receipt;
     }
 
-    private List<ReceiptContentDto> makeContents(List<ReceiptContentRequestsDto> list, Receipt receipt) {
-        List<ReceiptContentDto> contentDtoList = new ArrayList<>();
+    private List<ReceiptContentDetailDto> makeContents(List<ReceiptContentRequestsDto> list, Receipt receipt) {
+        List<ReceiptContentDetailDto> contentDtoList = new ArrayList<>();
         for (ReceiptContentRequestsDto requestsDto: list) {
             Merchandise merchandise = merchandiseMapper.findByMerchandiseId(requestsDto.getMerchandiseId());
             ReceiptContent content = makeContent(requestsDto, merchandise, receipt.getReceiptId());
@@ -131,8 +131,8 @@ public class ReceiptService {
         return content;
     }
 
-    private ReceiptContentDto makeMerchandise(Merchandise merchandise, ReceiptContentRequestsDto dto) {
-        ReceiptContentDto result = new ReceiptContentDto();
+    private ReceiptContentDetailDto makeMerchandise(Merchandise merchandise, ReceiptContentRequestsDto dto) {
+        ReceiptContentDetailDto result = new ReceiptContentDetailDto();
         result.setMerchandiseId(merchandise.getMerchandiseId());
         result.setMerchandiseName(merchandise.getMerchandiseName());
         result.setMerchandisePrice(merchandise.getMerchandisePrice());
@@ -174,10 +174,10 @@ public class ReceiptService {
             throw new NoSuchElementException();
         }
         List<ReceiptContent> contents = receiptMapper.findContentsByReceiptId(userId, receiptId);
-        List<ReceiptContentDto> contentDtoList = new ArrayList<>();
+        List<ReceiptContentDetailDto> contentDtoList = new ArrayList<>();
         for (ReceiptContent content: contents) {
             Merchandise merchandise = merchandiseMapper.findByMerchandiseId(content.getMerchandiseId());
-            ReceiptContentDto dto = new ReceiptContentDto();
+            ReceiptContentDetailDto dto = new ReceiptContentDetailDto();
             dto.setMerchandiseId(merchandise.getMerchandiseId());
             dto.setMerchandiseName(merchandise.getMerchandiseName());
             dto.setMerchandisePrice(merchandise.getMerchandisePrice());
@@ -204,22 +204,22 @@ public class ReceiptService {
 
 
     @Transactional
-    public ReceiptTotalDto getTotal(Long userId) {
-        ReceiptTotalDto dto = new ReceiptTotalDto();
+    public MonthlyExpenseDto getTotal(Long userId) {
+        MonthlyExpenseDto dto = new MonthlyExpenseDto();
         dto.setUserId(userId);
-        dto.setTotal(receiptMapper.getTotal(userId));
-        dto.setLastMonth(receiptMapper.getLastMonthTotal(userId));
+        dto.setThisMonthExpense(receiptMapper.getThisMonthTotal(userId));
+        dto.setLastMonthExpense(receiptMapper.getLastMonthTotal(userId));
         return dto;
     }
 
-    public List<RejectedReceiptDto> getRejected(Long userId) {
+    public RejectReceiptListDto getRejected(Long userId) {
         List<RejectedReceiptDto> rejectedList = receiptMapper.findRejected(userId);
         for (RejectedReceiptDto dto: rejectedList) {
             List<ReceiptContent> contents = receiptMapper.findContentsByReceiptId(userId, dto.getReceiptId());
-            List<ReceiptContentDto> contentDtoList = new ArrayList<>();
+            List<ReceiptContentDetailDto> contentDtoList = new ArrayList<>();
             for (ReceiptContent content: contents) {
                 Merchandise merchandise = merchandiseMapper.findByMerchandiseId(content.getMerchandiseId());
-                ReceiptContentDto contentDto = new ReceiptContentDto();
+                ReceiptContentDetailDto contentDto = new ReceiptContentDetailDto();
                 contentDto.setMerchandiseId(content.getMerchandiseId());
                 contentDto.setAmount(content.getAmount());
                 contentDto.setMerchandiseName(merchandise.getMerchandiseName());
@@ -229,7 +229,7 @@ public class ReceiptService {
             }
             dto.setContentList(contentDtoList);
         }
-        return rejectedList;
+        return new RejectReceiptListDto(rejectedList);
     }
 
     public void changeState(Long userId, Long receiptProcessId) {

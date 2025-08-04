@@ -24,5 +24,5 @@ public class RejectedReceiptDto {
     private Long cardId;
     private String processState;
     private Long receiptProcessId;
-    private List<ReceiptContentDto> contentList;
+    private List<ReceiptContentDetailDto> contentList;
 }

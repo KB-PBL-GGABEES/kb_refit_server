@@ -4,7 +4,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 @Data
-public class ReceiptContentDto {
+public class ReceiptContentDetailDto {
     @ApiModelProperty(value = "상품 아이디", example = "1")
     private Long merchandiseId;
     @ApiModelProperty(value = "상품명", example = "카페 아메리카노")
