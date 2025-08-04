@@ -5,6 +5,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.refit.spring.auth.dto.LoginRequestDto;
+import org.refit.spring.auth.dto.UserRequestDto;
 import org.refit.spring.auth.dto.UserResponseDto;
 import org.refit.spring.auth.entity.User;
 import org.refit.spring.auth.service.UserService;
@@ -67,7 +68,9 @@ public class AuthController {
 
     @ApiOperation(value = "새 access token 발급", notes = "refresh token을 이용하여 새로운 access token을 발급하는 API입니다.")
     @PostMapping("/refresh")
-    public ResponseEntity<?> refresh(@RequestHeader("Authorization") String refreshToken) {
+//    public ResponseEntity<?> refresh(@RequestHeader("Authorization") String refreshToken) {
+    public ResponseEntity<?> refresh(@RequestBody UserRequestDto.RefreshTokenDto request) {
+        String refreshToken = request.getRefreshToken();
         if (!jwtTokenProvider.validateRefreshToken(refreshToken)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Refresh token invalid or expired");
         }

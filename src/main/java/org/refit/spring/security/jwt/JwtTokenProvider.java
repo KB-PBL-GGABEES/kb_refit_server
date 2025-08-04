@@ -96,7 +96,7 @@ public class JwtTokenProvider {
     //refresh token;
     public String createRefreshToken(String username) {
         Date now = new Date();
-        long refreshValidTime = 1000L * 60 * 60 * 24 * 3; // 3일로 일단 설정
+        long refreshValidTime = 1000L * 60 * 60 * 24 * 7; // 7일
 
         Claims claims = Jwts.claims().setSubject(username);
         return Jwts.builder()
