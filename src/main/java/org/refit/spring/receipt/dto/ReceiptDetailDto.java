@@ -16,7 +16,7 @@ public class ReceiptDetailDto {
     private Long receiptId;
     private Long companyId;
     private String companyName;
-    private String ceo;
+    private String ceoName;
     private String address;
     private List<ReceiptContentDetailDto> receiptContents;
     private Long totalPrice;
@@ -30,5 +30,5 @@ public class ReceiptDetailDto {
     private String cardNumber;
     @ApiModelProperty(value = "법인 카드 여부", example = "1")
     private Integer isCorporate;
-    private String rejected_reason;
+    private String rejectedReason;
 }
