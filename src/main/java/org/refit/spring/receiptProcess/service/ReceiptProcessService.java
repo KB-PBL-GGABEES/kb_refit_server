@@ -50,7 +50,7 @@ public class ReceiptProcessService {
             String url = validateUrl + "?serviceKey=" + apiKey + "&returnType=JSON";
 
             Map<String, Object> business = new HashMap<>();
-            business.put("b_no", dto.getCompanyId());
+            business.put("b_no", String.valueOf(dto.getCompanyId()));
             business.put("start_dt", new SimpleDateFormat("yyyyMMdd").format(dto.getOpenedDate()));
             business.put("p_nm", dto.getCeoName());
 
@@ -65,8 +65,14 @@ public class ReceiptProcessService {
                     url, HttpMethod.POST, entity, String.class
             );
 
+            System.out.println("🛰 OpenAPI 응답 body: " + response.getBody());
+
             JsonNode root = objectMapper.readTree(response.getBody());
-            JsonNode data = root.get("data").get(0);
+            JsonNode dataList = root.get("data");
+            if (dataList == null || !dataList.isArray() || dataList.size() == 0) {
+                throw new RuntimeException("OpenAPI 응답에서 사업자 데이터가 존재하지 않습니다.");
+            }
+            JsonNode data = dataList.get(0);
             String valid = data.get("valid").asText();
 
             // 2. 유효하지 않으면 바로 반환
@@ -75,31 +81,32 @@ public class ReceiptProcessService {
                         .isValid(false)
                         .companyId(dto.getCompanyId())
                         .ceoName(dto.getCeoName())
-                        .openedDate(new SimpleDateFormat("yyyyMMdd").format(dto.getOpenedDate()))
+                        .openedDate(dto.getOpenedDate())
                         .build();
             }
 
             // 3. company 테이블에서 회사 조회
-            Long companyId = Long.valueOf(dto.getCompanyId());
-            CheckCompanyResponseDto company = receiptProcessMapper.findCompanyInfoByCompanyId(companyId);
+            CheckCompanyResponseDto company = receiptProcessMapper.findCompanyInfoByCompanyId(dto.getCompanyId());
 
-            if (company == null) {
-                throw new IllegalStateException("회사 정보가 시스템에 등록되어 있지 않습니다.");
+            if (company == null ||
+                    company.getCompanyName() == null ||
+                    company.getCeoName() == null ||
+                    company.getOpenedDate() == null) {
+                throw new IllegalStateException("회사 정보가 시스템에 등록되어 있지 않거나 필수 값이 누락되어 있습니다.");
             }
 
-            // 4. employee 테이블에 유저 등록
-            receiptProcessMapper.insertEmployeeIfNotExists(userId, companyId, new Date());
-
-            // 5. 응답 리턴
+            // 4. 회사 정보 응답
             return CheckCompanyResponseDto.builder()
                     .isValid(true)
-                    .companyId(String.valueOf(companyId))
+                    .companyId(dto.getCompanyId())
                     .companyName(company.getCompanyName())
                     .ceoName(company.getCeoName())
-                    .openedDate(new SimpleDateFormat("yyyyMMdd").format(company.getOpenedDate()))
+                    .openedDate(company.getOpenedDate())
                     .build();
 
         } catch (Exception e) {
+            System.out.println("💥 예외 발생! 메시지: " + e.getMessage());
+            e.printStackTrace();
             throw new RuntimeException("사업자 진위 확인 처리 중 오류", e);
         }
     }

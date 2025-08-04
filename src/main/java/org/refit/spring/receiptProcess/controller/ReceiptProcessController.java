@@ -64,29 +64,29 @@ public class ReceiptProcessController {
     public ResponseEntity<?> verifyCompany(@ApiIgnore @UserId Long userId,
                                            @RequestBody CheckCompanyRequestDto dto) {
         try {
-            if (dto.getCompanyId() == null || dto.getCeoName() == null || dto.getOpenedDate() == null) {
-                Map<String, String> response = new HashMap<>();
-                response.put("message", "필수 정보(companyId, ceoName, openedDate)가 누락되었습니다.");
-                return ResponseEntity.badRequest().body(response);
-            }
-
+            validateRequest(dto);
             CheckCompanyResponseDto result = receiptProcessService.verifyAndRegisterEmployee(dto, userId);
             if (!result.isValid()) {
-                Map<String, String> response = new HashMap<>();
-                response.put("message", "유효하지 않은 사업자번호입니다.");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Collections.singletonMap("message", "유효하지 않은 사업자번호입니다."));
             }
-
             return ResponseEntity.ok(result);
-
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Collections.singletonMap("message", e.getMessage()));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Collections.singletonMap("message", e.getMessage()));
         } catch (Exception e) {
             log.error("사업자 진위확인 중 오류", e);
-            Map<String, String> response = new HashMap<>();
-            response.put("message", "진위확인 처리 중 서버 오류가 발생했습니다.");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("message", "진위확인 처리 중 서버 오류가 발생했습니다."));
         }
     }
 
+    private void validateRequest(CheckCompanyRequestDto dto) {
+        if (dto.getCompanyId() == null || dto.getCeoName() == null || dto.getOpenedDate() == null) {
+            throw new IllegalArgumentException("필수 정보 누락");
+        }
+    }
 
     @ApiOperation(value = "영수 처리 요청", notes = "영수 처리를 요청할 수 있습니다.")
     @PatchMapping
