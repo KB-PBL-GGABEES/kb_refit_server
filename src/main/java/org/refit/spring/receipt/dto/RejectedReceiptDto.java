@@ -20,6 +20,7 @@ public class RejectedReceiptDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date updatedAt;
     private Long companyId;
+    private String companyName;
     private Long userId;
     private Long cardId;
     private String processState;

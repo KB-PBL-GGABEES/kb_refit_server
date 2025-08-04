@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class ReceiptQueryProvider {
     public static String buildFilteredQuery(Map<String, Object> params) {
-        StringBuilder sql = new StringBuilder("SELECT r.*, rp.process_state FROM receipt r LEFT OUTER JOIN receipt_process rp ON rp.receipt_id = r.receipt_id WHERE r.user_id = #{userId}");
+        StringBuilder sql = new StringBuilder("SELECT r.*, rp.process_state, c.company_name FROM receipt r LEFT OUTER JOIN receipt_process rp ON rp.receipt_id = r.receipt_id LEFT OUTER JOIN company c ON r.company_id = c.company_id WHERE r.user_id = #{userId}");
 
         ReceiptSort sort = (ReceiptSort) params.get("sort");
         if (sort == null) {
