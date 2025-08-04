@@ -8,9 +8,9 @@ import java.util.Date;
 
 @Getter
 @Setter
-public class InsuranceSubscribedResponseDto {
-    private Long insuranceId;
-    private String insuranceName;
+public class HospitalVisitCheckDto {
+    private String hospitalName;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
-    private Date joinedDate;
+    private Date createdAt;
 }
+
