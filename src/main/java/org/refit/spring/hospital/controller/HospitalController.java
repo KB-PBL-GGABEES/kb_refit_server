@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 import springfox.documentation.annotations.ApiIgnore;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Api(tags = "의료 영수증 API", description = "의료 영수증 관련 API입니다.")
@@ -33,7 +32,7 @@ public class HospitalController {
     @GetMapping("/list")
     public ResponseEntity<?> getHospitalExpenses(@ApiIgnore @UserId Long userId,
                                                  @RequestParam(value = "cursorId", required = false) Long cursorId) {
-        HospitalListDto dto = hospitalService.getHospitalExpenses(userId, cursorId);
+        HospitalReceiptListCursorDto dto = hospitalService.getHospitalExpenses(userId, cursorId);
         return ResponseEntity.ok(dto);
     }
 
@@ -42,7 +41,7 @@ public class HospitalController {
     public ResponseEntity<?> getHospitalExpensesWithinMonths(@ApiIgnore @UserId Long userId,
                                                              @RequestParam(value = "cursorId", required = false) Long cursorId,
                                                              @RequestParam(value = "period") Integer period) {
-        HospitalListDto dto = hospitalService.getListMonths(userId, cursorId, period);
+        HospitalReceiptListCursorDto dto = hospitalService.getListMonths(userId, cursorId, period);
         return ResponseEntity.ok(dto);
     }
 
@@ -52,7 +51,7 @@ public class HospitalController {
                                                          @RequestParam(value = "cursorId", required = false) Long cursorId,
                                                          @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
                                                          @RequestParam("endDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate) {
-        HospitalListDto dto = hospitalService.getListPeriod(userId, cursorId, startDate, endDate);
+        HospitalReceiptListCursorDto dto = hospitalService.getListPeriod(userId, cursorId, startDate, endDate);
         return ResponseEntity.ok(dto);
     }
 
@@ -70,7 +69,7 @@ public class HospitalController {
 
         System.out.println("=== [Controller] cursorId: " + cursorId + " / sort: " + sort);
 
-        HospitalListDto dto = hospitalService.getFilteredList(
+        HospitalReceiptListCursorDto dto = hospitalService.getFilteredList(
                 userId, cursorId, period, startDate, endDate, type, filter, sort
         );
 
@@ -85,7 +84,7 @@ public class HospitalController {
             @RequestParam("receiptId") Long receiptId)
     {
 
-        HospitalExpenseDetailResponseDto result = hospitalService.findHospitalExpenseDetail(userId, receiptId);
+        HospitalReceiptDetailDto result = hospitalService.findHospitalExpenseDetail(userId, receiptId);
 
         if (result == null) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -99,7 +98,7 @@ public class HospitalController {
     @ApiOperation(value = "진료비 세부산정내역 파일명 저장", notes = "프론트에서 보낸 파일명을 DB에 저장합니다.")
     @PostMapping("/voucher")
     public ResponseEntity<?> saveHospitalVoucher(@ApiIgnore @UserId Long userId,
-                                                 @RequestBody HospitalVoucherRequestDto dto) {
+                                                 @RequestBody HospitalImageFileNameDownloadDto dto) {
 
         if (dto.getReceiptId() == null || dto.getHospitalVoucher() == null || dto.getHospitalVoucher().isEmpty()) {
             return ResponseEntity.badRequest().body(Collections.singletonMap("message", "필수 정보 누락"));
@@ -117,7 +116,7 @@ public class HospitalController {
     public ResponseEntity<?> getHospitalVoucher(@ApiIgnore @UserId Long userId,
                                                 @RequestParam("receiptId") Long receiptId) {
 
-        HospitalVoucherResponseDto result = hospitalService.findHospitalVoucher(userId, receiptId);
+        HospitalImageFileNameCheckDto result = hospitalService.findHospitalVoucher(userId, receiptId);
 
         if (result == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -131,7 +130,7 @@ public class HospitalController {
     @ApiOperation(value = "최근 병원비 및 보험청구 가능 건수", notes = "최근 3년간 병원비 총액과 보험청구 가능한 건수를 조회합니다.")
     @GetMapping("/recent")
     public ResponseEntity<?> getHospitalRecentInfo(@ApiIgnore @UserId Long userId) {
-        HospitalRecentResponseDto result = hospitalService.getHospitalRecentInfo(userId);
+        HospitalReceiptRecentDto result = hospitalService.getHospitalRecentInfo(userId);
 
         if (result == null) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -145,7 +144,7 @@ public class HospitalController {
     @ApiOperation(value = "가입된 보험 목록 조회", notes = "가입된 보험 목록을 조회할 수 있습니다.")
     @GetMapping("/insurance")
     public ResponseEntity<?> findInsuranceSubscribeById(@ApiIgnore @UserId Long userId) {
-        List<InsuranceSubscribedResponseDto> result = hospitalService.findInsuranceSubscribeById(userId);
+        List<InsuranceSubscribedCheckDto> result = hospitalService.findInsuranceSubscribeById(userId);
 
         if (result == null || result.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -162,7 +161,7 @@ public class HospitalController {
             @ApiIgnore @UserId Long userId,
             @RequestParam Long receiptId) {
 
-        InsuranceVisit result = hospitalService.getHospitalVisitInfo(userId, receiptId);
+        HospitalVisitCheckDto result = hospitalService.getHospitalVisitInfo(userId, receiptId);
 
         if (result == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -175,7 +174,7 @@ public class HospitalController {
     @ApiOperation(value = "보험 청구 요청", notes = "보험 청구 페이지에서 보험 청구를 요청할 수 있습니다.")
     @PatchMapping("/insurance/claim")
     public ResponseEntity<?> claimInsurance(@ApiIgnore @UserId Long userId,
-                                            @RequestBody InsuranceClaimRequestDto dto) {
+                                            @RequestBody InsuranceClaimDto dto) {
         try {
             hospitalService.insertInsuranceClaim(dto, userId);
 

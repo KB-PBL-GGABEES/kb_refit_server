@@ -2,9 +2,6 @@ package org.refit.spring.mapper;
 
 import org.apache.ibatis.annotations.*;
 import org.refit.spring.hospital.dto.*;
-import org.refit.spring.hospital.enums.HospitalFilter;
-import org.refit.spring.hospital.enums.HospitalSort;
-import org.refit.spring.hospital.enums.HospitalType;
 import org.refit.spring.hospital.provider.HospitalQueryProvider;
 
 import java.util.List;
@@ -31,8 +28,8 @@ public interface HospitalMapper {
             "AND r.receipt_id < #{cursorId} " +
             "ORDER BY r.receipt_id DESC " +
             "LIMIT 10")
-    List<HospitalExpenseResponseDto> findByCursorId(@Param("userId") Long userId,
-                                                    @Param("cursorId") Long cursorId);
+    List<HospitalReceiptListDto> findByCursorId(@Param("userId") Long userId,
+                                                @Param("cursorId") Long cursorId);
     // 최근 N개월 이내의 병원 영수증 목록 조회 (커서 기반)
     @Select("SELECT " +
             "r.created_at AS createdAt, " +
@@ -50,9 +47,9 @@ public interface HospitalMapper {
             "AND r.created_at >= DATE_SUB(NOW(), INTERVAL #{period} MONTH) " +  // 최근 N개월 조건
             "ORDER BY r.receipt_id DESC " +
             "LIMIT 10")
-    List<HospitalExpenseResponseDto> findByCursorIdWithinMonths(@Param("userId") Long userId,
-                                                                @Param("cursorId") Long cursorId,
-                                                                @Param("period") Integer period);
+    List<HospitalReceiptListDto> findByCursorIdWithinMonths(@Param("userId") Long userId,
+                                                            @Param("cursorId") Long cursorId,
+                                                            @Param("period") Integer period);
     // 시작일 ~ 종료일 사이 병원 영수증 목록 조회 (커서 기반)
     @Select("SELECT " +
             "r.created_at AS createdAt, " +
@@ -70,13 +67,13 @@ public interface HospitalMapper {
             "AND r.created_at BETWEEN #{startDate} AND #{endDate} " +
             "ORDER BY r.receipt_id DESC " +
             "LIMIT 10")
-    List<HospitalExpenseResponseDto> findByCursorIdWithPeriod(@Param("userId") Long userId,
-                                                              @Param("cursorId") Long cursorId,
-                                                              @Param("startDate") Date startDate,
-                                                              @Param("endDate") Date endDate);
+    List<HospitalReceiptListDto> findByCursorIdWithPeriod(@Param("userId") Long userId,
+                                                          @Param("cursorId") Long cursorId,
+                                                          @Param("startDate") Date startDate,
+                                                          @Param("endDate") Date endDate);
 
     @SelectProvider(type = HospitalQueryProvider.class, method = "buildFilteredQuery")
-    List<HospitalExpenseResponseDto> getFilteredList(Map<String, Object> params);
+    List<HospitalReceiptListDto> getFilteredList(Map<String, Object> params);
 
 
     // 의료비 납입 내역 상세 조회
@@ -101,7 +98,7 @@ public interface HospitalMapper {
             "WHERE r.user_id = #{userId} " +
             "AND r.receipt_id = #{receiptId} " +
             "AND cat.category_id = 1")
-    List<HospitalExpenseDetailResponseDto> findHospitalExpenseDetailByUserIdAndReceiptId(
+    List<HospitalReceiptDetailDto> findHospitalExpenseDetailByUserIdAndReceiptId(
             @Param("userId") Long userId,
             @Param("receiptId") Long receiptId
     );
@@ -143,7 +140,7 @@ public interface HospitalMapper {
             "WHERE cat.category_id = 1 " +
             "AND r.created_at >= DATE_SUB(NOW(), INTERVAL 3 YEAR) " +
             "AND r.user_id = #{userId}")
-    HospitalRecentResponseDto findByHospitalRecentId(@Param("userId") Long userId);
+    HospitalReceiptRecentDto findByHospitalRecentId(@Param("userId") Long userId);
 
     // 가입된 보험 조회
     @Select("SELECT insurance_id AS insuranceId, " +
@@ -151,7 +148,7 @@ public interface HospitalMapper {
             "joined_date AS joinedDate " +
             "FROM insurance " +
             "WHERE user_id = #{userId}")
-    List<InsuranceSubscribedResponseDto> findByInsuranceSubscribeId(@Param("userId") Long userId);
+    List<InsuranceSubscribedCheckDto> findByInsuranceSubscribeId(@Param("userId") Long userId);
 
    // 보험 청구_방문 정보
    @Select("SELECT c.company_name AS hospitalName, r.created_at AS createdAt " +
@@ -159,7 +156,7 @@ public interface HospitalMapper {
            "JOIN company c ON r.company_id = c.company_id " +
            "JOIN categories cat ON c.category_id = cat.category_id " +
            "WHERE r.receipt_id = #{receiptId} AND r.user_id = #{userId} AND cat.category_id = 1")
-   InsuranceVisit findHospitalVisitInfo(@Param("userId") Long userId, @Param("receiptId") Long receiptId);
+   HospitalVisitCheckDto findHospitalVisitInfo(@Param("userId") Long userId, @Param("receiptId") Long receiptId);
 
 
     // 보험이 none인 경우에만 보험 청구 가능
@@ -170,7 +167,7 @@ public interface HospitalMapper {
     @Update("UPDATE hospital_process " +
             "SET process_state = #{processState}, sicked_date = #{sickedDate}, visited_reason = #{visitedReason}, insurance_id = #{insuranceId} " +
             "WHERE receipt_id = #{receiptId}")
-    void updateInsuranceClaim(InsuranceClaimRequestDto dto);
+    void updateInsuranceClaim(InsuranceClaimDto dto);
 
    // 보험 가입 여부 확인용 메서드
     @Select("SELECT COUNT(*) > 0 " +
@@ -187,7 +184,7 @@ public interface HospitalMapper {
             "visited_reason = #{visitedReason}, " +
             "insurance_id = #{insuranceId} " +
             "WHERE receipt_id = #{receiptId}")
-    void insertInsuranceClaim(InsuranceClaimRequestDto dto);
+    void insertInsuranceClaim(InsuranceClaimDto dto);
 
 
 
