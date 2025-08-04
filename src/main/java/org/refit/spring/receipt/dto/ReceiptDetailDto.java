@@ -16,6 +16,7 @@ public class ReceiptDetailDto {
     private Long receiptId;
     private Long companyId;
     private String companyName;
+    private String ceo;
     private String address;
     private List<ReceiptContentDetailDto> receiptContents;
     private Long totalPrice;
