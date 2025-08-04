@@ -7,10 +7,10 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class HospitalVoucherResponseDto {
+public class HospitalImageFileNameCheckDto {
     private String hospitalVoucher;
 
-    public HospitalVoucherResponseDto(String hospitalVoucher) {
+    public HospitalImageFileNameCheckDto(String hospitalVoucher) {
         this.hospitalVoucher = hospitalVoucher;
     }
 }

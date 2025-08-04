@@ -7,7 +7,7 @@ import java.util.Date;
 
 @Getter
 @Setter
-public class HospitalExpenseDetailResponseDto {
+public class HospitalReceiptDetailDto {
     private String hospitalName;
     private Long companyId;
     private String ceoName;

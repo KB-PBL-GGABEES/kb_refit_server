@@ -12,4 +12,5 @@ public class HospitalProcess {
     private String visitedReason;
     private Long receiptId;
     private Long insuranceId;
+    private String hospitalVoucher;
 }

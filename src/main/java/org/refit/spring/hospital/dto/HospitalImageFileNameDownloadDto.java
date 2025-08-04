@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class HospitalVoucherRequestDto {
+public class HospitalImageFileNameDownloadDto {
     private Long receiptId;
     private String hospitalVoucher;
 }
