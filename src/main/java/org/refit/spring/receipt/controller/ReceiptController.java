@@ -28,6 +28,9 @@ public class ReceiptController {
     private final ReceiptService receiptService;
 
 
+
+
+
     @ApiOperation(value = "영수증 목록 조회", notes = "전체 영수증을 조회하며, 파라미터로 필터링이 가능합니다.")
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "잘못된 요청"),

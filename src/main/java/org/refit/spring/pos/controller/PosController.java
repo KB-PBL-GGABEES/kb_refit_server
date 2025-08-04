@@ -34,7 +34,7 @@ public class PosController {
     private final UserService userService;
     private final ReceiptService receiptService;
 
-    private final long CARBON_POINT = 100L;
+    private static final long CARBON_POINT = 100L;
 
     @ApiOperation(value = "POS 상품 조회", notes = "POS 기계에서 영수증을 찍을 수 있도록 현재 상점의 상품 목록을 조회할 수 있습니다.")
     @GetMapping("/merchandise/{companyId}")
