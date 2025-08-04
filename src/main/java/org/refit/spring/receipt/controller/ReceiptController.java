@@ -13,15 +13,10 @@ import org.refit.spring.receipt.enums.ReceiptFilter;
 import org.refit.spring.receipt.enums.ReceiptSort;
 import org.refit.spring.receipt.enums.ReceiptType;
 import org.refit.spring.receipt.service.ReceiptService;
-import org.refit.spring.reward.entity.Reward;
-import org.refit.spring.reward.service.RewardService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
-
-import java.net.URI;
-import java.sql.SQLException;
 import java.util.Date;
 
 
@@ -31,9 +26,6 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class ReceiptController {
     private final ReceiptService receiptService;
-
-
-
 
 
     @ApiOperation(value = "영수증 목록 조회", notes = "전체 영수증을 조회하며, 파라미터로 필터링이 가능합니다.")
