@@ -2,12 +2,17 @@ package org.refit.spring.hospital.service;
 
 import lombok.RequiredArgsConstructor;
 import org.refit.spring.hospital.dto.*;
+import org.refit.spring.hospital.enums.HospitalFilter;
+import org.refit.spring.hospital.enums.HospitalSort;
+import org.refit.spring.hospital.enums.HospitalType;
 import org.refit.spring.mapper.HospitalMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,14 +52,50 @@ public class HospitalService {
         return HospitalListDto.from(list, nextCursorId);
     }
 
+    @Transactional(readOnly = true)
+    public HospitalListDto getFilteredList(Long userId, Long cursorId, Integer period,
+                                           Date startDate, Date endDate,
+                                           HospitalType type, HospitalFilter filter, HospitalSort sort) {
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("userId", userId);
+
+        // 1. 기본 정렬값 지정
+        if (sort == null) sort = HospitalSort.LATEST;
+
+        // 2. 커서 초기화
+        if (cursorId == null) {
+            cursorId = (sort == HospitalSort.OLDEST) ? 0L : Long.MAX_VALUE;
+        }
+
+        params.put("cursorId", cursorId);
+        params.put("sort", sort); // 필수
+
+        // 3. 날짜 필터
+        if (period != null) {
+            params.put("period", period); // 내부에서 INTERVAL #{period} MONTH 처리
+        } else if (startDate != null && endDate != null) {
+            params.put("startDate", startDate);
+            params.put("endDate", endDate);
+        }
+
+        // 4. 기타 조건
+        if (type != null) params.put("type", type);
+        if (filter != null) params.put("filter", filter);
+
+        // 디버깅 로그
+        System.out.println("===[ 필터링 디버깅 ]===\nsort: " + sort + "\ncursorId: " + cursorId +
+                "\nperiod: " + period + "\nstartDate: " + startDate + "\nendDate: " + endDate +
+                "\ntype: " + type + "\nfilter: " + filter);
+
+        // 5. 쿼리 실행
+        List<HospitalExpenseResponseDto> list = hospitalMapper.getFilteredList(params);
+
+        Long nextCursorId = (list.size() < 10) ? null : list.get(list.size() - 1).getReceiptId();
+        return HospitalListDto.from(list, nextCursorId);
+    }
 
 
-//    public List<HospitalExpenseResponseDto> getHospitalExpenses(Long userId, Date cursorDate) {
-//        if (cursorDate == null) {
-//            return hospitalMapper.findFirstPage(userId);
-//        }
-//        return hospitalMapper.findByCursorDate(userId, cursorDate);
-//    }
 
     // 병원 영수증 상세 조회
     public HospitalExpenseDetailResponseDto findHospitalExpenseDetail(Long userId, Long receiptId) {

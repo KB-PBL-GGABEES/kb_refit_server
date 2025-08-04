@@ -6,6 +6,9 @@ import lombok.RequiredArgsConstructor;
 
 import org.refit.spring.auth.annotation.UserId;
 import org.refit.spring.hospital.dto.*;
+import org.refit.spring.hospital.enums.HospitalFilter;
+import org.refit.spring.hospital.enums.HospitalSort;
+import org.refit.spring.hospital.enums.HospitalType;
 import org.refit.spring.hospital.service.HospitalService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -53,30 +56,27 @@ public class HospitalController {
         return ResponseEntity.ok(dto);
     }
 
-//    @ApiOperation(value = "의료비 납입 내역 조회", notes = "의료비 납입 내역을 조회할 수 있습니다.")
-//    @GetMapping("/list")
-//    public ResponseEntity<?> getHospitalExpenses(@ApiIgnore @UserId Long userId,
-//            @RequestParam(value = "cursorDate", required = false)
-//            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date cursorDate) {
-//
-//        List<HospitalExpenseResponseDto> list = hospitalService.getHospitalExpenses(userId, cursorDate);
-//
-//        if (list == null || list.isEmpty()) {
-//            Map<String, String> error = new HashMap<>();
-//            error.put("message", "해당 유저의 병원 영수증 데이터가 없습니다.");
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
-//        }
-//
-//        // 다음 커서 계산
-//        Date nextCursor = (list.size() < 2) ? null : list.get(list.size() - 1).getCreatedAt();
-//        String nextCursorDateStr = (nextCursor != null) ? new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(nextCursor) : null;
-//
-//        Map<String, Object> response = new HashMap<>();
-//        response.put("data", list);
-//        response.put("nextCursorDate", nextCursorDateStr);
-//
-//        return ResponseEntity.ok(response);
-//    }
+    @ApiOperation(value = "필터 기반 병원 영수증 조회", notes = "필터(기간, 종류, 정렬, 청구 여부)에 따라 병원 영수증을 조회합니다.")
+    @GetMapping("/list/filter")
+    public ResponseEntity<?> getHospitalExpensesWithFilter(
+            @ApiIgnore @UserId Long userId,
+            @RequestParam(required = false) Long cursorId,
+            @RequestParam(required = false) Integer period,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate,
+            @RequestParam(required = false) HospitalType type,
+            @RequestParam(required = false) HospitalSort sort,
+            @RequestParam(required = false) HospitalFilter filter) {
+
+        System.out.println("=== [Controller] cursorId: " + cursorId + " / sort: " + sort);
+
+        HospitalListDto dto = hospitalService.getFilteredList(
+                userId, cursorId, period, startDate, endDate, type, filter, sort
+        );
+
+        return ResponseEntity.ok(dto);
+    }
+
 
     // 병원 영수증 상세 조회
     @ApiOperation(value = "의료비 납입 내역 상세 조회", notes = "의료비 납입 내역을 상세 조회할 수 있습니다.")
