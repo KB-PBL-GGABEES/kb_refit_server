@@ -15,7 +15,7 @@ import java.time.format.DateTimeFormatter;
 @NoArgsConstructor
 @AllArgsConstructor
 @ApiModel(description = "경비 처리 영수증 DTO")
-public class CeoListDto {
+public class ReceiptDto {
     @ApiModelProperty(value = "영수증 ID", example = "1")
     private Long receiptId;
     @ApiModelProperty(value = "가게명", example = "스타벅스")
@@ -23,20 +23,20 @@ public class CeoListDto {
     @ApiModelProperty(value = "주문합계", example = "5900")
     private Long totalPrice;
     @ApiModelProperty(value = "결제 일시", example = "2025-05-13 14:10:00")
-    private String receiptDateTime;
+    private String createdAt;
     @ApiModelProperty(value = "영수 처리 상태", example = "none")
     private String processState;
 
-    public static CeoListDto of(Ceo vo) {
+    public static ReceiptDto of(Ceo vo) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-        CeoListDto ceo = CeoListDto.builder()
+        ReceiptDto ceo = ReceiptDto.builder()
                 .receiptId(vo.getReceiptId())
                 .companyName(vo.getCompanyName())
                 .totalPrice(vo.getTotalPrice())
-                .receiptDateTime(
-                        vo.getReceiptDateTime() != null
-                                ? vo.getReceiptDateTime().format(formatter)
+                .createdAt(
+                        vo.getCreatedAt() != null
+                                ? vo.getCreatedAt().format(formatter)
                                 : null)
                 .processState(vo.getProcessState())
                 .build();

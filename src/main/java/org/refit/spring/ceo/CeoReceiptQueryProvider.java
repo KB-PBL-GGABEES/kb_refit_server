@@ -11,7 +11,7 @@ public class CeoReceiptQueryProvider {
         // 경비 처리 완료 내역 조회
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT ");
-        sql.append(" r.receipt_id, c.company_name, r.created_at AS receipt_date_time, r.total_price,");
+        sql.append(" r.receipt_id, c.company_name, r.created_at, r.total_price,");
         sql.append(" CASE WHEN p.process_state = 'accepted' THEN '승인'");
         sql.append(" WHEN p.process_state = 'rejected' THEN '거절' ELSE p.process_state END AS process_state");
         sql.append(" FROM receipt r");

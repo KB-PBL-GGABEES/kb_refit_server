@@ -27,7 +27,7 @@ public interface CeoMapper {
     @Select("SELECT\n" +
             "            r.receipt_id,\n" +
             "            c.company_name,\n" +
-            "            r.created_at AS receipt_date_time,\n" +
+            "            r.created_at,\n" +
             "            r.total_price,\n" +
             "            p.process_state\n" +
             "        FROM receipt r\n" +
@@ -56,12 +56,12 @@ public interface CeoMapper {
 
     // 경비 청구 항목 상세 조회
     @Select("SELECT \n" +
-            "        u.user_id AS userId,\n" +
-            "        u.name AS name,\n" +
-            "        p.progress_type AS progressType,\n" +
-            "        p.progress_detail AS progressDetail,\n" +
-            "        p.voucher,\n" +
-            "        r.receipt_id AS receiptId,\n" +
+            "        u.user_id,\n" +
+            "        u.name,\n" +
+            "        p.progress_type AS documentType,\n" +
+            "        p.progress_detail AS documentDetail,\n" +
+            "        p.voucher AS imageFileName,\n" +
+            "        r.receipt_id,\n" +
             "        p.process_state\n" +
             "    FROM receipt r\n" +
             "    JOIN user u ON r.user_id = u.user_id\n" +

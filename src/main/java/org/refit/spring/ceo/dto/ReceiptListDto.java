@@ -19,11 +19,11 @@ public class ReceiptListDto {
     @ApiModelProperty(value = "사장님 이름", example = "조승연")
     private String name;
     @ApiModelProperty(value = "경비 처리 항목", example = "업무 추진")
-    private String progressType;
+    private String documentType;
     @ApiModelProperty(value = "세부 내용", example = "업무 추진 간 타사 협력을 위한 카페 방문")
-    private String progressDetail;
+    private String documentDetail;
     @ApiModelProperty(value = "증빙 이미지 파일명", example = "샘플 이미지 파일명")
-    private String voucher;
+    private String imageFileName;
     @ApiModelProperty(value = "영수증 ID", example = "1")
     private Long receiptId;
     @ApiModelProperty(value = "영수 처리 상태", example = "none")
@@ -33,9 +33,9 @@ public class ReceiptListDto {
         ReceiptListDto receiptList = ReceiptListDto.builder()
                 .userid(vo.getUserid())
                 .name(vo.getName())
-                .progressType(vo.getProgressType())
-                .progressDetail(vo.getProgressDetail())
-                .voucher(vo.getVoucher())
+                .documentType(vo.getDocumentType())
+                .documentDetail(vo.getDocumentDetail())
+                .imageFileName(vo.getImageFileName())
                 .receiptId(vo.getReceiptId())
                 .processState(vo.getProcessState())
                 .build();
