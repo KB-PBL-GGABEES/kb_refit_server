@@ -41,7 +41,7 @@ public class ReceiptService {
     public Receipt create(ReceiptRequestDto dto, Long userId) {
         List<ReceiptContentRequestsDto> requestList = dto.getContentsList();
         Merchandise firstMerchandise = merchandiseMapper.findByMerchandiseId(requestList.get(0).getMerchandiseId());
-        Receipt receipt = initReceipt(dto.getCardId(), firstMerchandise.getCompanyId(), userId);
+        Receipt receipt = initReceipt(dto.getCardId(), firstMerchandise.getCompanyId(), receiptMapper.getCompanyName(firstMerchandise.getCompanyId()), userId);
         List<ReceiptContentDetailDto> list = makeContents(dto.getContentsList(), receipt);
         updatePrice(receipt);
         receipt.setContentList(list);
@@ -66,6 +66,7 @@ public class ReceiptService {
         refundReceipt.setCreatedAt(new Date());
         refundReceipt.setUpdatedAt(new Date());
         refundReceipt.setCompanyId(nowReceipt.getCompanyId());
+        refundReceipt.setCompanyName(receiptMapper.getCompanyName(nowReceipt.getCompanyId()));
         refundReceipt.setUserId(userId);
         refundReceipt.setCardId(nowReceipt.getCardId());
         receiptMapper.create(refundReceipt);
@@ -94,7 +95,7 @@ public class ReceiptService {
         return refundReceipt;
     }
 
-    private Receipt initReceipt(Long cardId, Long companyId, Long userId) {
+    private Receipt initReceipt(Long cardId, Long companyId, String companyName, Long userId) {
         Receipt receipt = new Receipt();
         receipt.setTotalPrice(0L);
         receipt.setSupplyPrice(0L);
@@ -105,6 +106,7 @@ public class ReceiptService {
         receipt.setUpdatedAt(new Date());
         receipt.setUserId(userId);
         receipt.setCompanyId(companyId);
+        receipt.setCompanyName(companyName);
         receiptMapper.create(receipt);
         return receipt;
     }
