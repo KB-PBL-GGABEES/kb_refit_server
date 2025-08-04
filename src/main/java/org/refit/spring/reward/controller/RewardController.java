@@ -52,7 +52,7 @@ public class RewardController {
             @ApiResponse(code = 400, message = "잘못된 요청"),
             @ApiResponse(code = 500, message = "서버 내부 오류")
     })
-    @GetMapping("/summary")
+    @GetMapping("/rewardSummary")
     public ResponseEntity<?> getTotalPoint(
             @ApiIgnore @UserId Long userId) {
         RewardSummaryDto dto = rewardService.getTotal(userId);
