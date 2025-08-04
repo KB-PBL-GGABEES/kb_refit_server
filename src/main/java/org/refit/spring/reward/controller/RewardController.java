@@ -59,17 +59,4 @@ public class RewardController {
         return ResponseEntity.ok(dto);
     }
 
-    @ApiOperation(value = "지갑 상점 구매", notes = "상점에서 포인트로 지갑을 구매하면 포인트가 차감되고 보유 지갑 브랜드 테이블에 추가됩니다.")
-    @ApiResponses(value = {
-            @ApiResponse(code = 400, message = "잘못된 요청"),
-            @ApiResponse(code = 500, message = "서버 내부 오류")
-    })
-    @PostMapping("/purchase")
-    public ResponseEntity<?> getWallet(
-            @ApiIgnore @UserId Long userId,
-            @RequestBody RewardWalletRequestDto rewardWalletRequestDto) {
-        RewardWalletResponseDto dto = rewardService.purchaseWallet(userId, rewardWalletRequestDto);
-        URI location = URI.create("/reward/" + dto.getWalletId());
-        return ResponseEntity.created(location).body(dto);
-    }
 }
