@@ -30,4 +30,5 @@ public class ReceiptDetailDto {
     private String cardNumber;
     @ApiModelProperty(value = "법인 카드 여부", example = "1")
     private Integer isCorporate;
+    private String rejected_reason;
 }
