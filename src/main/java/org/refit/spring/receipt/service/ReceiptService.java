@@ -212,7 +212,7 @@ public class ReceiptService {
         return dto;
     }
 
-    public RejectReceiptListDto getRejected(Long userId) {
+    public RejectedReceiptListDto getRejected(Long userId) {
         List<RejectedReceiptDto> rejectedList = receiptMapper.findRejected(userId);
         for (RejectedReceiptDto dto: rejectedList) {
             List<ReceiptContent> contents = receiptMapper.findContentsByReceiptId(userId, dto.getReceiptId());
@@ -229,7 +229,7 @@ public class ReceiptService {
             }
             dto.setContentList(contentDtoList);
         }
-        return new RejectReceiptListDto(rejectedList);
+        return new RejectedReceiptListDto(rejectedList);
     }
 
     public void changeState(Long userId, Long receiptProcessId) {

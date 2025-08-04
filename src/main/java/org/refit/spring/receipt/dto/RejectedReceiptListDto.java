@@ -9,6 +9,6 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RejectReceiptListDto {
+public class RejectedReceiptListDto {
     List<RejectedReceiptDto> rejectedList;
 }
