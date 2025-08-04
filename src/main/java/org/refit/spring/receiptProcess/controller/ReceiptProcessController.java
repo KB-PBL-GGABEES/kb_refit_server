@@ -109,7 +109,7 @@ public class ReceiptProcessController {
             // 서비스 호출
             receiptProcessService.upsertReceiptProcess(dto, userId);
 
-            return ResponseEntity.ok(Collections.singletonMap("message", "영수처리 요청이 완료되었습니다."));
+            return ResponseEntity.noContent().build();
 
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
