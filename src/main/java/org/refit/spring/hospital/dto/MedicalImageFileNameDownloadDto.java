@@ -7,10 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class HospitalImageFileNameCheckDto {
+public class MedicalImageFileNameDownloadDto {
+    private Long receiptId;
     private String hospitalVoucher;
-
-    public HospitalImageFileNameCheckDto(String hospitalVoucher) {
-        this.hospitalVoucher = hospitalVoucher;
-    }
 }

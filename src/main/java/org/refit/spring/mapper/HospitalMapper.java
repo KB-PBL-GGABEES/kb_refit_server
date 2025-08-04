@@ -28,8 +28,8 @@ public interface HospitalMapper {
             "AND r.receipt_id < #{cursorId} " +
             "ORDER BY r.receipt_id DESC " +
             "LIMIT 10")
-    List<HospitalReceiptListDto> findByCursorId(@Param("userId") Long userId,
-                                                @Param("cursorId") Long cursorId);
+    List<MedicalReceiptListDto> findByCursorId(@Param("userId") Long userId,
+                                               @Param("cursorId") Long cursorId);
     // 최근 N개월 이내의 병원 영수증 목록 조회 (커서 기반)
     @Select("SELECT " +
             "r.created_at AS createdAt, " +
@@ -47,9 +47,9 @@ public interface HospitalMapper {
             "AND r.created_at >= DATE_SUB(NOW(), INTERVAL #{period} MONTH) " +  // 최근 N개월 조건
             "ORDER BY r.receipt_id DESC " +
             "LIMIT 10")
-    List<HospitalReceiptListDto> findByCursorIdWithinMonths(@Param("userId") Long userId,
-                                                            @Param("cursorId") Long cursorId,
-                                                            @Param("period") Integer period);
+    List<MedicalReceiptListDto> findByCursorIdWithinMonths(@Param("userId") Long userId,
+                                                           @Param("cursorId") Long cursorId,
+                                                           @Param("period") Integer period);
     // 시작일 ~ 종료일 사이 병원 영수증 목록 조회 (커서 기반)
     @Select("SELECT " +
             "r.created_at AS createdAt, " +
@@ -67,13 +67,13 @@ public interface HospitalMapper {
             "AND r.created_at BETWEEN #{startDate} AND #{endDate} " +
             "ORDER BY r.receipt_id DESC " +
             "LIMIT 10")
-    List<HospitalReceiptListDto> findByCursorIdWithPeriod(@Param("userId") Long userId,
-                                                          @Param("cursorId") Long cursorId,
-                                                          @Param("startDate") Date startDate,
-                                                          @Param("endDate") Date endDate);
+    List<MedicalReceiptListDto> findByCursorIdWithPeriod(@Param("userId") Long userId,
+                                                         @Param("cursorId") Long cursorId,
+                                                         @Param("startDate") Date startDate,
+                                                         @Param("endDate") Date endDate);
 
     @SelectProvider(type = HospitalQueryProvider.class, method = "buildFilteredQuery")
-    List<HospitalReceiptListDto> getFilteredList(Map<String, Object> params);
+    List<MedicalReceiptListDto> getFilteredList(Map<String, Object> params);
 
 
     // 의료비 납입 내역 상세 조회
@@ -98,7 +98,7 @@ public interface HospitalMapper {
             "WHERE r.user_id = #{userId} " +
             "AND r.receipt_id = #{receiptId} " +
             "AND cat.category_id = 1")
-    List<HospitalReceiptDetailDto> findHospitalExpenseDetailByUserIdAndReceiptId(
+    List<MedicalReceiptDetailDto> findHospitalExpenseDetailByUserIdAndReceiptId(
             @Param("userId") Long userId,
             @Param("receiptId") Long receiptId
     );
@@ -140,7 +140,7 @@ public interface HospitalMapper {
             "WHERE cat.category_id = 1 " +
             "AND r.created_at >= DATE_SUB(NOW(), INTERVAL 3 YEAR) " +
             "AND r.user_id = #{userId}")
-    HospitalReceiptRecentDto findByHospitalRecentId(@Param("userId") Long userId);
+    MedicalReceiptRecentDto findByHospitalRecentId(@Param("userId") Long userId);
 
     // 가입된 보험 조회
     @Select("SELECT insurance_id AS insuranceId, " +
@@ -156,7 +156,7 @@ public interface HospitalMapper {
            "JOIN company c ON r.company_id = c.company_id " +
            "JOIN categories cat ON c.category_id = cat.category_id " +
            "WHERE r.receipt_id = #{receiptId} AND r.user_id = #{userId} AND cat.category_id = 1")
-   HospitalVisitCheckDto findHospitalVisitInfo(@Param("userId") Long userId, @Param("receiptId") Long receiptId);
+   MedicalCheckDto findHospitalVisitInfo(@Param("userId") Long userId, @Param("receiptId") Long receiptId);
 
 
     // 보험이 none인 경우에만 보험 청구 가능

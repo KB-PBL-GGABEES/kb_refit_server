@@ -21,40 +21,40 @@ public class HospitalService {
 
     // 병원 영수증 목록 조회
     @Transactional(readOnly = true)
-    public HospitalReceiptListCursorDto getHospitalExpenses(Long userId, Long cursorId) {
+    public MedicalReceiptListCursorDto getHospitalExpenses(Long userId, Long cursorId) {
         if (cursorId == null) cursorId = Long.MAX_VALUE;
-        List<HospitalReceiptListDto> list = hospitalMapper.findByCursorId(userId, cursorId);
+        List<MedicalReceiptListDto> list = hospitalMapper.findByCursorId(userId, cursorId);
         Long nextCursorId = (list.size() < 10) ? null : list.get(list.size() - 1).getReceiptId();
 
-        return HospitalReceiptListCursorDto.from(list, nextCursorId);
+        return MedicalReceiptListCursorDto.from(list, nextCursorId);
     }
 
     // 2. 최근 n개월 내 병원 영수증 조회
     @Transactional(readOnly = true)
-    public HospitalReceiptListCursorDto getListMonths(Long userId, Long cursorId, Integer period) {
+    public MedicalReceiptListCursorDto getListMonths(Long userId, Long cursorId, Integer period) {
         if (cursorId == null) cursorId = Long.MAX_VALUE;
 
-        List<HospitalReceiptListDto> list = hospitalMapper.findByCursorIdWithinMonths(userId, cursorId, period);
+        List<MedicalReceiptListDto> list = hospitalMapper.findByCursorIdWithinMonths(userId, cursorId, period);
         Long nextCursorId = (list.size() < 10) ? null : list.get(list.size() - 1).getReceiptId();
 
-        return HospitalReceiptListCursorDto.from(list, nextCursorId);
+        return MedicalReceiptListCursorDto.from(list, nextCursorId);
     }
 
     // 3. 시작일 ~ 종료일 기간 필터로 병원 영수증 조회
     @Transactional(readOnly = true)
-    public HospitalReceiptListCursorDto getListPeriod(Long userId, Long cursorId, Date startDate, Date endDate) {
+    public MedicalReceiptListCursorDto getListPeriod(Long userId, Long cursorId, Date startDate, Date endDate) {
         if (cursorId == null) cursorId = Long.MAX_VALUE;
 
-        List<HospitalReceiptListDto> list = hospitalMapper.findByCursorIdWithPeriod(userId, cursorId, startDate, endDate);
+        List<MedicalReceiptListDto> list = hospitalMapper.findByCursorIdWithPeriod(userId, cursorId, startDate, endDate);
         Long nextCursorId = (list.size() < 10) ? null : list.get(list.size() - 1).getReceiptId();
 
-        return HospitalReceiptListCursorDto.from(list, nextCursorId);
+        return MedicalReceiptListCursorDto.from(list, nextCursorId);
     }
 
     @Transactional(readOnly = true)
-    public HospitalReceiptListCursorDto getFilteredList(Long userId, Long cursorId, Integer period,
-                                                        Date startDate, Date endDate,
-                                                        HospitalType type, HospitalFilter filter, HospitalSort sort) {
+    public MedicalReceiptListCursorDto getFilteredList(Long userId, Long cursorId, Integer period,
+                                                       Date startDate, Date endDate,
+                                                       HospitalType type, HospitalFilter filter, HospitalSort sort) {
 
         Map<String, Object> params = new HashMap<>();
         params.put("userId", userId);
@@ -88,17 +88,17 @@ public class HospitalService {
                 "\ntype: " + type + "\nfilter: " + filter);
 
         // 5. 쿼리 실행
-        List<HospitalReceiptListDto> list = hospitalMapper.getFilteredList(params);
+        List<MedicalReceiptListDto> list = hospitalMapper.getFilteredList(params);
 
         Long nextCursorId = (list.size() < 10) ? null : list.get(list.size() - 1).getReceiptId();
-        return HospitalReceiptListCursorDto.from(list, nextCursorId);
+        return MedicalReceiptListCursorDto.from(list, nextCursorId);
     }
 
 
 
     // 병원 영수증 상세 조회
-    public HospitalReceiptDetailDto findHospitalExpenseDetail(Long userId, Long receiptId) {
-        List<HospitalReceiptDetailDto> results =
+    public MedicalReceiptDetailDto findHospitalExpenseDetail(Long userId, Long receiptId) {
+        List<MedicalReceiptDetailDto> results =
                 hospitalMapper.findHospitalExpenseDetailByUserIdAndReceiptId(userId, receiptId);
 
         if (results == null || results.isEmpty()) return null;
@@ -108,7 +108,7 @@ public class HospitalService {
 
     // 진료비 세부산정내역 PDF 파일명 DB저장
     @Transactional
-    public void updateHospitalVoucher(Long userId, HospitalImageFileNameDownloadDto dto) {
+    public void updateHospitalVoucher(Long userId, MedicalImageFileNameDownloadDto dto) {
         String state = hospitalMapper.findProcessStateByReceiptId(dto.getReceiptId());
 
         // 없다면 먼저 insert
@@ -123,14 +123,14 @@ public class HospitalService {
 
 
     // 진료비 세부산정내역 PDF 파일명 조회
-    public HospitalImageFileNameCheckDto findHospitalVoucher(Long userId, Long receiptId) {
+    public MedicalImageFileNameCheckDto findHospitalVoucher(Long userId, Long receiptId) {
         String fileName = hospitalMapper.findHospitalVoucherByReceiptId(receiptId, userId);
         if (fileName == null || fileName.isEmpty()) return null;
-        return new HospitalImageFileNameCheckDto(fileName);
+        return new MedicalImageFileNameCheckDto(fileName);
     }
 
     // 최근 병원비 조회
-    public HospitalReceiptRecentDto getHospitalRecentInfo(Long userId) {
+    public MedicalReceiptRecentDto getHospitalRecentInfo(Long userId) {
         boolean exists = hospitalMapper.existsUserReceipt(userId);
         if (!exists) {
             return null; // 컨트롤러에서 에러 응답 처리
@@ -145,7 +145,7 @@ public class HospitalService {
 
 
     // 보험 청구_방문 정보
-    public HospitalVisitCheckDto getHospitalVisitInfo(Long userId, Long receiptId) {
+    public MedicalCheckDto getHospitalVisitInfo(Long userId, Long receiptId) {
         return hospitalMapper.findHospitalVisitInfo(userId, receiptId);
     }
 
