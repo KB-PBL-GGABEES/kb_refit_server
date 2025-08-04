@@ -8,9 +8,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class MedicalImageFileNameCheckDto {
-    private String hospitalVoucher;
+    private String medicalImageFileName;
 
-    public MedicalImageFileNameCheckDto(String hospitalVoucher) {
-        this.hospitalVoucher = hospitalVoucher;
+    public MedicalImageFileNameCheckDto(String medicalImageFileName) {
+        this.medicalImageFileName = medicalImageFileName;
     }
 }
