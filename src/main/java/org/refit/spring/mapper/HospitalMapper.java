@@ -12,25 +12,8 @@ import java.util.Map;
 public interface HospitalMapper {
 
     // 의료비 납입내역 조회
-    // 기본 커서 기반 병원 영수증 목록 조회 (최근 순, LIMIT 10)
-    @Select("SELECT " +
-            "r.created_at AS createdAt, " +
-            "c.company_name AS storeName, " +
-            "hp.process_state AS processState, " +
-            "r.total_price AS totalPrice, " +
-            "r.receipt_id AS receiptId " +
-            "FROM receipt r " +
-            "JOIN company c ON r.company_id = c.company_id " +
-            "JOIN categories cat ON c.category_id = cat.category_id " +
-            "LEFT JOIN hospital_process hp ON r.receipt_id = hp.receipt_id " +
-            "WHERE r.user_id = #{userId} " +
-            "AND cat.category_id = 1 " +
-            "AND r.receipt_id < #{cursorId} " +
-            "ORDER BY r.receipt_id DESC " +
-            "LIMIT 10")
-    List<MedicalReceiptListDto> findByCursorId(@Param("userId") Long userId,
-                                               @Param("cursorId") Long cursorId);
-    // 최근 N개월 이내의 병원 영수증 목록 조회 (커서 기반)
+
+    // 최근 N개월 이내의 의료 영수증 목록 조회 (커서 기반)
     @Select("SELECT " +
             "r.created_at AS createdAt, " +
             "c.company_name AS storeName, " +
@@ -50,7 +33,7 @@ public interface HospitalMapper {
     List<MedicalReceiptListDto> findByCursorIdWithinMonths(@Param("userId") Long userId,
                                                            @Param("cursorId") Long cursorId,
                                                            @Param("period") Integer period);
-    // 시작일 ~ 종료일 사이 병원 영수증 목록 조회 (커서 기반)
+    // 시작일 ~ 종료일 사이 의료 영수증 목록 조회 (커서 기반)
     @Select("SELECT " +
             "r.created_at AS createdAt, " +
             "c.company_name AS storeName, " +
@@ -106,10 +89,10 @@ public interface HospitalMapper {
     // 진료비 세부산정내역 PDF 파일명 DB저장
     @Update("UPDATE hospital_process hp " +
             "JOIN receipt r ON hp.receipt_id = r.receipt_id " +
-            "SET hp.hospital_voucher = #{hospitalVoucher} " +
+            "SET hp.hospital_voucher = #{medicalImageFileName} " +
             "WHERE hp.receipt_id = #{receiptId} AND r.user_id = #{userId}")
     void updateHospitalVoucher(@Param("receiptId") Long receiptId,
-                               @Param("hospitalVoucher") String hospitalVoucher,
+                               @Param("medicalImageFileName") String medicalImageFileName,
                                @Param("userId") Long userId);
 
     @Insert("INSERT INTO hospital_process (receipt_id, process_state) VALUES (#{receiptId}, 'none')")
@@ -185,7 +168,4 @@ public interface HospitalMapper {
             "insurance_id = #{insuranceId} " +
             "WHERE receipt_id = #{receiptId}")
     void insertInsuranceClaim(InsuranceClaimDto dto);
-
-
-
 }
