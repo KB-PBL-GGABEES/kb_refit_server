@@ -11,6 +11,7 @@ import lombok.*;
 public class CheckCompanyResponseDto {
         private boolean isValid;
         private String companyId;
+        private String companyName;
         private String ceoName;
         private String openedDate;
 }
