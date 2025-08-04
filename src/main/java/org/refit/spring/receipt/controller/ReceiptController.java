@@ -117,7 +117,7 @@ public class ReceiptController {
             @ApiResponse(code = 400, message = "잘못된 요청"),
             @ApiResponse(code = 500, message = "서버 내부 오류")
     })
-    @GetMapping("/getRejectedList")
+    @GetMapping("/rejectedList")
     public ResponseEntity<?> getRejected(@ApiIgnore @UserId Long userId) {
         RejectReceiptListDto dto = receiptService.getRejected(userId);
         return ResponseEntity.ok(dto);
