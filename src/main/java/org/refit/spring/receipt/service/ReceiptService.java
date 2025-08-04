@@ -34,6 +34,7 @@ public class ReceiptService {
     private final PersonalBadgeMapper personalBadgeMapper;
     private final UserMapper userMapper;
     private final HospitalMapper hospitalMapper;
+    private final ReceiptProcessMapper receiptProcessMapper;
 
     private final DataSource dataSource;
 
@@ -201,7 +202,8 @@ public class ReceiptService {
                 receipt.getCreatedAt(),
                 receiptMapper.getState(receiptId),
                 receiptMapper.getCardNumber(userId, receipt.getCardId()),
-                receiptMapper.getCorporate(userId, receipt.getCardId())
+                receiptMapper.getCorporate(userId, receipt.getCardId()),
+                receiptProcessMapper.findReason(receiptId)
         );
     }
 
