@@ -92,8 +92,8 @@ public class ReceiptController {
     })
     @PatchMapping("/completeDeposit")
     public ResponseEntity<?> changeState(@ApiIgnore @UserId Long userId,
-                                         @RequestBody Long receiptProcessId) {
-        receiptService.changeState(userId, receiptProcessId);
+                                         @RequestBody ChangeStateRequestDto requestDto) {
+        receiptService.changeState(userId, requestDto.getReceiptId());
         return ResponseEntity.noContent().build();
     }
 }
