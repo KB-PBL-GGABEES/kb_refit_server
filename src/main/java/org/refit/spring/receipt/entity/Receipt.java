@@ -31,4 +31,8 @@ public class Receipt {
     private Long cardId;
     private String processState;
     private String companyName;
+
+    public String getProcessState() {
+        return processState != null ? processState : "none";
+    }
 }
