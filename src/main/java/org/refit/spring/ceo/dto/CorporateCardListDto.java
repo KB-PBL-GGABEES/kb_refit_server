@@ -1,5 +1,6 @@
 package org.refit.spring.ceo.dto;
 
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,25 +12,26 @@ import org.refit.spring.ceo.entity.CorporateCardList;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ApiModel(description = "법인카드 영수증 DTO")
 public class CorporateCardListDto {
-    private Long receiptId;         // 영수증
+    private Long receiptId;
     @ApiModelProperty(value = "가게명", example = "이디야커피")
-    private String companyName;     // 상호명
+    private String companyName;
     @ApiModelProperty(value = "주문합계", example = "4100")
-    private Long totalPrice;        // 주문 합계
+    private Long totalPrice;
     @ApiModelProperty(value = "결제 일시", example = "2025-07-27 09:30:00")
-    private String receiptDateTime; // 결제 일시
+    private String createdAt;
     @ApiModelProperty(value = "영수 처리 상태", example = "null")
-    private String processState;    // 영수처리 여부
+    private String processState;
     @ApiModelProperty(value = "법인카드 여부", example = "true")
-    private boolean corporate;      // 법인 카드 여부
+    private boolean corporate;
 
     public static CorporateCardListDto of(CorporateCardList vo) {
         CorporateCardListDto CorporateCardList = CorporateCardListDto.builder()
                 .receiptId(vo.getReceiptId())
                 .companyName(vo.getCompanyName())
                 .totalPrice(vo.getTotalPrice())
-                .receiptDateTime(vo.getReceiptDateTime())
+                .createdAt(vo.getCreatedAt())
                 .processState(vo.getProcessState())
                 .corporate(vo.isCorporate())
                 .build();

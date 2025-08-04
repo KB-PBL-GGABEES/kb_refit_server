@@ -13,11 +13,11 @@ public class ReceiptProcess {
     private Long receiptProcessId;
     private String processState;
     private Long ceoId;
-    private String progressType;
-    private String progressDetail;
+    private String documentType;
+    private String documentDetail;
     private Date createdAt;
     private Date updatedAt;
     private String rejectedReason;
-    private String voucher;
+    private String imageFileName;
     private Long receiptId;
 }
