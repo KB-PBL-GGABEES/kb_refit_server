@@ -111,25 +111,6 @@ public class CeoController {
         );
     }
 
-//    public ResponseEntity<Map<String, Object>> receiptProcessing(
-//            @RequestBody Map<String, Object> requestBody,
-//            @ApiIgnore @UserId Long userId) {
-//
-//        Long receiptProcessId = Long.valueOf(requestBody.get("receiptProcessId").toString());
-//        String progressState = requestBody.get("progressState").toString();
-//
-//        String rejectedReason = (requestBody.get("rejectedReason") != null)
-//                ? requestBody.get("rejectedReason").toString()
-//                : null;
-//
-//        ceoService.receiptProcessing(receiptProcessId, progressState, rejectedReason, userId);
-//
-//        return ResponseEntity.ok(Map.of(
-//                "message", "영수 처리 완료",
-//                "processStatus", progressState
-//        ));
-//    }
-
     @ApiOperation(value = "한달 법카 금액 조회", notes = "법카의 이번 달 사용액과 지난달 사용액을 가져옵니다.")
     @GetMapping("/corporateCardCost")
     @ApiResponses(value = {
@@ -140,11 +121,6 @@ public class CeoController {
     public ResponseEntity<CorporateCardTotalPriceDto> getCorporateCardTotalPrice(@UserId Long userId) {
         return ResponseEntity.ok(ceoService.getCorporateCardTotalPrice(userId));
     }
-
-//    public ResponseEntity<Map<String, Object>> getCorporateCardCost(
-//            @ApiIgnore @UserId Long userId) {
-//        return ResponseEntity.ok(ceoService.getCorporateCardCost(userId));
-//    }
 
     @ApiOperation(value = "법카 내역 조회", notes = "법카의 사용 내역을 보여줍니다.")
     @GetMapping("/corporateCard")

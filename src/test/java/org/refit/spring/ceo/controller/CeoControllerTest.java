@@ -50,4 +50,32 @@ class CeoControllerTest {
 
         log.info("응답 결과 : " + response);
     }
+
+    @Test
+    void getPendingDetail() {
+    }
+
+    @Test
+    void getReceiptList() {
+    }
+
+    @Test
+    void getCompletedReceipts() {
+    }
+
+    @Test
+    void sendEmail() {
+    }
+
+    @Test
+    void receiptProcess() {
+    }
+
+    @Test
+    void getCorporateCardTotalPrice() {
+    }
+
+    @Test
+    void getCorporateCard() {
+    }
 }
