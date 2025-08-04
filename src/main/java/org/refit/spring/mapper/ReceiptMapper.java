@@ -42,7 +42,7 @@ public interface ReceiptMapper {
     Receipt get(@Param("userId") Long userId, @Param("receiptId") Long receiptId);
 
     @Select("SELECT IFNULL(SUM(total_price), 0) FROM receipt WHERE user_id = #{userId} AND MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE())")
-    Long getTotal(@Param("userId") Long userId);
+    Long getThisMonthTotal(@Param("userId") Long userId);
 
     @Select("SELECT IFNULL(SUM(total_price), 0) FROM receipt WHERE user_id = #{userId} AND MONTH(created_at) = MONTH(DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH)) AND YEAR(created_at) = YEAR(DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH))")
     Long getLastMonthTotal(@Param("userId") Long userId);

@@ -17,7 +17,7 @@ public class ReceiptDetailDto {
     private Long companyId;
     private String companyName;
     private String address;
-    private List<ReceiptContentDto> receiptContents;
+    private List<ReceiptContentDetailDto> receiptContents;
     private Long totalPrice;
     private Long supplyPrice;
     private Long surtax;

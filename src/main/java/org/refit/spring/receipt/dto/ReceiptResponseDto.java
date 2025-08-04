@@ -5,7 +5,6 @@ import lombok.Getter;
 import org.refit.spring.receipt.entity.Receipt;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -13,7 +12,7 @@ import java.util.List;
 public class ReceiptResponseDto {
     private Long userId;
     private Long receiptId;
-    private List<ReceiptContentDto> contentsList;
+    private List<ReceiptContentDetailDto> contentsList;
     private Long totalPrice;
     private Long supplyPrice;
     private Long surtax;

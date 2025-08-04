@@ -7,10 +7,7 @@ import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.refit.spring.auth.annotation.UserId;
 import org.refit.spring.auth.service.UserService;
-import org.refit.spring.receipt.dto.ReceiptDetailDto;
-import org.refit.spring.receipt.dto.ReceiptListDto;
-import org.refit.spring.receipt.dto.ReceiptRequestDto;
-import org.refit.spring.receipt.dto.ReceiptResponseDto;
+import org.refit.spring.receipt.dto.*;
 import org.refit.spring.receipt.entity.Receipt;
 import org.refit.spring.receipt.enums.ReceiptFilter;
 import org.refit.spring.receipt.enums.ReceiptSort;
@@ -110,7 +107,7 @@ public class ReceiptController {
             @ApiResponse(code = 400, message = "잘못된 요청"),
             @ApiResponse(code = 500, message = "서버 내부 오류")
     })
-    @GetMapping("/monthlyReport")
+    @GetMapping("/monthlyExpenseReport")
     public ResponseEntity<?> getTotal(@ApiIgnore @UserId Long userId) {
         return ResponseEntity.ok(receiptService.getTotal(userId));
     }
@@ -120,9 +117,10 @@ public class ReceiptController {
             @ApiResponse(code = 400, message = "잘못된 요청"),
             @ApiResponse(code = 500, message = "서버 내부 오류")
     })
-    @GetMapping("/getRejected")
+    @GetMapping("/getRejectedList")
     public ResponseEntity<?> getRejected(@ApiIgnore @UserId Long userId) {
-        return ResponseEntity.ok(receiptService.getRejected(userId));
+        RejectReceiptListDto dto = receiptService.getRejected(userId);
+        return ResponseEntity.ok(dto);
     }
 
     @ApiOperation(value = "계좌 이체 후 완료 처리", notes = "법인 처리 불가 항목을 계좌이체 완료 하였을 시 상태를 deposit으로 변경합니다.")
