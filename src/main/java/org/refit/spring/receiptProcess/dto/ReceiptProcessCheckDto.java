@@ -9,6 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReceiptProcessCheckDto {
+    private Long companyId;
     private String companyName;
     private String address;
 }

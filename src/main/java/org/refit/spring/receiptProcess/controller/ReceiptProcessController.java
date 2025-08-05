@@ -12,9 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 @Slf4j
 @Api(tags = "영수 처리 API", description = "영수 처리 관련 API입니다.")
@@ -43,14 +41,22 @@ public class ReceiptProcessController {
 
     @ApiOperation(value = "영수 처리 정보 조회", notes = "영수 처리 정보를 조회할 수 있습니다.")
     @GetMapping
-    public ResponseEntity<?> getCompanyInfo(@RequestParam("receiptId") Long receiptId) {
+    public ResponseEntity<?> getCompanyInfo(@RequestParam("companyId") Long companyId) {
         try {
-            ReceiptProcessCheckDto companyInfo = receiptProcessService.getCompanyInfoByReceiptId(receiptId);
+            ReceiptProcessCheckDto companyInfo = receiptProcessService.getCompanyInfoByReceiptId(companyId);
             if (companyInfo == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(Collections.singletonMap("message", "해당 영수증에 대한 회사 정보가 존재하지 않습니다."));
             }
-            return ResponseEntity.ok(companyInfo);
+
+            // 응답 포맷 맞춤
+            Map<String, Object> response = new LinkedHashMap<>();
+            response.put("companyId", companyId);
+            response.put("companyName", companyInfo.getCompanyName());
+            response.put("address", companyInfo.getAddress());
+
+            return ResponseEntity.ok(response);
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Collections.singletonMap("message", "회사 정보 확인 중 오류가 발생했습니다."));
