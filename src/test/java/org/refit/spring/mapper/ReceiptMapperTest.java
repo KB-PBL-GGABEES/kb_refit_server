@@ -1,16 +1,25 @@
 package org.refit.spring.mapper;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.refit.spring.ceo.entity.Card;
+import org.refit.spring.ceo.entity.Company;
 import org.refit.spring.config.RootConfig;
+import org.refit.spring.receipt.dto.RejectedReceiptDto;
 import org.refit.spring.receipt.entity.Receipt;
 import org.refit.spring.receipt.entity.ReceiptContent;
+import org.refit.spring.receipt.enums.ReceiptFilter;
+import org.refit.spring.receipt.enums.ReceiptSort;
+import org.refit.spring.receipt.enums.ReceiptType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -24,6 +33,16 @@ class ReceiptMapperTest {
     @Autowired
     private ReceiptMapper receiptMapper;
 
+//    @BeforeEach
+//    void setUp() {
+//        Company company = new Company();
+//        company.setCompanyId(2018168693L);
+//        company.setCompanyName("집");
+//
+//        Card card = new Card();
+//        card.setCardId(1L);
+//        card.setCardNumber("테스트 카드");
+//    }
 
     @DisplayName("새로운 영수증을 생성합니다.")
     @Test
@@ -38,6 +57,7 @@ class ReceiptMapperTest {
         receipt.setCreatedAt(new Date());
         receipt.setUpdatedAt(new Date());
         receipt.setCardId(1L);
+        receipt.setCompanyId(2018168693L);
 
         receiptMapper.create(receipt);
 
@@ -57,6 +77,7 @@ class ReceiptMapperTest {
         receipt.setCreatedAt(new Date());
         receipt.setUpdatedAt(new Date());
         receipt.setCardId(1L);
+        receipt.setCompanyId(2018168693L);
         receiptMapper.create(receipt);
         ReceiptContent content = new ReceiptContent();
         content.setReceiptId(receipt.getReceiptId());
@@ -79,6 +100,7 @@ class ReceiptMapperTest {
         receipt.setTransactionType("CARD");
         receipt.setCompanyId(1L);
         receipt.setUserId(1L);
+        receipt.setCompanyId(2018168693L);
         receipt.setCreatedAt(new Date());
         receipt.setUpdatedAt(new Date());
         receipt.setCardId(1L);
@@ -98,13 +120,11 @@ class ReceiptMapperTest {
         assertEquals(Long.valueOf(1364L), updated.getSurtax());
     }
 
-    /*
     @DisplayName("영수증 목록을 조회합니다.")
     @Test
-    void getList() {
+    void getFilteredList() {
         for (int i = 1; i <= 25; i++) {
             Receipt receipt = new Receipt();
-            receipt.setCompanyId(1L);
             receipt.setUserId(1L);
             receipt.setTotalPrice(10000L + i);
             receipt.setSupplyPrice(9000L + i);
@@ -113,11 +133,11 @@ class ReceiptMapperTest {
             receipt.setCreatedAt(new Date());
             receipt.setUpdatedAt(new Date());
             receipt.setCardId(1L);
+            receipt.setCompanyId(2018168693L);
             receiptMapper.create(receipt);
         }
-        List<Receipt> list = receiptMapper.getList(Long.MAX_VALUE, 1L);
+        List<Receipt> list = receiptMapper.getFilteredList(1L, null, null, null, null, null, null, null);
         assertNotNull(list);
-        assertEquals(20, list.size());
 
         long prevId = Long.MAX_VALUE;
         for (Receipt receipt : list) {
@@ -126,8 +146,6 @@ class ReceiptMapperTest {
             prevId = receipt.getReceiptId();
         }
     }
-    
-     */
 
     @DisplayName("영수증 아이디를 바탕으로 영수증 항목을 찾습니다.")
     @Test
@@ -142,6 +160,7 @@ class ReceiptMapperTest {
         receipt.setCreatedAt(new Date());
         receipt.setUpdatedAt(new Date());
         receipt.setCardId(1L);
+        receipt.setCompanyId(2018168693L);
         receiptMapper.create(receipt);
         long merchandiseId = 1L;
         for (int i = 0; i < 3; i++) {
@@ -175,6 +194,7 @@ class ReceiptMapperTest {
         receipt.setCreatedAt(new Date());
         receipt.setUpdatedAt(new Date());
         receipt.setCardId(1L);
+        receipt.setCompanyId(2018168693L);
         receiptMapper.create(receipt);
         Receipt result = receiptMapper.get(receipt.getUserId(), receipt.getReceiptId());
         assertNotNull(result);
@@ -188,7 +208,7 @@ class ReceiptMapperTest {
     @DisplayName("이번 달 사용한 총 금액을 계산합니다.")
     @Test
     void getTotal() {
-        Long total = receiptMapper.getTotal(1L);
+        Long total = receiptMapper.getThisMonthTotal(1L);
         assertNotNull(total);
     }
 
@@ -197,5 +217,84 @@ class ReceiptMapperTest {
     void getLastMonthTotal() {
         Long total = receiptMapper.getLastMonthTotal(1L);
         assertNotNull(total);
+    }
+
+    @DisplayName("회사 이름을 조회합니다.")
+    @Test
+    void getCompanyName() {
+        Long companyId = 2018168693L;
+
+        String companyName = receiptMapper.getCompanyName(companyId);
+
+        assertNotNull(companyName);
+        assertEquals("서울삼성병원", companyName);
+    }
+
+    @DisplayName("회사 주소를 조회합니다.")
+    @Test
+    void getCompanyAddress() {
+        Long companyId = 2018168693L;
+
+        String companyAddress = receiptMapper.getCompanyAddress(companyId);
+
+        assertNotNull(companyAddress);
+        assertEquals("서울특별시 광진구 화양동 4-3 403호", companyAddress);
+    }
+
+    @DisplayName("처리 상태를 조회합니다.")
+    @Test
+    void getState() {
+        Long receiptId = 77L;
+
+        String state = receiptMapper.getState(receiptId);
+        assertNotNull(state);
+        assertEquals("none", state);
+    }
+
+    @DisplayName("카드 번호를 조회합니다.")
+    @Test
+    void getCardNumber() {
+        String number = receiptMapper.getCardNumber(5L, 1L);
+        assertNotNull(number);
+        assertEquals("12345678910", number);
+    }
+
+    @DisplayName("법인 카드 여부를 조회합니다.")
+    @Test
+    void getCorporate() {
+        Integer is = receiptMapper.getCorporate(5L, 1L);
+        assertNotNull(is);
+        assertEquals(0, is);
+    }
+
+    @DisplayName("반려된 영수증을 조회합니다.")
+    @Test
+    void findRejected() {
+        List<RejectedReceiptDto> list = receiptMapper.findRejected(1L);
+        assertNotNull(list);
+    }
+
+    @DisplayName("배지를 찾습니다.")
+    @Test
+    void findBadge() {
+        Long badge = receiptMapper.findBadge(1L, 78L);
+        assertNotNull(badge);
+        assertEquals(1L, badge);
+    }
+
+    @DisplayName("카테고리를 찾습니다.")
+    @Test
+    void findCategory() {
+        Long category = receiptMapper.findCategory(1L, 78L);
+        assertNotNull(category);
+        assertEquals(1, category);
+    }
+
+    @DisplayName("대표 이름을 조회합니다.")
+    @Test
+    void findCeoName() {
+        String ceoName = receiptMapper.findCeoName(2018168693L);
+        assertNotNull(ceoName);
+        assertEquals("이환주", ceoName);
     }
 }

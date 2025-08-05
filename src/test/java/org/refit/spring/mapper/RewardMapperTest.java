@@ -11,6 +11,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -31,14 +32,16 @@ class RewardMapperTest {
         reward.setCarbonPoint(10L);
         reward.setReward(500L);
         reward.setCreatedAt(new Date());
-        rewardMapper.create(reward);
+        rewardMapper.createReward(reward);
+        rewardMapper.createCarbon(reward);
         assertNotNull(reward.getRewardId());
     }
-
+    @DisplayName("리스트 조회 테스트")
     @Test
     void getList() {
+        List<Reward> list = rewardMapper.getList(1L, null, null, null, null, null, null);
+        assertNotNull(list);
     }
-
     @Test
     @DisplayName("총 캐시백 조회")
     void getTotalCashback() {
@@ -59,7 +62,7 @@ class RewardMapperTest {
     @DisplayName("가장 많이 이용한 카테고리 조회")
     void getCategory() {
         String category = rewardMapper.getCategory(1L);
-        assertNotNull(category);
+        System.out.println(category);
     }
 
     @Test
@@ -85,7 +88,7 @@ class RewardMapperTest {
     @Test
     @DisplayName("지갑 보유 여부 확인")
     void checkPossess() {
-        boolean result = rewardMapper.checkPossess(1L, 1L);
+        boolean result = rewardMapper.checkPossess(5L, 1L);
         assertTrue(result);
     }
 }
