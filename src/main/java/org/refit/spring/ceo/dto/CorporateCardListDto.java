@@ -25,6 +25,8 @@ public class CorporateCardListDto {
     private String processState;
     @ApiModelProperty(value = "법인카드 여부", example = "true")
     private boolean corporate;
+    @ApiModelProperty(value = "커서 ID", example = "3")
+    private Long cursorId;
 
     public static CorporateCardListDto of(CorporateCardList vo) {
         CorporateCardListDto CorporateCardList = CorporateCardListDto.builder()
@@ -34,6 +36,7 @@ public class CorporateCardListDto {
                 .createdAt(vo.getCreatedAt())
                 .processState(vo.getProcessState())
                 .corporate(vo.isCorporate())
+                .cursorId(vo.getReceiptId())
                 .build();
 
         return CorporateCardList;

@@ -26,6 +26,8 @@ public class ReceiptDto {
     private String createdAt;
     @ApiModelProperty(value = "영수 처리 상태", example = "none")
     private String processState;
+    @ApiModelProperty(value = "커서 ID", example = "3")
+    private Long cursorId;
 
     public static ReceiptDto of(Ceo vo) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -39,6 +41,7 @@ public class ReceiptDto {
                                 ? vo.getCreatedAt().format(formatter)
                                 : null)
                 .processState(vo.getProcessState())
+                .cursorId(vo.getReceiptId())
                 .build();
 
         return ceo;

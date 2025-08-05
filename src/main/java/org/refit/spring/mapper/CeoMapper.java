@@ -90,10 +90,6 @@ public interface CeoMapper {
     ReceiptProcessApplicantDto getReceiptProcessDetail(
             @Param("receiptId") Long receiptId,
             @Param("userId") Long userId);
-    
-    // 영수증 내역 상세 조회
-//    @Select("SELECT * FROM receipt WHERE user_id = #{userId} AND receipt_id = #{receiptId}")
-//    Receipt get(@Param("userId") Long userId, @Param("receiptId") Long receiptId);
 
     // 구매항목 상세 조회
     @Select("SELECT rc.merchandise_id, m.merchandise_name, m.merchandise_price, rc.amount " +

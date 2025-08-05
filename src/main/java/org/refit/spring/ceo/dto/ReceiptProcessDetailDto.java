@@ -15,8 +15,8 @@ import org.refit.spring.receipt.dto.ReceiptDetailDto;
 @ApiModel(description = "경비 처리 상세 정보 DTO")
 public class ReceiptProcessDetailDto {
     @ApiModelProperty(value = "영수증 상세 정보")
-    private ReceiptDetailDto receiptDetail;
+    private ReceiptDetailDto ReceiptDetail;
 
     @ApiModelProperty(value = "영수처리 신청자 상세 정보")
-    private ReceiptProcessApplicantDto receiptInfo;
+    private ReceiptProcessApplicantDto ReceiptProcessApplicant;
 }

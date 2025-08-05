@@ -78,7 +78,7 @@ public class CeoController {
 
         Map<String, Object> result = new HashMap<>();
         result.put("list", list);
-        result.put("nextCursorId", nextCursorId);
+        result.put("cursorId", nextCursorId);
 
         return ResponseEntity.ok(result);
     }
@@ -150,7 +150,7 @@ public class CeoController {
 
         Map<String, Object> result = new HashMap<>();
         result.put("list", list);
-        result.put("nextCursorId", nextCursorId);
+        result.put("cursorId", nextCursorId);
 
         return ResponseEntity.ok(result);
     }
