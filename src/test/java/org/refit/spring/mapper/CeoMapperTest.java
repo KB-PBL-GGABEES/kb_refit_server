@@ -125,7 +125,7 @@ class CeoMapperTest {
         String rejectedReason = "반려 사유";
         Long userId = 1L;
 
-        ceoMapper.updateProcessState(receiptProcessId, processState, rejectedReason, userId);
+        ceoMapper.updateProcessState(receiptProcessId, processState, rejectedReason);
         log.info("updateProcessState - 실행 결과 : processState = " + processState);
     }
 
