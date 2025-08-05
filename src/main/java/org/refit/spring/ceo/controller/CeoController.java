@@ -105,7 +105,7 @@ public class CeoController {
             @RequestBody ReceiptProcessingRequestDto request
     ) {
         ReceiptProcessDto result = ceoService.receiptProcessing(
-                request.getReceiptId(),
+                request.getReceiptProcessId(),
                 request.getProgressState(),
                 request.getRejectedReason()
         );
