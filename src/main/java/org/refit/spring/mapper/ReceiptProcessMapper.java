@@ -38,20 +38,24 @@ public interface ReceiptProcessMapper {
 
 
     // 영수 처리 요청
+    @Select("SELECT ceo_id AS ceoId FROM company WHERE company_id = #{companyId}")
+    Long ceoIdByCompanyId(@Param("companyId") Long companyId);
+
     @Insert("INSERT INTO receipt_process (process_state, ceo_id, progress_type, progress_detail, voucher, receipt_id, created_at, updated_at) " +
-            "VALUES ('inProgress', #{ceoId}, #{progressType}, #{progressDetail}, #{voucher}, #{receiptId}, NOW(), NOW())")
+            "VALUES ('inProgress', #{ceoId}, #{progressType}, #{progressDetail}, #{fileName}, #{receiptId}, NOW(), NOW())")
     void insertReceiptProcess(
             @Param("ceoId") Long ceoId,
             @Param("progressType") String progressType,
             @Param("progressDetail") String progressDetail,
-            @Param("voucher") String voucher,
+            @Param("fileName") String fileName,
             @Param("receiptId") Long receiptId
     );
     // UPDATE (등록 내용 전체 갱신용)
     @Update("UPDATE receipt_process " +
             "SET progress_type = #{progressType}, " +
+            "ceo_id = #{ceoId}, " +
             "progress_detail = #{progressDetail}, " +
-            "voucher = #{voucher}, " +
+            "voucher = #{fileName}, " +
             "updated_at = NOW() " +
             "WHERE receipt_id = #{receiptId}")
     void updateReceiptProcess(ReceiptProcessRequestDto dto);
