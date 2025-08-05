@@ -10,8 +10,6 @@ import org.refit.spring.ceo.enums.ProcessState;
 import org.refit.spring.ceo.enums.RejectState;
 import org.refit.spring.ceo.enums.Sort;
 import org.refit.spring.receipt.dto.ReceiptContentDetailDto;
-import org.refit.spring.receipt.dto.ReceiptDetailDto;
-import org.refit.spring.receipt.entity.Receipt;
 
 import java.util.Date;
 import java.util.List;
@@ -90,10 +88,6 @@ public interface CeoMapper {
     ReceiptProcessApplicantDto getReceiptProcessDetail(
             @Param("receiptId") Long receiptId,
             @Param("userId") Long userId);
-    
-    // 영수증 내역 상세 조회
-//    @Select("SELECT * FROM receipt WHERE user_id = #{userId} AND receipt_id = #{receiptId}")
-//    Receipt get(@Param("userId") Long userId, @Param("receiptId") Long receiptId);
 
     // 구매항목 상세 조회
     @Select("SELECT rc.merchandise_id, m.merchandise_name, m.merchandise_price, rc.amount " +
