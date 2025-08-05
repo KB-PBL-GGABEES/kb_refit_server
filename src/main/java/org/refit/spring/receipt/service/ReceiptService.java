@@ -45,7 +45,7 @@ public class ReceiptService {
         updatePrice(receipt);
         receipt.setContentList(list);
         receiptMapper.update(userId, receipt);
-        Long category = receiptMapper.findCaterogy(userId, receipt.getReceiptId());
+        Long category = receiptMapper.findCategory(userId, receipt.getReceiptId());
         if (category == 1) hospitalMapper.insertEmptyHospitalProcess(receipt.getReceiptId());
         else ceoMapper.insertProcess(null, userId, receipt.getReceiptId());
 

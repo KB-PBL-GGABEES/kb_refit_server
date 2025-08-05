@@ -29,24 +29,24 @@ class RewardServiceTest {
     @DisplayName("리워드 생성 테스트")
     @Test
     void create() {
-        Reward result = service.create(100L, 10000L, 1L);
+        Reward result = service.create(100L, 10000L, 5L, 78L);
 
         assertEquals(100L, (long) result.getCarbonPoint());
         assertEquals( 10000L * 0.05, (long) result.getReward());
-        assertEquals(1L, result.getUserId());
+        assertEquals(5L, result.getUserId());
         assertNotNull(result.getCreatedAt());
     }
 
     @DisplayName("리워드 목록 조회 테스트")
     @Test
     void getList() {
-        RewardListDto dto = service.getList(1L, null);
+        RewardListDto dto = service.getList(5L, null, null, null, null, null, null);
         assertNotNull(dto);
-        assertEquals(1L, dto.getUserId());
+        assertEquals(5L, dto.getUserId());
         List<Reward> list = dto.getRewardList();
         assertNotNull(list);
         if (!list.isEmpty()) {
-            assertTrue(list.get(0).getUserId().equals(1L));
+            assertTrue(list.get(0).getUserId().equals(5L));
         }
     }
 

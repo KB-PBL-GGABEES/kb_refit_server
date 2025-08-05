@@ -39,9 +39,8 @@ class ReceiptServiceTest {
     @DisplayName("구매 영수증 목록 조회 테스트")
     @Test
     void getList() {
-        Long userId = 1L;
-        Long cursorId = null;
-        ReceiptListDto listDto = service.getList(userId, cursorId);
+        Long userId = 5L;
+        ReceiptListDto listDto = service.getFilteredList(userId, null, null, null, null, null, null, null);
         log.info(listDto.getReceiptList());
         log.info(listDto.getNextCursorId());
     }
@@ -51,7 +50,7 @@ class ReceiptServiceTest {
     void get() {
         Long receiptId = 8L;
         Long cursorId = null;
-        ReceiptDetailDto receipt = service.get(1L, cursorId, receiptId);
+        ReceiptDetailDto receipt = service.get(5L, cursorId, receiptId);
         log.info(receipt.getReceiptId());
         log.info(receipt.getTotalPrice());
         for (ReceiptContentDetailDto contentDto: receipt.getReceiptContents()) {
@@ -66,8 +65,8 @@ class ReceiptServiceTest {
     void getTotal() {
         Long userId = 1L;
         MonthlyExpenseDto dto = service.getTotal(userId);
-        log.info(dto.getTotal());
-        log.info(dto.getLastMonth());
+        log.info(dto.getLastMonthExpense());
+        log.info(dto.getThisMonthExpense());
     }
 
     @DisplayName("영수증 환불 테스트")
@@ -102,8 +101,20 @@ class ReceiptServiceTest {
     @DisplayName("처리 거절된 영수증 목록 조회")
     @Test
     void getRejected() {
-        Long userId = 1L;
-        RejectedReceiptDto result = service.getRejected(userId);
-        log.info(result.getList());
+        Long userId = 5L;
+        RejectedReceiptListDto result = service.getRejected(userId);
+        log.info(result.getRejectedList());
+    }
+
+    @DisplayName("배지 조건 확인 후 획득 처리")
+    @Test
+    void checkAndInsertBadge() {
+        try {
+            service.checkAndInsertBadge(5L, 78L);
+            log.info("성공");
+        }
+        catch (Exception e) {
+            log.info("실패");
+        }
     }
 }
