@@ -86,7 +86,7 @@ class CeoMapperTest {
         Long userId = 1L;
         Long receiptId = 1L;
 
-        ReceiptProcessApplicantDto dto = ceoMapper.getReceiptProcessDetail(userId, receiptId);
+        ReceiptProcessApplicantDto dto = ceoMapper.getReceiptProcessDetail(receiptId);
 
         if(dto != null) {
             log.info("getReceiptList - 조회 결과\n" + dto);
