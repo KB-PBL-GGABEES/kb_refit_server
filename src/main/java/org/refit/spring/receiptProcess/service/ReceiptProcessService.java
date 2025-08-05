@@ -6,20 +6,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.*;
 import org.refit.spring.mapper.ReceiptProcessMapper;
 import org.refit.spring.receiptProcess.dto.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.*;
 
 @Slf4j
@@ -126,7 +120,11 @@ public class ReceiptProcessService {
 
     // 사업장 선택 조회
     public List<ReceiptSelectDto> getCompanySelectionListByUserId(Long userId) {
-        return receiptProcessMapper.findCompanySelectionListByUserId(userId);
+        List<ReceiptSelectDto> companyList =  receiptProcessMapper.findCompanySelectionListByUserId(userId);
+        if(companyList.isEmpty()){
+            throw new NoSuchElementException("");
+        }
+        return companyList;
     }
 
     // 영수 처리 정보 조회
