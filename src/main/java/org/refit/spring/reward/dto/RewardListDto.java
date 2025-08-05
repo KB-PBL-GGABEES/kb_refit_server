@@ -1,6 +1,5 @@
 package org.refit.spring.reward.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.refit.spring.reward.entity.Reward;
