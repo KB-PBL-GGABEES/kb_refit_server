@@ -11,7 +11,7 @@ import java.util.List;
 public interface ReceiptProcessMapper {
 
     // 사업장 선택 조회
-    @Select("SELECT c.company_name AS companyName, e.start_date AS startDate, e.end_date AS endDate " +
+    @Select("SELECT c.company_id AS companyId, c.company_name AS companyName, e.start_date AS startDate, e.end_date AS endDate " +
             "FROM employee e " +
             "JOIN company c ON e.company_id = c.company_id " +
             "WHERE e.user_id = #{userId}")
