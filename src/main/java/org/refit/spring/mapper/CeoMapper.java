@@ -28,14 +28,16 @@ public interface CeoMapper {
     // 경비 처리가 필요한 내역 조회
     @Select("SELECT\n" +
             "            r.receipt_id,\n" +
-            "            c.company_name,\n" +
+            "            cp.company_name,\n" +
             "            r.created_at,\n" +
             "            r.total_price,\n" +
             "            p.process_state\n" +
             "        FROM receipt r\n" +
-            "            JOIN company c ON r.company_id = c.company_id\n" +
+            "            JOIN company cp ON r.company_id = cp.company_id\n" +
             "            JOIN receipt_process p ON r.receipt_id = p.receipt_id\n" +
+            "            JOIN card c ON r.card_id = c.card_id\n" +
             "WHERE p.process_state = 'inProgress'\n" +
+            "AND c.is_corporate = FALSE\n" +
             "  AND EXISTS (\n" +
             "    SELECT 1 FROM employee e\n" +
             "    WHERE e.user_id = r.user_id\n" +
@@ -48,7 +50,9 @@ public interface CeoMapper {
     @Select("SELECT COUNT(*) " +
             "FROM receipt r " +
             "JOIN receipt_process p ON r.receipt_id = p.receipt_id " +
+            "JOIN card c ON r.card_id = c.card_id\n" +
             "WHERE p.process_state = 'inProgress'\n" +
+            "AND c.is_corporate = FALSE\n" +
             "  AND EXISTS (\n" +
             "    SELECT 1 FROM employee e\n" +
             "    WHERE e.user_id = r.user_id\n" +
@@ -60,7 +64,9 @@ public interface CeoMapper {
     @Select("SELECT COUNT(*) " +
             "FROM receipt r " +
             "JOIN receipt_process p ON r.receipt_id = p.receipt_id " +
+            "JOIN card c ON r.card_id = c.card_id\n" +
             "WHERE p.process_state IN ('accepted', 'rejected')\n" +
+            "AND c.is_corporate = FALSE\n" +
             "  AND MONTH(r.created_at) = MONTH(CURDATE())\n" +
             "  AND YEAR(r.created_at) = YEAR(CURDATE())\n" +
             "  AND EXISTS (\n" +
@@ -129,7 +135,9 @@ public interface CeoMapper {
     @Select("SELECT COUNT(*)\n" +
             "FROM receipt r\n" +
             "JOIN receipt_process p ON r.receipt_id = p.receipt_id\n" +
+            "JOIN card c ON r.card_id = c.card_id\n" +
             "WHERE p.process_state IN ('accepted', 'rejected')\n" +
+            "AND c.is_corporate = FALSE\n" +
             "  AND EXISTS (\n" +
             "    SELECT 1 FROM employee e\n" +
             "    WHERE e.user_id = r.user_id\n" +
@@ -141,7 +149,6 @@ public interface CeoMapper {
     // 영수 처리 승인 및 반려
     @Select("SELECT receipt_id FROM receipt_process WHERE receipt_process_id = #{receiptProcessId}")
     Long getReceiptProcessId(@Param("receiptProcessId") Long receiptProcessId);
-
 
     @Update("UPDATE receipt_process\n" +
             "SET process_state = #{progressState},\n" +
@@ -159,6 +166,7 @@ public interface CeoMapper {
             "JOIN employee e ON r.user_id = e.user_id " +
             "JOIN employee emp ON emp.company_id = e.company_id " +
             "WHERE c.is_corporate = TRUE " +
+            "AND c.is_corporate = TRUE " +
             "AND emp.user_id = #{ceoId} " +
             "AND MONTH(r.created_at) = MONTH(CURDATE()) " +
             "AND YEAR(r.created_at) = YEAR(CURDATE())")
@@ -171,6 +179,7 @@ public interface CeoMapper {
             "JOIN employee e ON r.user_id = e.user_id " +
             "JOIN employee emp ON emp.company_id = e.company_id " +
             "WHERE c.is_corporate = TRUE " +
+            "AND c.is_corporate = TRUE " +
             "AND emp.user_id = #{ceoId} " +
             "AND MONTH(r.created_at) = MONTH(DATE_SUB(CURDATE(), INTERVAL 1 MONTH)) " +
             "AND YEAR(r.created_at) = YEAR(DATE_SUB(CURDATE(), INTERVAL 1 MONTH))")

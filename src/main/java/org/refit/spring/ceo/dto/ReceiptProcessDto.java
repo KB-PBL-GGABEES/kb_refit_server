@@ -17,8 +17,6 @@ public class ReceiptProcessDto {
     private String message;
     @ApiModelProperty(value = "처리 상태", example = "accepted")
     private String processStatus;
-    @ApiModelProperty(value = "영수처리 ID", example = "1")
-    private Long receiptProcessId;
     @ApiModelProperty(value = "영수증 ID", example = "1")
     private Long receiptId;
 }

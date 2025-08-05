@@ -86,7 +86,6 @@ public class CeoServiceImpl implements CeoService {
         return ReceiptProcessDto.builder()
                 .message("영수 처리 완료")
                 .processStatus(progressState)
-                .receiptProcessId(receiptProcessId)
                 .receiptId(receiptId)
                 .build();
     }
