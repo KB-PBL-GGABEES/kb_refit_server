@@ -23,7 +23,7 @@ public interface CeoService {
     EmailSendDto sendEmail(String email, Long userId);
 
     // 영수 처리 승인 및 반려
-    ReceiptProcessDto receiptProcessing(Long receiptId, String progressState, String rejectedReason);
+    ReceiptProcessDto receiptProcessing(Long receiptProcessId, String progressState, String rejectedReason);
 
     // 한달 법카 금액 조회
     CorporateCardTotalPriceDto getCorporateCardTotalPrice(Long userId);

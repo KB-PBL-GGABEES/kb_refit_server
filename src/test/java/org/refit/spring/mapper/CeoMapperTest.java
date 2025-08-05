@@ -67,7 +67,7 @@ class CeoMapperTest {
             log.info("getPendingReceipts - 리스트가 비어 있음");
         } else {
             log.info("getPendingReceipts - 조회 결과 : " + list.size() + "건");
-//            list.forEach(dto -> log.info(dto));
+            list.forEach(dto -> log.info(dto));
         }
     }
 
@@ -83,7 +83,6 @@ class CeoMapperTest {
     @Test
     @DisplayName("getReceiptList - 경비 청구 항목 상세 조회")
     void getReceiptProcessDetail() {
-        Long userId = 1L;
         Long receiptId = 1L;
 
         ReceiptProcessApplicantDto dto = ceoMapper.getReceiptProcessDetail(receiptId);
@@ -111,7 +110,7 @@ class CeoMapperTest {
             log.info("getCompleteReceipts - 조회 결과 : 0건 (빈 리스트)");
         } else {
             log.info("getCompleteReceipts - 조회 결과 : " + list.size() + "건");
-//            list.forEach(dto -> log.info(dto));
+            list.forEach(dto -> log.info(dto));
         }
     }
 
@@ -123,7 +122,6 @@ class CeoMapperTest {
         Long receiptProcessId = 1L;
         String processState = "rejected";
         String rejectedReason = "반려 사유";
-        Long userId = 1L;
 
         ceoMapper.updateProcessState(receiptProcessId, processState, rejectedReason);
         log.info("updateProcessState - 실행 결과 : processState = " + processState);
@@ -171,7 +169,7 @@ class CeoMapperTest {
             log.info("getCorporateCardReceipts - 조회 결과 : 0건 (빈 리스트)");
         } else {
             log.info("getCorporateCardReceipts - 조회 결과 : " + list.size() + "건");
-//            list.forEach(dto -> log.info(dto));
+            list.forEach(dto -> log.info(dto));
         }
     }
 }

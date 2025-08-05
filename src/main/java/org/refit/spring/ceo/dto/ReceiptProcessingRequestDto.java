@@ -9,7 +9,7 @@ import lombok.Data;
 public class ReceiptProcessingRequestDto {
 
     @ApiModelProperty(value = "영수증 ID", required = true, example = "1")
-    private Long receiptId;
+    private Long receiptProcessId;
 
     @ApiModelProperty(value = "처리 상태", required = true, example = "accepted")
     private String progressState;
