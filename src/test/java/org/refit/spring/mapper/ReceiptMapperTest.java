@@ -33,17 +33,6 @@ class ReceiptMapperTest {
     @Autowired
     private ReceiptMapper receiptMapper;
 
-//    @BeforeEach
-//    void setUp() {
-//        Company company = new Company();
-//        company.setCompanyId(2018168693L);
-//        company.setCompanyName("집");
-//
-//        Card card = new Card();
-//        card.setCardId(1L);
-//        card.setCardNumber("테스트 카드");
-//    }
-
     @DisplayName("새로운 영수증을 생성합니다.")
     @Test
     void create() {
