@@ -18,11 +18,10 @@ public interface ReceiptProcessMapper {
     List<ReceiptSelectDto> findCompanySelectionListByUserId(@Param("userId") Long userId);
 
     // 영수 처리 정보 조회
-    @Select("SELECT c.company_name AS companyName, c.address AS address " +
-            "FROM receipt r " +
-            "JOIN company c ON r.company_id = c.company_id " +
-            "WHERE r.receipt_id = #{receiptId}")
-    ReceiptProcessCheckDto findCompanyInfoByReceiptId(@Param("receiptId") Long receiptId);
+    @Select("SELECT c.company_id AS companyId, c.company_name AS companyName, c.address AS address " +
+            "FROM company c " +
+            "WHERE c.company_id = #{companyId}")
+    ReceiptProcessCheckDto findCompanyInfoByReceiptId(@Param("companyId") Long companyId);
 
 
 
