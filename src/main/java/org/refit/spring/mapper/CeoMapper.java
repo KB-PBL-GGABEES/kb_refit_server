@@ -10,6 +10,7 @@ import org.refit.spring.ceo.enums.ProcessState;
 import org.refit.spring.ceo.enums.RejectState;
 import org.refit.spring.ceo.enums.Sort;
 import org.refit.spring.receipt.dto.ReceiptContentDetailDto;
+import org.refit.spring.ceo.dto.ReceiptDetailDto;
 
 import java.util.Date;
 import java.util.List;
@@ -82,6 +83,30 @@ public interface CeoMapper {
             "WHERE r.receipt_id = #{receiptId}")
     ReceiptProcessApplicantDto getReceiptProcessDetail(@Param("receiptId") Long receiptId);
 
+    // 영수증 상세 내역 조회
+    @Select("SELECT\n" +
+            "  r.user_id,\n" +
+            "  r.receipt_id,\n" +
+            "  r.company_id,\n" +
+            "  c.company_name,\n" +
+            "  c.ceo_name,\n" +
+            "  c.address,\n" +
+            "  r.total_price,\n" +
+            "  r.supply_price,\n" +
+            "  r.surtax,\n" +
+            "  r.transaction_type,\n" +
+            "  r.created_at,\n" +
+            "  IFNULL(p.process_state, 'none') AS process_state,\n" +
+            "  cr.card_number,\n" +
+            "  cr.is_corporate,\n" +
+            "  IFNULL(p.rejected_reason, '') AS rejected_reason\n" +
+            "FROM receipt r\n" +
+            "JOIN company c ON r.company_id = c.company_id\n" +
+            "JOIN card cr ON r.card_id = cr.card_id\n" +
+            "LEFT JOIN receipt_process p ON r.receipt_id = p.receipt_id\n" +
+            "WHERE r.receipt_id = #{receiptId}")
+    ReceiptDetailDto getReceiptDetailByReceiptId(@Param("receiptId") Long receiptId);
+
     // 구매항목 상세 조회
     @Select("SELECT rc.merchandise_id, m.merchandise_name, m.merchandise_price, rc.amount " +
             "FROM receipt_content rc " +
@@ -114,6 +139,10 @@ public interface CeoMapper {
     );
 
     // 영수 처리 승인 및 반려
+    @Select("SELECT receipt_id FROM receipt_process WHERE receipt_process_id = #{receiptProcessId}")
+    Long getReceiptProcessId(@Param("receiptProcessId") Long receiptProcessId);
+
+
     @Update("UPDATE receipt_process\n" +
             "SET process_state = #{progressState},\n" +
             "rejected_reason = #{rejectedReason},\n" +
@@ -121,8 +150,7 @@ public interface CeoMapper {
             "WHERE receipt_process_id = #{receiptProcessId}")
     void updateProcessState(@Param("receiptProcessId") Long receiptProcessId,
                             @Param("progressState") String progressState,
-                            @Param("rejectedReason") String rejectedReason,
-                            @Param("userId") Long userId);
+                            @Param("rejectedReason") String rejectedReason);
 
     // 이번 달 법카 사용 금액 조회
     @Select("SELECT SUM(r.total_price) AS totalPrice " +

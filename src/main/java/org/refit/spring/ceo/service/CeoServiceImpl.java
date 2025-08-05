@@ -7,14 +7,9 @@ import org.refit.spring.ceo.enums.ProcessState;
 import org.refit.spring.ceo.enums.RejectState;
 import org.refit.spring.ceo.enums.Sort;
 import org.refit.spring.mapper.CeoMapper;
-import org.refit.spring.mapper.MerchandiseMapper;
 import org.refit.spring.mapper.ReceiptMapper;
-import org.refit.spring.mapper.ReceiptProcessMapper;
-import org.refit.spring.merchandise.entity.Merchandise;
 import org.refit.spring.receipt.dto.ReceiptContentDetailDto;
-import org.refit.spring.receipt.dto.ReceiptDetailDto;
-import org.refit.spring.receipt.entity.Receipt;
-import org.refit.spring.receipt.entity.ReceiptContent;
+import org.refit.spring.ceo.dto.ReceiptDetailDto;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -26,8 +21,7 @@ import java.util.stream.Collectors;
 public class CeoServiceImpl implements CeoService {
     private final CeoMapper ceoMapper;
     private final ReceiptMapper receiptMapper;
-    private final MerchandiseMapper merchandiseMapper;
-    private final ReceiptProcessMapper receiptProcessMapper;
+
 
     // 경비 처리가 필요한 내역 조회
     @Override
@@ -45,66 +39,16 @@ public class CeoServiceImpl implements CeoService {
 
     // 경비 청구 항목 상세 조회
     @Override
-    public ReceiptProcessDetailDto getReceiptList(Long userId, Long receiptId) {
-        // 영수증 조회
-        Receipt receipt = receiptMapper.get(userId, receiptId);
-        if (receipt == null) throw new NoSuchElementException("영수증 없음");
+    public ReceiptProcessDetailDto getReceiptList(Long receiptId) {
+        ReceiptDetailDto detail = ceoMapper.getReceiptDetailByReceiptId(receiptId);
+        if (detail == null) throw new NoSuchElementException("영수증 없음");
 
-        List<ReceiptContent> contents = receiptMapper.findContentsByReceiptId(userId, receiptId);
-        List<ReceiptContentDetailDto> contentDtoList = new ArrayList<>();
-        for (ReceiptContent content: contents) {
-            Merchandise merchandise = merchandiseMapper.findByMerchandiseId(content.getMerchandiseId());
-            ReceiptContentDetailDto dto = new ReceiptContentDetailDto();
-            dto.setMerchandiseId(merchandise.getMerchandiseId());
-            dto.setMerchandiseName(merchandise.getMerchandiseName());
-            dto.setMerchandisePrice(merchandise.getMerchandisePrice());
-            dto.setAmount(content.getAmount());
-            contentDtoList.add(dto);
-        }
+        List<ReceiptContentDetailDto> contentList = ceoMapper.getReceiptContents(receiptId);
+        detail.setReceiptContents(contentList);
 
-        ReceiptDetailDto detail = new ReceiptDetailDto(
-                receipt.getUserId(),
-                receipt.getReceiptId(),
-                receipt.getCompanyId(),
-                receiptMapper.getCompanyName(receipt.getCompanyId()),
-                receiptMapper.findCeoName(receipt.getCompanyId()),
-                receiptMapper.getCompanyAddress(receipt.getCompanyId()),
-                contentDtoList,
-                receipt.getTotalPrice(),
-                receipt.getSupplyPrice(),
-                receipt.getSurtax(),
-                receipt.getTransactionType(),
-                receipt.getCreatedAt(),
-                Optional.ofNullable(receiptMapper.getState(receiptId)).orElse("none"),
-                receiptMapper.getCardNumber(userId, receipt.getCardId()),
-                Optional.ofNullable(receiptMapper.getCorporate(userId, receipt.getCardId())).orElse(0),
-                Optional.ofNullable(receiptProcessMapper.findReason(receiptId)).orElse(""));
+        ReceiptProcessApplicantDto applicant = ceoMapper.getReceiptProcessDetail(receiptId);
 
-        detail.setUserId(receipt.getUserId());
-        detail.setReceiptId(receipt.getReceiptId());
-        detail.setCompanyId(receipt.getCompanyId());
-        detail.setCompanyName(receiptMapper.getCompanyName(receipt.getCompanyId()));
-        detail.setCeoName(receiptMapper.findCeoName(receipt.getCompanyId()));
-        detail.setAddress(receiptMapper.getCompanyAddress(receipt.getCompanyId()));
-        detail.setReceiptContents(contentDtoList);
-        detail.setTotalPrice(receipt.getTotalPrice());
-        detail.setSupplyPrice(receipt.getSupplyPrice());
-        detail.setSurtax(receipt.getSurtax());
-        detail.setTransactionType(receipt.getTransactionType());
-        detail.setCreatedAt(receipt.getCreatedAt());
-        detail.setProcessState(receiptMapper.getState(receiptId));
-        detail.setCardNumber(receiptMapper.getCardNumber(userId, receipt.getCardId()));
-        detail.setIsCorporate(receiptMapper.getCorporate(userId, receipt.getCardId()));
-        detail.setRejectedReason(receiptProcessMapper.findReason(receiptId));
-
-        // 중복 조회 예외 처리
-        ReceiptProcessApplicantDto info;
-        try {
-            info = ceoMapper.getReceiptProcessDetail(receiptId);
-        } catch (org.apache.ibatis.exceptions.TooManyResultsException e) {
-            throw new IllegalStateException("중복된 영수 처리 정보가 존재합니다. DB 무결성을 확인해주세요.");
-        }
-        return new ReceiptProcessDetailDto(detail, info);
+        return new ReceiptProcessDetailDto(detail, applicant);
     }
 
     // 경비 처리 완료 내역 조회
@@ -134,11 +78,16 @@ public class CeoServiceImpl implements CeoService {
 
     // 영수 처리 승인 및 반려
     @Override
-    public ReceiptProcessDto receiptProcessing(Long receiptProcessId, String progressState, String rejectedReason, Long userId) {
-        ceoMapper.updateProcessState(receiptProcessId, progressState, rejectedReason, userId);
+    public ReceiptProcessDto receiptProcessing(Long receiptProcessId, String progressState, String rejectedReason) {
+        ceoMapper.updateProcessState(receiptProcessId, progressState, rejectedReason);
+
+        Long receiptId = ceoMapper.getReceiptProcessId(receiptProcessId); // 새로 Mapper로 만듦
+
         return ReceiptProcessDto.builder()
                 .message("영수 처리 완료")
                 .processStatus(progressState)
+                .receiptProcessId(receiptProcessId)
+                .receiptId(receiptId)
                 .build();
     }
 

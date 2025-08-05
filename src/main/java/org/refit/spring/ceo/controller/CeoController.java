@@ -13,7 +13,6 @@ import org.refit.spring.ceo.enums.ProcessState;
 import org.refit.spring.ceo.enums.RejectState;
 import org.refit.spring.ceo.enums.Sort;
 import org.refit.spring.ceo.service.CeoService;
-import org.refit.spring.ceo.dto.ReceiptProcessApplicantDto;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -51,9 +50,8 @@ public class CeoController {
             @ApiResponse(code = 500, message = "서버 내부 오류")
     })
     public ResponseEntity<ReceiptProcessDetailDto> getReceiptList(
-            @ApiIgnore @UserId Long userId,
             @RequestParam Long receiptId) {
-        return ResponseEntity.ok(ceoService.getReceiptList(userId, receiptId));
+        return ResponseEntity.ok(ceoService.getReceiptList(receiptId));
     }
 
     @ApiOperation(value = "경비 처리 완료 내역 조회", notes = "경비 처리가 완료된(승인/반려) 내역을 가져옵니다.")
@@ -96,25 +94,24 @@ public class CeoController {
         return ResponseEntity.ok(ceoService.sendEmail(request.getEmail(), userId));
     }
 
-    @ApiOperation(value = "영수 처리 승인 및 반려 / 법카 영수 반려", notes = "process_state 를 승인(accepted) 또는 반려(rejected)로 반영(Update)합니다.")
     @PatchMapping("/receiptProcessing")
+    @ApiOperation(value = "영수 처리 승인 및 반려 / 법카 영수 반려", notes = "process_state 를 승인(accepted) 또는 반려(rejected)로 반영합니다.")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "영수 처리 승인 및 반려 / 법카 영수 반려 성공"),
+            @ApiResponse(code = 200, message = "영수 처리 성공"),
             @ApiResponse(code = 400, message = "잘못된 요청"),
             @ApiResponse(code = 500, message = "서버 내부 오류")
     })
     public ResponseEntity<ReceiptProcessDto> receiptProcess(
-            @RequestBody Map<String, Object> requestBody,
-            @ApiIgnore @UserId Long userId
+            @RequestBody ReceiptProcessingRequestDto request
     ) {
-        Long receiptProcessId = Long.valueOf(requestBody.get("receiptProcessId").toString());
-        String progressState = requestBody.get("progressState").toString();
-        String rejectedReason = requestBody.get("rejectedReason") != null ? requestBody.get("rejectedReason").toString() : null;
-
-        return ResponseEntity.ok(
-                ceoService.receiptProcessing(receiptProcessId, progressState, rejectedReason, userId)
+        ReceiptProcessDto result = ceoService.receiptProcessing(
+                request.getReceiptProcessId(),
+                request.getProgressState(),
+                request.getRejectedReason()
         );
+        return ResponseEntity.ok(result);
     }
+
 
     @ApiOperation(value = "한달 법카 금액 조회", notes = "법카의 이번 달 사용액과 지난달 사용액을 가져옵니다.")
     @GetMapping("/corporateCardCost")

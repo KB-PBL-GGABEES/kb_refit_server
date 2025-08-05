@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReceiptList {
-    private Long userid;            // 사장님
+    private Long userId;            // 사장님
     private String name;            // 사장님 이름
     private String documentType;    // 경비 처리 항목
     private String documentDetail;  // 세부 내용

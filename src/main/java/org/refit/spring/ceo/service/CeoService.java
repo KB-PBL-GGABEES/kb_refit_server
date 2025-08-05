@@ -14,7 +14,7 @@ public interface CeoService {
     PendingDetailDto getPendingDetail(Long userId);
 
     // 경비 청구 항목 상세 조회
-    ReceiptProcessDetailDto getReceiptList(Long userId, Long receipted);
+    ReceiptProcessDetailDto getReceiptList(Long receipted);
 
     // 경비 처리 완료 내역 조회
     List<ReceiptDto> getCompletedReceipts(Long userId, Long cursorId, Integer period, Date startDate, Date endDate, ProcessState processState, Sort sort);
@@ -23,7 +23,7 @@ public interface CeoService {
     EmailSendDto sendEmail(String email, Long userId);
 
     // 영수 처리 승인 및 반려
-    ReceiptProcessDto receiptProcessing(Long receiptProcessId, String progressState, String rejectedReason, Long userId);
+    ReceiptProcessDto receiptProcessing(Long receiptProcessId, String progressState, String rejectedReason);
 
     // 한달 법카 금액 조회
     CorporateCardTotalPriceDto getCorporateCardTotalPrice(Long userId);
