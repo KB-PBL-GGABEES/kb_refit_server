@@ -54,7 +54,7 @@ class ReceiptServiceTest {
         ReceiptDetailDto receipt = service.get(1L, cursorId, receiptId);
         log.info(receipt.getReceiptId());
         log.info(receipt.getTotalPrice());
-        for (ReceiptContentDetailDto contentDto: receipt.getReceiptContents()) {
+        for (ReceiptContentDto contentDto: receipt.getReceiptContents()) {
             log.info(contentDto.getMerchandiseName());
             log.info(contentDto.getMerchandisePrice());
             log.info(contentDto.getAmount());
@@ -65,7 +65,7 @@ class ReceiptServiceTest {
     @Test
     void getTotal() {
         Long userId = 1L;
-        MonthlyExpenseDto dto = service.getTotal(userId);
+        ReceiptTotalDto dto = service.getTotal(userId);
         log.info(dto.getTotal());
         log.info(dto.getLastMonth());
     }
