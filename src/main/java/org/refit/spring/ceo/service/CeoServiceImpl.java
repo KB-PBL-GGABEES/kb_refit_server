@@ -72,7 +72,7 @@ public class CeoServiceImpl implements CeoService {
         // 실제 이메일 전송 로직 생략
         return EmailSendDto.builder()
                 .email(email)
-                .numberSend(numberSend)
+//                .numberSend(numberSend)
                 .build();
     }
 
