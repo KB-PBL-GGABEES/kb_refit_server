@@ -11,6 +11,7 @@ import java.util.Date;
 @Getter
 @Setter
 public class ReceiptSelectDto {
+    private Long companyId;
     private String companyName;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
     private Date startDate;

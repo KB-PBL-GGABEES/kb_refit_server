@@ -31,12 +31,11 @@ public class ReceiptProcessController {
     public ResponseEntity<?> getCompanySelectionList(@ApiIgnore @UserId Long userId) {
         try {
             List<ReceiptSelectDto> companyList = receiptProcessService.getCompanySelectionListByUserId(userId);
-            if (companyList == null || companyList.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Collections.singletonMap("message", "조회된 회사 정보가 없습니다."));
-            }
             return ResponseEntity.ok(companyList);
-        } catch (Exception e) {
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.singletonMap("message", "조회되는 회사 목록이 없습니다."));
+        }
+        catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Collections.singletonMap("message", "회사 목록 조회 중 오류가 발생했습니다."));
         }
