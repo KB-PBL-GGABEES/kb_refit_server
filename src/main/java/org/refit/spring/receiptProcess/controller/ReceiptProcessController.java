@@ -13,9 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.NoSuchElementException;
 
 @Slf4j
 @Api(tags = "영수 처리 API", description = "영수 처리 관련 API입니다.")
@@ -64,27 +63,19 @@ public class ReceiptProcessController {
     public ResponseEntity<?> verifyCompany(@ApiIgnore @UserId Long userId,
                                            @RequestBody CheckCompanyRequestDto dto) {
         try {
-            validateRequest(dto);
             CheckCompanyResponseDto result = receiptProcessService.verifyAndRegisterEmployee(dto, userId);
-            if (!result.isValid()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Collections.singletonMap("message", "유효하지 않은 사업자번호입니다."));
-            }
             return ResponseEntity.ok(result);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Collections.singletonMap("message", e.getMessage()));
+        }
+          catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.singletonMap("message", e.getMessage()));
         } catch (IllegalStateException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(Collections.singletonMap("message", e.getMessage()));
         } catch (Exception e) {
             log.error("사업자 진위확인 중 오류", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Collections.singletonMap("message", "진위확인 처리 중 서버 오류가 발생했습니다."));
-        }
-    }
-
-    private void validateRequest(CheckCompanyRequestDto dto) {
-        if (dto.getCompanyId() == null || dto.getCeoName() == null || dto.getOpenedDate() == null) {
-            throw new IllegalArgumentException("필수 정보 누락");
         }
     }
 
@@ -102,8 +93,8 @@ public class ReceiptProcessController {
             }
 
             // 비어 있는 voucher는 null 처리
-            if (dto.getVoucher() != null && dto.getVoucher().trim().isEmpty()) {
-                dto.setVoucher(null);
+            if (dto.getFileName() != null && dto.getFileName().trim().isEmpty()) {
+                dto.setFileName(null);
             }
 
             // 서비스 호출
@@ -117,19 +108,7 @@ public class ReceiptProcessController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Collections.singletonMap("message", "서버 오류로 인해 영수처리에 실패했습니다."));
+
         }
-    }
-
-    @ApiOperation(value = "관련 이미지 파일명 DB조회", notes = "관련 이미지 파일명을 조회할 수 있습니다.")
-    @GetMapping("/voucher")
-    public ResponseEntity<?> getReceiptVoucher(@RequestParam("receiptId") Long receiptId) {
-        ReceiptVoucherResponseDto dto = receiptProcessService.getVoucherFileName(receiptId);
-
-        if (dto == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Collections.singletonMap("message", "해당 영수증의 이미지 파일명이 없습니다."));
-        }
-
-        return ResponseEntity.ok(dto);
     }
 }

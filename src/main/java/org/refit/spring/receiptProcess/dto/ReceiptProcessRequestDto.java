@@ -7,9 +7,10 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ReceiptProcessRequestDto {
+    private Long ceoId;
     private Long companyId;
     private Long receiptId;
     private String progressType;
     private String progressDetail;
-    private String voucher;
+    private String fileName;
 }
