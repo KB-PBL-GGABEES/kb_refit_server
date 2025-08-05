@@ -11,6 +11,7 @@ import org.refit.spring.auth.service.UserService;
 import org.refit.spring.mapper.UserMapper;
 import org.refit.spring.security.jwt.JwtTokenProvider;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -43,7 +44,8 @@ public class AuthController {
     }
 
     @ApiOperation(value = "현재 로그인한 유저 정보 조회 API", notes = "현재 로그인한 유저의 정보를 조회할 수 있습니다.")
-    @GetMapping("/me")
+//    @GetMapping("/me")
+    @GetMapping(value = "/me", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getMyData(@RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
 

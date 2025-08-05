@@ -2,11 +2,13 @@ package org.refit.spring.auth.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.refit.spring.auth.entity.User;
 
 
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 public class UserResponseDto {
     private Long userId;
     private String role;
