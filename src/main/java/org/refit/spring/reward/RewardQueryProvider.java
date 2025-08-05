@@ -22,10 +22,9 @@ public class RewardQueryProvider {
         }
         RewardType type = (RewardType) params.get("type");
         if (type != null && type != RewardType.ALL) {
-            if (type == RewardType.CARBONPOINT) sql.append(" AND carbon_point > 0");
-            else if (type == RewardType.CASHBACK) sql.append(" AND reward > 0");
+            if (type == RewardType.CARBONPOINT) sql.append(" AND carbon_point != 0");
+            else if (type == RewardType.CASHBACK) sql.append(" AND reward != 0");
         }
-
         if (sort == ReceiptSort.LATEST) sql.append(" ORDER BY created_at DESC");
         else sql.append(" ORDER BY created_at ASC");
         sql.append(" LIMIT 20");
