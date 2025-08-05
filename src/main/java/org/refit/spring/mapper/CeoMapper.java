@@ -70,24 +70,17 @@ public interface CeoMapper {
     int countCompletedReceiptsThisMonth(@Param("userId") Long userId);
 
     // 영수처리 신청자 상세 조회
-    @Select("SELECT \n" +
-            "        u.user_id,\n" +
-            "        u.name,\n" +
-            "        p.progress_type AS documentType,\n" +
-            "        p.progress_detail AS documentDetail,\n" +
-            "        p.voucher AS imageFileName\n" +
-            "    FROM receipt r\n" +
-            "    JOIN user u ON r.user_id = u.user_id\n" +
-            "    JOIN receipt_process p ON r.receipt_id = p.receipt_id\n" +
-            "    WHERE r.receipt_id = #{receiptId}\n" +
-            "AND EXISTS (\n" +
-            "  SELECT 1 FROM employee e\n" +
-            "  WHERE e.user_id = r.user_id\n" +
-            "    AND e.company_id IN (\n" +
-            "      SELECT company_id FROM company WHERE ceo_id = #{userId}))")
-    ReceiptProcessApplicantDto getReceiptProcessDetail(
-            @Param("receiptId") Long receiptId,
-            @Param("userId") Long userId);
+    @Select("SELECT\n" +
+            "    u.user_id,\n" +
+            "    u.name,\n" +
+            "    p.progress_type AS documentType,\n" +
+            "    p.progress_detail AS documentDetail,\n" +
+            "    p.voucher AS imageFileName\n" +
+            "FROM receipt r\n" +
+            "JOIN user u ON r.user_id = u.user_id\n" +
+            "JOIN receipt_process p ON r.receipt_id = p.receipt_id\n" +
+            "WHERE r.receipt_id = #{receiptId}")
+    ReceiptProcessApplicantDto getReceiptProcessDetail(@Param("receiptId") Long receiptId);
 
     // 구매항목 상세 조회
     @Select("SELECT rc.merchandise_id, m.merchandise_name, m.merchandise_price, rc.amount " +

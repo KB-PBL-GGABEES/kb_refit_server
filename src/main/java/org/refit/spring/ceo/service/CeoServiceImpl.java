@@ -100,7 +100,7 @@ public class CeoServiceImpl implements CeoService {
         // 중복 조회 예외 처리
         ReceiptProcessApplicantDto info;
         try {
-            info = ceoMapper.getReceiptProcessDetail(receiptId, userId);
+            info = ceoMapper.getReceiptProcessDetail(receiptId);
         } catch (org.apache.ibatis.exceptions.TooManyResultsException e) {
             throw new IllegalStateException("중복된 영수 처리 정보가 존재합니다. DB 무결성을 확인해주세요.");
         }
