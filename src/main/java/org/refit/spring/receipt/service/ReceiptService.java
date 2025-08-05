@@ -146,11 +146,11 @@ public class ReceiptService {
         receipt.setSupplyPrice(supply);
         receipt.setSurtax(total - supply);
         receipt.setUpdatedAt(new Date());
+        User user = userMapper.findByUserId(receipt.getUserId());
         if (personalBadgeMapper.checkIsWorn(receipt.getUserId(), receipt.getReceiptId())) {
-            User user = userMapper.findByUserId(receipt.getUserId());
             user.setTotalStarPoint((long) (user.getTotalStarPoint() + receipt.getTotalPrice() * 0.05));
-            user.setTotalCarbonPoint(user.getTotalCarbonPoint() + 100);
         }
+        user.setTotalCarbonPoint(user.getTotalCarbonPoint() + 100);
     }
 
     @Transactional(readOnly = true)
