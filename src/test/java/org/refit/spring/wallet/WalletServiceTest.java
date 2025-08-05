@@ -3,6 +3,10 @@ package org.refit.spring.wallet;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.refit.spring.config.RootConfig;
+import org.refit.spring.mapper.RewardMapper;
+import org.refit.spring.reward.dto.RewardWalletRequestDto;
+import org.refit.spring.reward.dto.RewardWalletResponseDto;
+import org.refit.spring.reward.service.RewardService;
 import org.refit.spring.wallet.dto.WalletResponseDto;
 import org.refit.spring.wallet.service.WalletService;
 import static org.junit.jupiter.api.Assertions.*;
@@ -16,6 +20,12 @@ public class WalletServiceTest {
 
     @Autowired
     private WalletService walletService;
+
+    @Autowired
+    private RewardService rewardService;
+
+    @Autowired
+    private RewardMapper rewardMapper;
 
     @Test
     @DisplayName("✅ 전체 지갑 브랜드 조회 성공 - 유효한 userId")
@@ -157,6 +167,73 @@ public class WalletServiceTest {
         } catch (AssertionError e) {
             System.out.println("❌ 테스트 실패: " + e.getMessage());
             throw e; // 테스트 실패를 JUnit에게 알림
+        }
+    }
+
+    @Test
+    @DisplayName("🟨 지갑 구매 성공 테스트")
+    void purchaseWallet_success() {
+        // given
+        Long userId = 5L;     // 실제 포인트가 충분한 사용자 ID
+        Long walletId = 4L;   // 구매 가능한 지갑 ID (이미 보유하지 않은 것으로)
+
+        RewardWalletRequestDto requestDto = new RewardWalletRequestDto();
+        requestDto.setWalletId(walletId);
+
+        // when
+        RewardWalletResponseDto result = rewardService.purchaseWallet(userId, requestDto);
+
+        // then
+        assertNotNull(result);
+        assertEquals(userId, result.getUserId());
+        assertEquals(walletId, result.getWalletId());
+
+        System.out.println("🟨 지갑 구매 성공!");
+        System.out.println("✅ 구매 지갑 ID: " + result.getWalletId());
+        System.out.println("✅ 지갑 가격: " + result.getWalletCost());
+        System.out.println("✅ 남은 포인트: " + result.getTotalStarPoint());
+    }
+
+    @Test
+    @DisplayName("❌ 이미 보유한 지갑 구매 시 예외 발생")
+    void purchaseWallet_alreadyOwned() {
+        // given
+        Long userId = 5L;
+        Long walletId = 4L; // 이미 구매한 지갑 ID
+
+        RewardWalletRequestDto requestDto = new RewardWalletRequestDto();
+        requestDto.setWalletId(walletId);
+
+        // when & then
+        try {
+            rewardService.purchaseWallet(userId, requestDto);
+            fail("❌ 예외가 발생해야 하지만 발생하지 않음");
+        } catch (IllegalArgumentException e) {
+            assertEquals("이미 보유 중인 지갑입니다.", e.getMessage());
+            System.out.println("⚠️ 이미 보유한 지갑 예외 발생 확인: " + e.getMessage());
+        }
+    }
+
+    @Test
+    @DisplayName("❌ 포인트 부족 시 지갑 구매 실패")
+    void purchaseWallet_insufficientPoints() {
+        // given
+        Long userId = 5L;
+        Long walletId = 6L; // 비싼 지갑 ID라고 가정
+
+        // 사용자 포인트를 0으로 만들기 (테스트 환경이라면 가능)
+        rewardMapper.updateStarPoint(userId, 0L);
+
+        RewardWalletRequestDto requestDto = new RewardWalletRequestDto();
+        requestDto.setWalletId(walletId);
+
+        // when & then
+        try {
+            rewardService.purchaseWallet(userId, requestDto);
+            fail("❌ 예외가 발생해야 하지만 발생하지 않음");
+        } catch (IllegalArgumentException e) {
+            assertEquals("보유 포인트가 부족합니다.", e.getMessage());
+            System.out.println("⚠️ 포인트 부족 예외 발생 확인: " + e.getMessage());
         }
     }
 }
