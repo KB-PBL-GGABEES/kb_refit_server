@@ -13,6 +13,7 @@ public class RewardQueryProvider {
             sort = ReceiptSort.LATEST;
             params.put("sort", sort);
         }
+        sql.append(" AND (reward != 0 OR carbon_point != 0)");
         if (sort == ReceiptSort.LATEST) sql.append(" AND reward_id < #{cursorId}");
         else sql.append(" AND reward_id > #{cursorId}");
         Integer period = (Integer) params.get("period");
