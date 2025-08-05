@@ -1,5 +1,6 @@
 package org.refit.spring.wallet;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.refit.spring.config.RootConfig;
@@ -26,6 +27,11 @@ public class WalletServiceTest {
 
     @Autowired
     private RewardMapper rewardMapper;
+
+    @BeforeEach
+    void resetPointBeforeEachTest() {
+        rewardMapper.updateStarPoint(5L, 10000L);
+    }
 
     @Test
     @DisplayName("✅ 전체 지갑 브랜드 조회 성공 - 유효한 userId")
@@ -235,5 +241,64 @@ public class WalletServiceTest {
             assertEquals("보유 포인트가 부족합니다.", e.getMessage());
             System.out.println("⚠️ 포인트 부족 예외 발생 확인: " + e.getMessage());
         }
+    }
+
+    @Test
+    @DisplayName("✅ 지갑 구매 후 보유 여부 확인")
+    void purchaseWallet_then_checkIsOwned() {
+        // given
+        Long userId = 5L;
+        Long walletId = 7L; // 아직 보유하지 않은 지갑 ID
+
+        // 테스트용으로 충분한 포인트를 먼저 세팅
+        rewardMapper.updateStarPoint(userId, 10000L);
+
+        RewardWalletRequestDto requestDto = new RewardWalletRequestDto();
+        requestDto.setWalletId(walletId);
+
+        // when: 지갑 구매
+        rewardService.purchaseWallet(userId, requestDto);
+
+        // then: 해당 지갑이 보유 리스트에 포함되었는지 확인
+        WalletResponseDto.WalletBrandListDto result = walletService.getWalletList(userId);
+        boolean isOwned = result.getWalletBrandDtoList().stream()
+                .anyMatch(dto -> dto.getWalletId().equals(walletId) && dto.isOwned());
+
+        assertTrue(isOwned, "지갑 구매 후 isOwned가 true여야 함");
+        System.out.println("✅ 지갑 구매 후 isOwned 확인 완료");
+    }
+
+    @Test
+    @DisplayName("🧪 지갑 착용 후 목록 조회에서 isMounted 확인")
+    void toggleWallet_then_checkIsMounted() {
+        // given
+        Long userId = 5L;
+        Long walletId = 2L;
+
+        // when: 지갑 착용
+        walletService.toggleMountedWallet(userId, walletId);
+
+        // then: 목록 조회 후 착용 여부 확인
+        WalletResponseDto.WalletBrandListDto result = walletService.getWalletList(userId);
+        boolean isMounted = result.getWalletBrandDtoList().stream()
+                .anyMatch(dto -> dto.getWalletId().equals(walletId) && dto.isMounted());
+
+        assertTrue(isMounted, "지갑 착용 후 isMounted가 true여야 함");
+        System.out.println("🧪 지갑 착용 후 isMounted 확인 완료");
+    }
+
+    @Test
+    @DisplayName("❌ 보유하지 않은 지갑 착용 시 → null 또는 예외 발생")
+    void toggleMountedWallet_withoutOwnership_shouldFail() {
+        // given
+        Long userId = 5L;
+        Long walletId = 999L; // 보유하지 않은 지갑 ID로 가정
+
+        // when
+        WalletResponseDto.ToggleMountedWalletDto result = walletService.toggleMountedWallet(userId, walletId);
+
+        // then
+        assertNull(result, "보유하지 않은 지갑은 착용되지 않아야 하며 null 반환이 기대됨");
+        System.out.println("❌ 보유하지 않은 지갑 착용 시도 → 실패 확인 완료");
     }
 }
