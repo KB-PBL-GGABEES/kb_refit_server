@@ -1,5 +1,6 @@
 package org.refit.spring.auth.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import org.refit.spring.auth.enums.UserRole;
 
@@ -20,6 +21,8 @@ public class User {
     //enum으로 사업자/일반유저 분리
     private UserRole role;
     private String refreshToken;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate createdAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate updatedAt;
 }
