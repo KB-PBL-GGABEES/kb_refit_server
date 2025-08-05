@@ -17,9 +17,9 @@ public class CeoReceiptQueryProvider {
         sql.append(" FROM receipt r");
         sql.append(" JOIN company c ON r.company_id = c.company_id");
         sql.append(" JOIN receipt_process p ON r.receipt_id = p.receipt_id");
-//        sql.append(" JOIN card cd ON r.card_id = cd.card_id");
+        sql.append(" JOIN card cd ON r.card_id = cd.card_id");
         sql.append(" WHERE p.process_state IN ('accepted', 'rejected')");
-//        sql.append(" AND cd.is_corporate = 'FALSE");
+        sql.append(" AND cd.is_corporate = FALSE");
 
         sql.append(" AND EXISTS (");
         sql.append(" SELECT 1 FROM employee e");
