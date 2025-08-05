@@ -66,16 +66,20 @@ public class ReceiptProcessService {
             );
 
             JsonNode root = objectMapper.readTree(response.getBody());
-            JsonNode dataList = root.get("data");
-            if (dataList == null || !dataList.isArray() || dataList.size() == 0) {
-                throw new RuntimeException("OpenAPI 응답에서 사업자 데이터가 존재하지 않습니다.");
+            JsonNode statusCode = root.get("status_code");
+            if (statusCode.equals("OK")) {
+//                성공 로직
+            } else {
+                if(statusCode.equals("BAD_JSON_REQUEST")) {
+//                    오류에 맞는 exception 발생
+//                    아니면 사용자한테, 이거에 맞는 Response 반환
+                } else if (statusCode.equals("REQUEST_DATA_MALFORMED")) {
+//                    필수 파라미터 누락 (이 경우에는 서버 문제일 가능성이 높음)
+                }
             }
 
-            JsonNode data = dataList.get(0);
-            String valid = data.get("valid").asText();
-
             // 2. 유효하지 않으면 바로 반환
-            if (!"01".equals(valid)) {
+            if (statusCode.equals("OK")) {
                 return CheckCompanyResponseDto.builder()
                         .isValid(false)
                         .companyId(dto.getCompanyId())
@@ -90,9 +94,14 @@ public class ReceiptProcessService {
                 CheckCompanyResponseDto company = receiptProcessMapper.findCompanyInfoByCompanyId(dto.getCompanyId());
                 if (company != null) {
                     companyName = company.getCompanyName();
+                } else {
+//                    TODO: null인 경우에 대한 정보
+//                    exception 404 띄워
                 }
             } catch (Exception ignored) {
                 // 무시
+//                여기서 404가 발생하면 사용자한테, -> 우리 서비스에 등록되지 않은 사업자. -> KB 리핏에 가입하지 않은 사업자입니다.
+//                return;
             }
 
             // 4. valid 성공 응답
