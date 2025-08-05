@@ -81,7 +81,7 @@ public class CeoServiceImpl implements CeoService {
     public ReceiptProcessDto receiptProcessing(Long receiptProcessId, String progressState, String rejectedReason) {
         ceoMapper.updateProcessState(receiptProcessId, progressState, rejectedReason);
 
-        Long receiptId = ceoMapper.getReceiptProcessId(receiptProcessId); // 새로 Mapper로 만듦
+        Long receiptId = ceoMapper.getReceiptProcessId(receiptProcessId);
 
         return ReceiptProcessDto.builder()
                 .message("영수 처리 완료")

@@ -12,8 +12,8 @@ public class CeoReceiptQueryProvider {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT ");
         sql.append(" r.receipt_id, c.company_name, r.created_at, r.total_price,");
-        sql.append(" CASE WHEN p.process_state = 'accepted' THEN '승인'");
-        sql.append(" WHEN p.process_state = 'rejected' THEN '거절' ELSE p.process_state END AS process_state");
+        sql.append(" CASE WHEN p.process_state = 'accepted'");
+        sql.append(" WHEN p.process_state = 'rejected' ELSE p.process_state END AS process_state");
         sql.append(" FROM receipt r");
         sql.append(" JOIN company c ON r.company_id = c.company_id");
         sql.append(" JOIN receipt_process p ON r.receipt_id = p.receipt_id");
