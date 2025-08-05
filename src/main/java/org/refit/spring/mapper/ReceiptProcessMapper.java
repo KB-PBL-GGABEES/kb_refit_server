@@ -55,6 +55,7 @@ public interface ReceiptProcessMapper {
             "ceo_id = #{ceoId}, " +
             "progress_detail = #{progressDetail}, " +
             "voucher = #{fileName}, " +
+            "process_state = 'inProgress', " +
             "updated_at = NOW() " +
             "WHERE receipt_id = #{receiptId}")
     void updateReceiptProcess(ReceiptProcessRequestDto dto);
