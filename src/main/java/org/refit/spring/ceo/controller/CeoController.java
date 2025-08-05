@@ -13,7 +13,9 @@ import org.refit.spring.ceo.enums.ProcessState;
 import org.refit.spring.ceo.enums.RejectState;
 import org.refit.spring.ceo.enums.Sort;
 import org.refit.spring.ceo.service.CeoService;
+import org.refit.spring.ceo.service.ReceiptExportService;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -29,6 +31,7 @@ import java.util.Map;
 @RequestMapping("/api/ceo")
 public class CeoController {
     final CeoService ceoService;
+    final ReceiptExportService receiptExportService;
 
     @ApiOperation(value = "경비 처리가 필요한 내역 조회", notes = "경비 처리가 필요한 내역을 최신순으로 다 가져옵니다.")
     @ApiResponses(value = {
@@ -88,10 +91,17 @@ public class CeoController {
             @ApiResponse(code = 400, message = "잘못된 요청"),
             @ApiResponse(code = 500, message = "서버 내부 오류")
     })
-    public ResponseEntity<EmailSendDto> sendEmail(
-            @RequestBody EmailSendDto request,
-            @ApiIgnore @UserId Long userId) {
-        return ResponseEntity.ok(ceoService.sendEmail(request.getEmail(), userId));
+    public ResponseEntity<?> sendEmail(
+            @RequestBody EmailSendDto request, @ApiIgnore @UserId Long userId) {
+        //csv파일로 만들기
+
+        try {
+            receiptExportService.generateAndSendCsvByEmail(userId, request.getEmail());
+            return ResponseEntity.ok("이메일 전송 완료");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("이메일 전송 실패: " + e.getMessage());
+        }
     }
 
     @PatchMapping("/receiptProcessing")

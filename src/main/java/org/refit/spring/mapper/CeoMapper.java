@@ -4,6 +4,7 @@ import org.apache.ibatis.annotations.*;
 import org.refit.spring.ceo.CeoReceiptQueryProvider;
 import org.refit.spring.ceo.CorporateCardQueryProvider;
 import org.refit.spring.ceo.dto.CorporateCardListDto;
+import org.refit.spring.ceo.dto.ReceiptExceptMerchandiseDto;
 import org.refit.spring.ceo.entity.Ceo;
 import org.refit.spring.ceo.dto.ReceiptProcessApplicantDto;
 import org.refit.spring.ceo.enums.ProcessState;
@@ -130,6 +131,31 @@ public interface CeoMapper {
             @Param("endDate") Date endDate,
             @Param("processState") ProcessState processState,
             @Param("sort") Sort sort);
+
+    //이메일 전송 용 완료 항목 조회
+    @Select("SELECT " +
+            "  r.receipt_id, " +
+            "  r.user_id, " +
+            "  r.company_id, " +
+            "  c.company_name, " +
+            "  c.ceo_name, " +
+            "  c.address, " +
+            "  r.total_price, " +
+            "  r.supply_price, " +
+            "  r.surtax, " +
+            "  r.transaction_type, " +
+            "  r.created_at, " +
+            "  p.process_state, " +
+            "  cr.card_number, " +
+            "  cr.is_corporate, " +
+            "  IFNULL(p.rejected_reason, '') AS rejected_reason " +
+            "FROM receipt r " +
+            "JOIN company c ON r.company_id = c.company_id " +
+            "JOIN card cr ON r.card_id = cr.card_id " +
+            "JOIN receipt_process p ON r.receipt_id = p.receipt_id " +
+            "WHERE c.ceo_id = #{userId} " +
+            "AND p.process_state = 'accepted'")
+    List<ReceiptExceptMerchandiseDto> getCompletedReceiptDetails(@Param("userId") Long userId);
 
     // 처리 완료된 항목 이메일 전송
     @Select("SELECT COUNT(*)\n" +
