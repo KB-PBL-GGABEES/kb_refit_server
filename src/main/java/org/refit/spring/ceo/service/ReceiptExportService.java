@@ -3,6 +3,7 @@ package org.refit.spring.ceo.service;
 import lombok.RequiredArgsConstructor;
 import org.refit.spring.ceo.dto.ReceiptExceptMerchandiseDto;
 import org.refit.spring.mapper.CeoMapper;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -10,9 +11,7 @@ import org.springframework.stereotype.Service;
 import com.opencsv.CSVWriter;
 
 import javax.mail.internet.MimeMessage;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
 
 @Service
@@ -75,9 +74,39 @@ public class ReceiptExportService {
 
         helper.setTo(toEmail);
         helper.setSubject("처리 완료된 영수증 내역 CSV");
-        helper.setText("첨부된 CSV 파일을 확인해주세요.", false);
+
+        // 1. HTML load
+        String htmlContent = loadEmailHtmlTemplate();
+        helper.setText(htmlContent, true); //html = true
+
+        // 2. logo.png 이미지 추가
+//        File imageFile = new File("src/main/resources/static/images/logo.png");
+        ClassPathResource imageResource = new ClassPathResource("static/images/logo.png");
+        helper.addInline("logo", imageResource);
+
+        //html 사용할거니까 기존에 사용하던 setText는 주석처리
+//        helper.setText("첨부된 CSV 파일을 확인해주세요.", false);
+
+        // 3. CSV 첨부
         helper.addAttachment(file.getName(), file);
 
         javaMailSender.send(message);
+    }
+
+    //HTML을 String으로 읽어서 메일 본문으로 사용
+    private String loadEmailHtmlTemplate() throws IOException {
+        ClassPathResource resource = new ClassPathResource("templates/refitCeoEmail.html");
+
+        try (InputStream inputStream = resource.getInputStream();
+             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+
+            StringBuilder contentBuilder = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                contentBuilder.append(line).append("\n");
+            }
+
+            return contentBuilder.toString();
+        }
     }
 }
