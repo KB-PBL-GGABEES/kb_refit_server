@@ -95,8 +95,8 @@ public interface HospitalMapper {
                                @Param("medicalImageFileName") String medicalImageFileName,
                                @Param("userId") Long userId);
 
-    @Insert("INSERT INTO hospital_process (receipt_id, process_state) VALUES (#{receiptId}, 'none')")
-    void insertEmptyHospitalProcess(@Param("receiptId") Long receiptId);
+    @Insert("INSERT INTO hospital_process (receipt_id, process_state, hospital_voucher) VALUES (#{receiptId}, 'none', #{hospitalVoucher})")
+    void insertEmptyHospitalProcess(@Param("receiptId") Long receiptId, @Param("hospitalVoucher") String hospitalVoucher);
 
     // 진료비 세부산정내역 PDF 파일명 조회
     @Select("SELECT hp.hospital_voucher " +
