@@ -9,10 +9,10 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class MedicalReceiptListCursorDto {
-    private List<MedicalReceiptListDto> hospitalList;
+    private List<MedicalReceiptDto> hospitalList;
     private Long nextCursorId;
 
-    public static MedicalReceiptListCursorDto from(List<MedicalReceiptListDto> list, Long nextCursorId) {
+    public static MedicalReceiptListCursorDto from(List<MedicalReceiptDto> list, Long nextCursorId) {
         return new MedicalReceiptListCursorDto(list, nextCursorId);
     }
 }

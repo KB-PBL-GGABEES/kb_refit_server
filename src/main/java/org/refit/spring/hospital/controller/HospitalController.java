@@ -31,19 +31,15 @@ public class HospitalController {
     @GetMapping("/list")
     public ResponseEntity<?> getHospitalExpensesWithFilter(
             @ApiIgnore @UserId Long userId,
-            @RequestParam(required = false) Long cursorId,
-            @RequestParam(required = false) Integer period,
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate,
-            @RequestParam(required = false) HospitalType type,
-            @RequestParam(required = false) HospitalSort sort,
-            @RequestParam(required = false) HospitalFilter filter) {
-
-        MedicalReceiptListCursorDto dto = hospitalService.getFilteredList(
-                userId, cursorId, period, startDate, endDate, type, filter, sort
-        );
-
-        return ResponseEntity.ok(dto);
+            @RequestParam(value = "size", required = false) Long size,
+            @ModelAttribute MedicalListRequestDto medicalListRequestDto) {
+        try {
+            MedicalReceiptListCursorDto dto = hospitalService.getFilteredList(userId, size, medicalListRequestDto);
+            return ResponseEntity.ok(dto);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("message", "서버 오류로 인해 실패했습니다."));
+        }
     }
 
 
@@ -71,17 +67,17 @@ public class HospitalController {
     @ApiOperation(value = "의료비 납입 내역 상세 조회", notes = "의료비 납입 내역을 상세 조회할 수 있습니다.")
     @GetMapping("/detail")
     public ResponseEntity<?> getHospitalExpenseDetail(@ApiIgnore @UserId Long userId,
-            @RequestParam("receiptId") Long receiptId)
-    {
-
-        MedicalReceiptDetailDto result = hospitalService.findHospitalExpenseDetail(userId, receiptId);
-
-        if (result == null) {
+                                                      @RequestParam("receiptId") Long receiptId) {
+        try {
+            MedicalReceiptDetailDto result = hospitalService.findHospitalExpenseDetail(userId, receiptId);
+            return ResponseEntity.ok(result);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Collections.singletonMap("message", e.getMessage()));
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Collections.singletonMap("message", "해당 userId와 receiptId에 해당하는 데이터가 없습니다."));
+                    .body(Collections.singletonMap("message", "서버 오류로 인해 실패했습니다."));
         }
 
-        return ResponseEntity.ok(result);
     }
 
     // 진료비 세부산정내역 PDF 파일명 DB저장
@@ -89,15 +85,16 @@ public class HospitalController {
     @PostMapping("/voucher")
     public ResponseEntity<?> saveHospitalVoucher(@ApiIgnore @UserId Long userId,
                                                  @RequestBody MedicalImageFileNameDownloadDto dto) {
-
-        if (dto.getReceiptId() == null || dto.getMedicalImageFileName() == null || dto.getMedicalImageFileName().isEmpty()) {
-            return ResponseEntity.badRequest().body(Collections.singletonMap("message", "필수 정보 누락"));
+        try {
+            hospitalService.updateHospitalVoucher(userId, dto);
+            return ResponseEntity.ok(Collections.singletonMap("message", "파일명이 정상적으로 저장되었습니다."));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Collections.singletonMap("message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("message", "서버 오류로 인해 실패했습니다."));
         }
-
-        hospitalService.updateHospitalVoucher(userId, dto);
-        return ResponseEntity.ok(Collections.singletonMap("message", "파일명이 정상적으로 저장되었습니다."));
     }
-
 
 
     // 진료비 세부산정내역 PDF 파일명 조회
@@ -106,42 +103,47 @@ public class HospitalController {
     public ResponseEntity<?> getHospitalVoucher(@ApiIgnore @UserId Long userId,
                                                 @RequestParam("receiptId") Long receiptId) {
 
-        MedicalImageFileNameCheckDto result = hospitalService.findHospitalVoucher(userId, receiptId);
-
-        if (result == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Collections.singletonMap("message", "해당 영수증에 대한 파일명이 존재하지 않습니다."));
+        try {
+            MedicalImageFileNameCheckDto result = hospitalService.findHospitalVoucher(userId, receiptId);
+            return ResponseEntity.ok(result);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Collections.singletonMap("message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("message", "서버 오류로 인해 실패했습니다."));
         }
-
-        return ResponseEntity.ok(result);
     }
 
     // 최근 병원비 조회
     @ApiOperation(value = "최근 병원비 및 보험청구 가능 건수", notes = "최근 3년간 병원비 총액과 보험청구 가능한 건수를 조회합니다.")
     @GetMapping("/recent")
     public ResponseEntity<?> getHospitalRecentInfo(@ApiIgnore @UserId Long userId) {
-        MedicalReceiptRecentDto result = hospitalService.getHospitalRecentInfo(userId);
 
-        if (result == null) {
+
+        try {
+            MedicalReceiptRecentDto result = hospitalService.getHospitalRecentInfo(userId);
+            return ResponseEntity.ok(result);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Collections.singletonMap("message", e.getMessage()));
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Collections.singletonMap("message", "해당 userId에 대한 최근 병원비 데이터가 없습니다."));
+                    .body(Collections.singletonMap("message", "서버 오류로 인해 실패했습니다."));
         }
-
-        return ResponseEntity.ok(result);
     }
 
     // 가입된 보험 목록 조회
     @ApiOperation(value = "가입된 보험 목록 조회", notes = "가입된 보험 목록을 조회할 수 있습니다.")
     @GetMapping("/insurance")
     public ResponseEntity<?> findInsuranceSubscribeById(@ApiIgnore @UserId Long userId) {
-        List<InsuranceSubscribedCheckDto> result = hospitalService.findInsuranceSubscribeById(userId);
-
-        if (result == null || result.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Collections.singletonMap("message", "가입된 보험 정보가 없습니다."));
+        try {
+            List<InsuranceSubscribedCheckDto> result = hospitalService.findInsuranceSubscribeById(userId);
+            return ResponseEntity.ok(result);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Collections.singletonMap("message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("message", "서버 오류로 인해 실패했습니다."));
         }
-
-        return ResponseEntity.ok(result);
     }
 
     // 보험 청구_방문 정보
@@ -151,14 +153,16 @@ public class HospitalController {
             @ApiIgnore @UserId Long userId,
             @RequestParam Long receiptId) {
 
-        MedicalCheckDto result = hospitalService.getHospitalVisitInfo(userId, receiptId);
-
-        if (result == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Collections.singletonMap("message", "해당 영수증 정보를 찾을 수 없습니다."));
+        try {
+            MedicalCheckDto result = hospitalService.getHospitalVisitInfo(userId, receiptId);
+            return ResponseEntity.ok(result);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Collections.singletonMap("message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("message", "서버 오류로 인해 실패했습니다."));
         }
 
-        return ResponseEntity.ok(result);
     }
     // 보험 청구_PATCH
     @ApiOperation(value = "보험 청구 요청", notes = "보험 청구 페이지에서 보험 청구를 요청할 수 있습니다.")
@@ -167,7 +171,6 @@ public class HospitalController {
                                             @RequestBody InsuranceClaimDto dto) {
         try {
             hospitalService.insertInsuranceClaim(dto, userId);
-
             Map<String, String> successMap = new HashMap<>();
             successMap.put("message", "보험 청구가 완료되었습니다.");
             return ResponseEntity.ok(successMap);
@@ -179,4 +182,3 @@ public class HospitalController {
         }
     }
 }
-

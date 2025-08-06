@@ -29,10 +29,10 @@ public interface HospitalMapper {
             "AND r.receipt_id < #{cursorId} " +
             "AND r.created_at >= DATE_SUB(NOW(), INTERVAL #{period} MONTH) " +  // 최근 N개월 조건
             "ORDER BY r.receipt_id DESC " +
-            "LIMIT 10")
-    List<MedicalReceiptListDto> findByCursorIdWithinMonths(@Param("userId") Long userId,
-                                                           @Param("cursorId") Long cursorId,
-                                                           @Param("period") Integer period);
+            "LIMIT 20")
+    List<MedicalReceiptDto> findByCursorIdWithinMonths(@Param("userId") Long userId,
+                                                       @Param("cursorId") Long cursorId,
+                                                       @Param("period") Integer period);
     // 시작일 ~ 종료일 사이 의료 영수증 목록 조회 (커서 기반)
     @Select("SELECT " +
             "r.created_at AS createdAt, " +
@@ -49,14 +49,14 @@ public interface HospitalMapper {
             "AND r.receipt_id < #{cursorId} " +
             "AND r.created_at BETWEEN #{startDate} AND #{endDate} " +
             "ORDER BY r.receipt_id DESC " +
-            "LIMIT 10")
-    List<MedicalReceiptListDto> findByCursorIdWithPeriod(@Param("userId") Long userId,
-                                                         @Param("cursorId") Long cursorId,
-                                                         @Param("startDate") Date startDate,
-                                                         @Param("endDate") Date endDate);
+            "LIMIT 20")
+    List<MedicalReceiptDto> findByCursorIdWithPeriod(@Param("userId") Long userId,
+                                                     @Param("cursorId") Long cursorId,
+                                                     @Param("startDate") Date startDate,
+                                                     @Param("endDate") Date endDate);
 
     @SelectProvider(type = HospitalQueryProvider.class, method = "buildFilteredQuery")
-    List<MedicalReceiptListDto> getFilteredList(Map<String, Object> params);
+    List<MedicalReceiptDto> getFilteredList(Map<String, Object> params);
 
 
     // 의료비 납입 내역 상세 조회
@@ -107,7 +107,11 @@ public interface HospitalMapper {
                                           @Param("userId") Long userId);
 
     // 최근 병원비 조회
-    @Select("SELECT EXISTS(SELECT 1 FROM receipt WHERE user_id = #{userId})")
+    @Select("SELECT EXISTS(SELECT 1 FROM receipt r " +
+            "JOIN company c ON r.company_id = c.company_id " +
+            "JOIN categories cat ON c.category_id = cat.category_id " +
+            "WHERE user_id = #{userId} " +
+            "AND cat.category_id = 1) ")
     boolean existsUserReceipt(@Param("userId") Long userId);
 
     @Select("SELECT " +
