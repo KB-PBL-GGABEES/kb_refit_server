@@ -10,6 +10,7 @@ import org.refit.spring.auth.annotation.UserId;
 import org.refit.spring.auth.service.UserService;
 import org.refit.spring.pos.dto.PosResponseDto;
 import org.refit.spring.pos.service.PosService;
+import org.refit.spring.receipt.dto.ReceiptContentRequestsDto;
 import org.refit.spring.receipt.dto.ReceiptRequestDto;
 import org.refit.spring.receipt.dto.ReceiptResponseDto;
 import org.refit.spring.receipt.entity.Receipt;
@@ -18,10 +19,14 @@ import org.refit.spring.reward.entity.Reward;
 import org.refit.spring.reward.service.RewardService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.net.URI;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.NoSuchElementException;
 
 @Api(tags = "POS", description = "POS관련 API입니다.")
 @RestController
@@ -62,15 +67,31 @@ public class PosController {
             @ApiResponse(code = 500, message = "서버 내부 오류")
     })
     @PostMapping("/create")
-    public ResponseEntity<?> create(@ApiIgnore @UserId Long userId, @RequestBody ReceiptRequestDto receiptRequestDto) throws SQLException {
-        Receipt receipt = receiptService.create(receiptRequestDto, userId);
-        Reward reward = rewardService.create(CARBON_POINT, receipt.getTotalPrice(), userId, receipt.getReceiptId());
-        userService.updatePoint(userId, reward.getCarbonPoint(), reward.getReward());
-        ReceiptResponseDto dto = ReceiptResponseDto.from(receipt, userId, reward.getCarbonPoint(), reward.getReward(), "none");
-        receiptService.checkAndInsertBadge(userId, receipt.getReceiptId());
-        URI location = URI.create("/receipt/" + receipt.getReceiptId());
+    public ResponseEntity<?> create(@ApiIgnore @UserId Long userId,
+                                    @RequestBody ReceiptRequestDto receiptRequestDto) throws SQLException {
+        try {
+            Map<String, Object> requiredFields = new HashMap<>();
+            requiredFields.put("cardId", receiptRequestDto.getCardId());
+            requiredFields.put("contentsList", receiptRequestDto.getContentsList());
+            for (ReceiptContentRequestsDto dto: receiptRequestDto.getContentsList()) {
+                requiredFields.put("amount", dto.getAmount());
+                requiredFields.put("merchandiseId", dto.getMerchandiseId());
+            }
+            receiptService.validateRequiredFields(requiredFields);
+            Receipt receipt = receiptService.create(receiptRequestDto, userId);
+            Reward reward = rewardService.create(CARBON_POINT, receipt.getTotalPrice(), userId, receipt.getReceiptId());
+            userService.updatePoint(userId, reward.getCarbonPoint(), reward.getReward());
+            ReceiptResponseDto dto = ReceiptResponseDto.from(receipt, userId, reward.getCarbonPoint(), reward.getReward(), "none");
+            receiptService.checkAndInsertBadge(userId, receipt.getReceiptId());
+            URI location = URI.create("/receipt/" + receipt.getReceiptId());
 
-        return ResponseEntity.created(location).body(dto);
+            return ResponseEntity.created(location).body(dto);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("서버 내부 오류가 발생했습니다.");
+        }
+
     }
 
     @ApiOperation(value = "환불 영수증 등록", notes = "결제 시 생성된 영수증 아이디를 이용해 환불 영수증을 생성합니다.")
@@ -79,13 +100,24 @@ public class PosController {
             @ApiResponse(code = 500, message = "서버 내부 오류")
     })
     @PostMapping("/refund")
-    public ResponseEntity<?> refund(@ApiIgnore @UserId Long userId, @RequestParam("receiptId") Long receiptId) {
-        Receipt receipt = receiptService.refund(userId, receiptId);
-        Reward reward = rewardService.create(-CARBON_POINT, receipt.getTotalPrice(), userId, receiptId);
-        userService.updatePoint(userId, reward.getCarbonPoint(), reward.getReward());
-        ReceiptResponseDto dto = ReceiptResponseDto.from(receipt, userId, reward.getCarbonPoint(), reward.getReward(), "none");
-        URI location = URI.create("/receipt/" + receipt.getReceiptId());
-        return ResponseEntity.created(location).body(dto);
+    public ResponseEntity<?> refund(@ApiIgnore @UserId Long userId,
+                                    @RequestParam(required = false) Long receiptId) {
+        try {
+            Map<String, Object> requiredFields = new HashMap<>();
+            requiredFields.put("receiptId", receiptId);
+            receiptService.validateRequiredFields(requiredFields);
+            Receipt receipt = receiptService.refund(userId, receiptId);
+            Reward reward = rewardService.create(-CARBON_POINT, receipt.getTotalPrice(), userId, receiptId);
+            userService.updatePoint(userId, reward.getCarbonPoint(), reward.getReward());
+            ReceiptResponseDto dto = ReceiptResponseDto.from(receipt, userId, reward.getCarbonPoint(), reward.getReward(), "none");
+            URI location = URI.create("/receipt/" + receipt.getReceiptId());
+            return ResponseEntity.created(location).body(dto);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("서버 내부 오류가 발생했습니다.");
+        }
+
     }
 
 }
