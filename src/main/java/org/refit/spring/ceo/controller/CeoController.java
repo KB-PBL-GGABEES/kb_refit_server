@@ -46,7 +46,7 @@ public class CeoController {
     }
 
     @ApiOperation(value = "영수증 상세 내역 조회", notes = "영수증 상세 내역을 보여줍니다.")
-    @GetMapping("/receiptDetail")
+    @GetMapping("/receipt/detail")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "영수증 상세 내역 조회 성공"),
             @ApiResponse(code = 400, message = "잘못된 요청"),
