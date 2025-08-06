@@ -12,49 +12,6 @@ import java.util.Map;
 public interface HospitalMapper {
 
     // 의료비 납입내역 조회
-
-    // 최근 N개월 이내의 의료 영수증 목록 조회 (커서 기반)
-    @Select("SELECT " +
-            "r.created_at AS createdAt, " +
-            "c.company_name AS storeName, " +
-            "hp.process_state AS processState, " +
-            "r.total_price AS totalPrice, " +
-            "r.receipt_id AS receiptId " +
-            "FROM receipt r " +
-            "JOIN company c ON r.company_id = c.company_id " +
-            "JOIN categories cat ON c.category_id = cat.category_id " +
-            "LEFT JOIN hospital_process hp ON r.receipt_id = hp.receipt_id " +
-            "WHERE r.user_id = #{userId} " +
-            "AND cat.category_id = 1 " +
-            "AND r.receipt_id < #{cursorId} " +
-            "AND r.created_at >= DATE_SUB(NOW(), INTERVAL #{period} MONTH) " +  // 최근 N개월 조건
-            "ORDER BY r.receipt_id DESC " +
-            "LIMIT 20")
-    List<MedicalReceiptDto> findByCursorIdWithinMonths(@Param("userId") Long userId,
-                                                       @Param("cursorId") Long cursorId,
-                                                       @Param("period") Integer period);
-    // 시작일 ~ 종료일 사이 의료 영수증 목록 조회 (커서 기반)
-    @Select("SELECT " +
-            "r.created_at AS createdAt, " +
-            "c.company_name AS storeName, " +
-            "hp.process_state AS processState, " +
-            "r.total_price AS totalPrice, " +
-            "r.receipt_id AS receiptId " +
-            "FROM receipt r " +
-            "JOIN company c ON r.company_id = c.company_id " +
-            "JOIN categories cat ON c.category_id = cat.category_id " +
-            "LEFT JOIN hospital_process hp ON r.receipt_id = hp.receipt_id " +
-            "WHERE r.user_id = #{userId} " +
-            "AND cat.category_id = 1 " +
-            "AND r.receipt_id < #{cursorId} " +
-            "AND r.created_at BETWEEN #{startDate} AND #{endDate} " +
-            "ORDER BY r.receipt_id DESC " +
-            "LIMIT 20")
-    List<MedicalReceiptDto> findByCursorIdWithPeriod(@Param("userId") Long userId,
-                                                     @Param("cursorId") Long cursorId,
-                                                     @Param("startDate") Date startDate,
-                                                     @Param("endDate") Date endDate);
-
     @SelectProvider(type = HospitalQueryProvider.class, method = "buildFilteredQuery")
     List<MedicalReceiptDto> getFilteredList(Map<String, Object> params);
 

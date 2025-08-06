@@ -65,31 +65,6 @@ public class HospitalService {
         return MedicalReceiptListCursorDto.from(list, nextCursorId);
     }
 
-    // 2. 최근 n개월 내 의료 영수증 조회
-    @Transactional(readOnly = true)
-    public MedicalReceiptListCursorDto getListMonths(Long userId, Long cursorId, Integer period) {
-        if (cursorId == null) cursorId = Long.MAX_VALUE;
-
-        List<MedicalReceiptDto> list = hospitalMapper.findByCursorIdWithinMonths(userId, cursorId, period);
-        Long nextCursorId = (list.size() < 20) ? null : list.get(list.size() - 1).getReceiptId();
-
-        return MedicalReceiptListCursorDto.from(list, nextCursorId);
-    }
-
-    // 3. 시작일 ~ 종료일 기간 필터로 의료 영수증 조회
-    @Transactional(readOnly = true)
-    public MedicalReceiptListCursorDto getListPeriod(Long userId, Long cursorId, Date startDate, Date endDate) {
-        if (cursorId == null) cursorId = Long.MAX_VALUE;
-
-        List<MedicalReceiptDto> list = hospitalMapper.findByCursorIdWithPeriod(userId, cursorId, startDate, endDate);
-        Long nextCursorId = (list.size() < 20) ? null : list.get(list.size() - 1).getReceiptId();
-
-        return MedicalReceiptListCursorDto.from(list, nextCursorId);
-    }
-
-
-
-
 
     // 의료 영수증 상세 조회
     public MedicalReceiptDetailDto findHospitalExpenseDetail(Long userId, Long receiptId) {
