@@ -15,6 +15,4 @@ import lombok.NoArgsConstructor;
 public class EmailSendDto {
     @ApiModelProperty(value = "이메일 주소", example = "test@naver.com")
     private String email;
-//    @ApiModelProperty(value = "총 전송한 항목 수", example = "4")
-//    private int numberSend;
 }

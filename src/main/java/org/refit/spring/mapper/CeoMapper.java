@@ -167,10 +167,11 @@ public interface CeoMapper {
             "  AND EXISTS (\n" +
             "    SELECT 1 FROM employee e\n" +
             "    WHERE e.user_id = r.user_id\n" +
+            "   AND MONTH(r.updated_at) = MONTH(CURDATE()) " +
+            "   AND YEAR(r.updated_at) = YEAR(CURDATE())" +
             "      AND e.company_id IN (\n" +
             "        SELECT company_id FROM company WHERE ceo_id = #{userId}))")
-    int countCompletedReceipts(@Param("userId") Long userId
-    );
+    int countCompletedReceipts(@Param("userId") Long userId);
 
     // 영수 처리 승인 및 반려
     @Select("SELECT receipt_process_id FROM receipt_process WHERE receipt_id = #{receiptId}")

@@ -19,6 +19,8 @@ public interface CeoService {
     // 경비 처리 완료 내역 조회
     List<ReceiptDto> getCompletedReceipts(Long userId, Long cursorId, Integer period, Date startDate, Date endDate, ProcessState processState, Sort sort);
 
+    int monthlySummary(Long userId);
+
     // 처리 완료된 항목 이메일 전송
     EmailSendDto sendEmail(String email, Long userId);
 

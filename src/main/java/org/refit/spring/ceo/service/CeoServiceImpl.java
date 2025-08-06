@@ -65,10 +65,17 @@ public class CeoServiceImpl implements CeoService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public int monthlySummary (Long userId) {
+        int numberSend = ceoMapper.countCompletedReceipts(userId);
+
+        return numberSend;
+    }
+
     // 처리 완료된 항목 이메일 전송
     @Override
     public EmailSendDto sendEmail(String email, Long userId) {
-        int numberSend = ceoMapper.countCompletedReceipts(userId);
+
         // 실제 이메일 전송 로직 생략
         return EmailSendDto.builder()
                 .email(email)

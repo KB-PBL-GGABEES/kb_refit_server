@@ -73,6 +73,7 @@ public class CeoController {
             @RequestParam(required = false) ProcessState processState,
             @RequestParam(required = false) Sort sort) {
 
+
         List<ReceiptDto> list = ceoService.getCompletedReceipts(userId, cursorId, period, startDate, endDate, processState, sort);
 
         Long nextCursorId = list.size() < 20 ? null : list.get(list.size() - 1).getReceiptId();
@@ -83,6 +84,26 @@ public class CeoController {
 
         return ResponseEntity.ok(result);
     }
+
+    @ApiOperation(value = "처리 완료된 항목 개수 반환", notes = "이번 달 처리가 완료된 항목들의 개수를 반환합니다.")
+    @GetMapping("/monthlySummary")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "처리 완료된 항목 개수 전송 성공"),
+            @ApiResponse(code = 400, message = "잘못된 요청"),
+            @ApiResponse(code = 500, message = "서버 내부 오류")
+    })
+    public ResponseEntity<?> getMonthlySummary(
+            @ApiIgnore @UserId Long userId) {
+        return ResponseEntity.ok(ceoService.monthlySummary(userId));
+    }
+
+//        try {
+//            receiptExportService.generateAndSendCsvByEmail(userId, request.getEmail());
+//            return ResponseEntity.ok("이메일 전송 완료");
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body("이메일 전송 실패: " + e.getMessage());
+//        }
 
     @ApiOperation(value = "처리 완료된 항목 이메일 전송", notes = "경비 처리가 완료된(승인/반려) 항목을 특정 이메일로 보냅니다.")
     @PostMapping("/sendEmail")
