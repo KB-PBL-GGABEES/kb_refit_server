@@ -33,11 +33,11 @@ public class HospitalService {
 
     // 의료 영수증 목록 조회
     @Transactional(readOnly = true)
-    public MedicalReceiptListCursorDto getFilteredList(Long userId, Long size, MedicalListRequestDto medicalListRequestDto) {
+    public MedicalReceiptListCursorDto getFilteredList(Long userId, MedicalListRequestDto medicalListRequestDto) {
         Map<String, Object> params = new HashMap<>();
         params.put("userId", userId);
 
-        long paginationSize = (size != null && size > 0) ? size : 20;
+        long paginationSize = (medicalListRequestDto.getSize() != null && medicalListRequestDto.getSize() > 0) ? medicalListRequestDto.getSize() : 20;
 
         // 1. 기본 정렬값 지정
         if (medicalListRequestDto.getSort() == null) medicalListRequestDto.setSort(HospitalSort.LATEST);

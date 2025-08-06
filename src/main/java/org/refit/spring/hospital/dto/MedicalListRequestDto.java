@@ -25,4 +25,5 @@ public class MedicalListRequestDto {
     private HospitalType type;
     private HospitalFilter filter;
     private HospitalSort sort;
+    private Long size;
 }
