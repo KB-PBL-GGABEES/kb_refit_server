@@ -34,8 +34,10 @@ public class ReceiptProcessService {
     // OpenAPI 요청 URL
     private String validateUrl;
 
+
     private void validateRequiredFields(Map<String, Object> fields) {
         List<String> missing = new ArrayList<>();
+
 
         for (Map.Entry<String, Object> entry : fields.entrySet()) {
             Object value = entry.getValue();
@@ -57,6 +59,7 @@ public class ReceiptProcessService {
 
         //필수 파라미터 validation
         validateRequiredFields(requiredFields);
+
 
         // 1. OpenAPI 요청
         String url = validateUrl + "?serviceKey=" + apiKey + "&returnType=JSON";
@@ -120,33 +123,48 @@ public class ReceiptProcessService {
     public List<ReceiptSelectDto> getCompanySelectionListByUserId(Long userId) {
         List<ReceiptSelectDto> companyList =  receiptProcessMapper.findCompanySelectionListByUserId(userId);
         if(companyList.isEmpty()){
-            throw new NoSuchElementException("");
+            throw new NoSuchElementException("조회되는 회사 목록이 없습니다.");
         }
         return companyList;
     }
 
     // 영수 처리 정보 조회
-    public ReceiptProcessCheckDto getCompanyInfoByReceiptId(Long receiptId) {
-        return receiptProcessMapper.findCompanyInfoByReceiptId(receiptId);
-    }
+    public ReceiptProcessCheckDto getCompanyInfoByCompanyId(Long companyId) {
+        if(companyId == null || companyId.toString().isEmpty()) {
+            throw new IllegalArgumentException("companyId는 필수 파라미터입니다.");
+        }
 
+        ReceiptProcessCheckDto dto = receiptProcessMapper.getCompanyInfoByCompanyId(companyId);
+
+        if(dto == null){
+            throw new NoSuchElementException("해당 기업과 관련된 데이터가 존재하지 않습니다.");
+        }
+        log.info(String.valueOf(dto.getCompanyId()));
+
+        return dto;
+    }
 
     // 영수 처리 요청
     public void upsertReceiptProcess(ReceiptProcessRequestDto dto, Long userId) {
 
-        if (dto.getCompanyId() == null) {
-            throw new IllegalArgumentException("companyId는 필수입니다.");
+        Map<String, Object> requiredFields = new HashMap<>();
+        requiredFields.put("companyId", dto.getCompanyId());
+        requiredFields.put("receiptId", dto.getReceiptId());
+        requiredFields.put("progressType", dto.getProgressType());
+        requiredFields.put("progressDetail", dto.getProgressDetail());
+
+        validateRequiredFields(requiredFields);
+
+        // 비어 있는 voucher는 null 처리
+        if (dto.getFileName() != null && dto.getFileName().trim().isEmpty()) {
+            dto.setFileName(null);
         }
 
-        // 1. receiptId 유효성 검사
-        if (dto.getReceiptId() == null) {
-            throw new IllegalArgumentException("receiptId는 필수입니다.");
-        }
 
         // 2. 해당 영수증이 userId 소유인지 확인 (ceo 권한 검증)
         Long ceoId = receiptProcessMapper.ceoIdByCompanyId(dto.getCompanyId());
         if (ceoId == null) {
-            throw new IllegalArgumentException("해당 기업에 대한 대표 정보가 올바르지 않거나, 없습니다.");
+            throw new NoSuchElementException("해당 기업에 대한 대표 정보가 올바르지 않거나, 없습니다.");
         }
         dto.setCeoId(ceoId);
         // 3. receipt_process 존재 여부 확인

@@ -21,7 +21,7 @@ public interface ReceiptProcessMapper {
     @Select("SELECT c.company_id AS companyId, c.company_name AS companyName, c.address AS address " +
             "FROM company c " +
             "WHERE c.company_id = #{companyId}")
-    ReceiptProcessCheckDto findCompanyInfoByReceiptId(@Param("companyId") Long companyId);
+    ReceiptProcessCheckDto getCompanyInfoByCompanyId(@Param("companyId") Long companyId);
 
 
 
