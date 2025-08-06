@@ -78,10 +78,13 @@ public class CeoServiceImpl implements CeoService {
 
     // 영수 처리 승인 및 반려
     @Override
-    public ReceiptProcessDto receiptProcessing(Long receiptProcessId, String progressState, String rejectedReason) {
-        ceoMapper.updateProcessState(receiptProcessId, progressState, rejectedReason);
+    public ReceiptProcessDto receiptProcessing(Long receiptId, String progressState, String rejectedReason) {
+        Long receiptProcessId = ceoMapper.getReceiptId(receiptId);
+        if (receiptProcessId == null) {
+            throw new IllegalArgumentException("영수 처리 내역이 존재하지 않습니다.");
+        }
 
-        Long receiptId = ceoMapper.getReceiptProcessId(receiptProcessId);
+        ceoMapper.updateProcessState(receiptProcessId, progressState, rejectedReason);
 
         return ReceiptProcessDto.builder()
                 .message("영수 처리 완료")
@@ -89,6 +92,7 @@ public class CeoServiceImpl implements CeoService {
                 .receiptId(receiptId)
                 .build();
     }
+
 
     // 한달 법카 금액 조회
     @Override

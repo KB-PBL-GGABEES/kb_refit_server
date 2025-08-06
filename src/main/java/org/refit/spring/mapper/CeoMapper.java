@@ -173,8 +173,8 @@ public interface CeoMapper {
     );
 
     // 영수 처리 승인 및 반려
-    @Select("SELECT receipt_id FROM receipt_process WHERE receipt_process_id = #{receiptProcessId}")
-    Long getReceiptProcessId(@Param("receiptProcessId") Long receiptProcessId);
+    @Select("SELECT receipt_process_id FROM receipt_process WHERE receipt_id = #{receiptId}")
+    Long getReceiptId(@Param("receiptId") Long receiptId);
 
     @Update("UPDATE receipt_process\n" +
             "SET process_state = #{progressState},\n" +
