@@ -80,12 +80,8 @@ public class ReceiptExportService {
         helper.setText(htmlContent, true); //html = true
 
         // 2. logo.png 이미지 추가
-//        File imageFile = new File("src/main/resources/static/images/logo.png");
         ClassPathResource imageResource = new ClassPathResource("static/images/logo.png");
         helper.addInline("logo", imageResource);
-
-        //html 사용할거니까 기존에 사용하던 setText는 주석처리
-//        helper.setText("첨부된 CSV 파일을 확인해주세요.", false);
 
         // 3. CSV 첨부
         helper.addAttachment(file.getName(), file);
