@@ -100,7 +100,7 @@ public class HospitalService {
         String state = hospitalMapper.findProcessStateByReceiptId(dto.getReceiptId());
 
         if (state == null) {
-            hospitalMapper.insertEmptyHospitalProcess(dto.getReceiptId());
+            hospitalMapper.insertEmptyHospitalProcess(dto.getReceiptId(), "");
         }
         hospitalMapper.updateHospitalVoucher(dto.getReceiptId(), dto.getMedicalImageFileName(), userId);
     }

@@ -21,6 +21,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
@@ -49,20 +51,32 @@ public class ReceiptService {
     }
 
     @Transactional
-    public Receipt create(ReceiptRequestDto dto, Long userId) {
+    public Receipt create(ReceiptRequestDto dto, Long userId) throws ParseException {
         List<ReceiptContentRequestsDto> requestList = dto.getContentsList();
         Merchandise firstMerchandise = merchandiseMapper.findByMerchandiseId(requestList.get(0).getMerchandiseId());
         Receipt receipt = initReceipt(dto.getCardId(), firstMerchandise.getCompanyId(), receiptMapper.getCompanyName(firstMerchandise.getCompanyId()), userId);
-        List<ReceiptContentDetailDto> list = makeContents(dto.getContentsList(), receipt);
-        updatePrice(receipt);
-        receipt.setContentList(list);
-        receiptMapper.update(userId, receipt);
         Long category = receiptMapper.findCategory(userId, receipt.getReceiptId());
-        if (category == 1) hospitalMapper.insertEmptyHospitalProcess(receipt.getReceiptId());
-        else ceoMapper.insertProcess(null, userId, receipt.getReceiptId());
-
+        if (category == 1) {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            Long price = firstMerchandise.getMerchandisePrice();
+            receipt.setTotalPrice(price);
+            Long supply = (long) (price / 1.1);
+            receipt.setSupplyPrice(supply);
+            receipt.setSurtax(price - supply);
+            receipt.setUpdatedAt(new Date());
+            User user = userMapper.findByUserId(userId);
+            hospitalMapper.insertEmptyHospitalProcess(receipt.getReceiptId(), user.getName() + "_" + sdf.format(receipt.getCreatedAt()) + "_이비인후과");
+        }
+        else {
+            List<ReceiptContentDetailDto> list = makeContents(dto.getContentsList(), receipt);
+            receipt.setContentList(list);
+            ceoMapper.insertProcess(null, userId, receipt.getReceiptId());
+        }
+        updatePrice(receipt);
+        receiptMapper.update(userId, receipt);
         return receipt;
     }
+
 
     @Transactional
     public Receipt refund(Long userId, Long receiptId) {
@@ -166,14 +180,23 @@ public class ReceiptService {
     }
 
     @Transactional(readOnly = true)
-    public ReceiptListDto getFilteredList(Long userId, Long cursorId, Integer period, Date startDate, Date endDate, ReceiptType type, ReceiptSort sort, ReceiptFilter filter) {
-        if (cursorId == null) {
-            cursorId = (sort == ReceiptSort.LATEST || sort == null) ? Long.MAX_VALUE : 0L;
+    public ReceiptListCursorDto getFilteredList(Long userId, Long size, ReceiptListRequestDto receiptListRequestDto) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("userId", userId);
+
+        long paginationSize = (size != null && size > 0) ? size : 20;
+
+        if (receiptListRequestDto.getSort() == null) receiptListRequestDto.setSort(ReceiptSort.LATEST);
+        if (receiptListRequestDto.getCursorId() == null) receiptListRequestDto.setCursorId((receiptListRequestDto.getSort() == ReceiptSort.OLDEST) ? 0L : Long.MAX_VALUE);
+        if (receiptListRequestDto.getPeriod() == null) {
+            params.put("startDate", receiptListRequestDto.getStartDate());
+            params.put("endDate", receiptListRequestDto.getEndDate());
+        } else {
+            params.put("period", receiptListRequestDto.getPeriod());
         }
-        ReceiptType finalType = (type == ReceiptType.ALL) ? null : type;
-        List<Receipt> receipts = receiptMapper.getFilteredList(userId, cursorId, period, startDate, endDate, finalType, filter, sort);
-        Long nextCursorId = receipts.size() < 20 ? null : receipts.get(receipts.size() - 1).getReceiptId();
-        return ReceiptListDto.from(userId, receipts, nextCursorId);
+        List<Receipt> receipts = receiptMapper.getFilteredList(params);
+        Long nextCursorId = (receipts.size() < paginationSize) ? null : receipts.get(receipts.size() - 1).getReceiptId();
+        return ReceiptListCursorDto.from(receipts, nextCursorId);
     }
 
 
@@ -256,6 +279,7 @@ public class ReceiptService {
         if (badgeId != null) {
             String sqlTemplate = personalBadgeMapper.getCondition(badgeId);
             String sql = sqlTemplate.replace("${userId}", userId.toString());
+            System.out.println(sql);
             try (Connection conn = dataSource.getConnection();
                  Statement stmt = conn.createStatement();
                  ResultSet rs = stmt.executeQuery(sql)) {

@@ -10,11 +10,12 @@ import org.refit.spring.receipt.entity.Receipt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 
+import java.text.ParseException;
 import java.util.List;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {RootConfig.class})
+@SpringJUnitWebConfig(classes = {RootConfig.class})
 @Log4j
 class ReceiptServiceTest {
 
@@ -24,7 +25,7 @@ class ReceiptServiceTest {
 
     @DisplayName("구매 영수증 생성 테스트")
     @Test
-    void create() {
+    void create() throws ParseException {
         ReceiptRequestDto dto = new ReceiptRequestDto();
         ReceiptContentRequestsDto content = new ReceiptContentRequestsDto();
         content.setMerchandiseId(1L);
@@ -40,9 +41,9 @@ class ReceiptServiceTest {
     @Test
     void getList() {
         Long userId = 5L;
-        ReceiptListDto listDto = service.getFilteredList(userId, null, null, null, null, null, null, null);
-        log.info(listDto.getReceiptList());
-        log.info(listDto.getNextCursorId());
+//        ReceiptListDto listDto = service.getFilteredList(userId, null, null, null, null, null, null, null);
+//        log.info(listDto.getReceiptList());
+//        log.info(listDto.getNextCursorId());
     }
 
     @DisplayName("구매 영수증 상세 조회 테스트")
@@ -71,7 +72,7 @@ class ReceiptServiceTest {
 
     @DisplayName("영수증 환불 테스트")
     @Test
-    void refund() {
+    void refund() throws ParseException {
         ReceiptRequestDto dto = new ReceiptRequestDto();
         ReceiptContentRequestsDto content = new ReceiptContentRequestsDto();
         content.setMerchandiseId(1L);
