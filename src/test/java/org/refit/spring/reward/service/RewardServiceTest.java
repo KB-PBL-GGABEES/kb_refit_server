@@ -3,7 +3,6 @@ package org.refit.spring.reward.service;
 import lombok.extern.log4j.Log4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.refit.spring.config.RootConfig;
 import org.refit.spring.reward.dto.RewardListDto;
 import org.refit.spring.reward.dto.RewardSummaryDto;
@@ -11,8 +10,6 @@ import org.refit.spring.reward.dto.RewardWalletRequestDto;
 import org.refit.spring.reward.dto.RewardWalletResponseDto;
 import org.refit.spring.reward.entity.Reward;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 
 import java.util.List;
@@ -29,7 +26,7 @@ class RewardServiceTest {
     @DisplayName("리워드 생성 테스트")
     @Test
     void create() {
-        Reward result = service.create(100L, 10000L, 5L, 78L);
+        Reward result = service.create(100L, 10000L, 5L, 391L);
 
         assertEquals(100L, (long) result.getCarbonPoint());
         assertEquals( 10000L * 0.05, (long) result.getReward());

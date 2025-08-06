@@ -3,13 +3,10 @@ package org.refit.spring.receipt.service;
 import lombok.extern.log4j.Log4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.refit.spring.config.RootConfig;
 import org.refit.spring.receipt.dto.*;
 import org.refit.spring.receipt.entity.Receipt;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 
 import java.text.ParseException;
@@ -41,9 +38,9 @@ class ReceiptServiceTest {
     @Test
     void getList() {
         Long userId = 5L;
-//        ReceiptListDto listDto = service.getFilteredList(userId, null, null, null, null, null, null, null);
-//        log.info(listDto.getReceiptList());
-//        log.info(listDto.getNextCursorId());
+        ReceiptListDto listDto = service.getFilteredList(userId, null, null, null, null, null, null, null);
+        log.info(listDto.getReceiptList());
+        log.info(listDto.getNextCursorId());
     }
 
     @DisplayName("구매 영수증 상세 조회 테스트")
