@@ -34,21 +34,21 @@ public class CeoController {
     final ReceiptExportService receiptExportService;
 
     @ApiOperation(value = "경비 처리가 필요한 내역 조회", notes = "경비 처리가 필요한 내역을 최신순으로 다 가져옵니다.")
+    @GetMapping("/pending")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "경비 처리가 필요한 내역 조회 성공"),
             @ApiResponse(code = 400, message = "잘못된 요청"),
             @ApiResponse(code = 500, message = "서버 내부 오류")
     })
-    @GetMapping("/pending")
     public ResponseEntity<PendingDetailDto> getPendingDetail(
             @ApiIgnore @UserId Long userId) {
         return ResponseEntity.ok(ceoService.getPendingDetail(userId));
     }
 
-    @ApiOperation(value = "경비 처리 항목 상세 조회", notes = "경비 청구 항목의 상세 정보를 보여줍니다.")
-    @GetMapping("/receiptProcessDetail")
+    @ApiOperation(value = "영수증 상세 내역 조회", notes = "영수증 상세 내역을 보여줍니다.")
+    @GetMapping("/receiptDetail")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "경비 청구 항목 상세 조회 성공"),
+            @ApiResponse(code = 200, message = "영수증 상세 내역 조회 성공"),
             @ApiResponse(code = 400, message = "잘못된 요청"),
             @ApiResponse(code = 500, message = "서버 내부 오류")
     })
@@ -134,7 +134,6 @@ public class CeoController {
         );
         return ResponseEntity.ok(result);
     }
-
 
     @ApiOperation(value = "한달 법카 금액 조회", notes = "법카의 이번 달 사용액과 지난달 사용액을 가져옵니다.")
     @GetMapping("/corporateCardCost")
