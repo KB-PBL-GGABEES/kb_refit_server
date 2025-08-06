@@ -82,6 +82,7 @@ public class ReceiptService {
     public Receipt refund(Long userId, Long receiptId) {
         Receipt nowReceipt = receiptMapper.get(userId, receiptId);
         if (nowReceipt == null) throw new IllegalArgumentException("존재하지 않는 영수증입니다.");
+        if (nowReceipt.getTransactionType().equals("환불")) throw new IllegalArgumentException("이미 환불된 영수증입니다.");
         Receipt refundReceipt = new Receipt();
         refundReceipt.setTotalPrice(-nowReceipt.getTotalPrice());
         refundReceipt.setSupplyPrice(-nowReceipt.getSupplyPrice());
@@ -180,23 +181,14 @@ public class ReceiptService {
     }
 
     @Transactional(readOnly = true)
-    public ReceiptListCursorDto getFilteredList(Long userId, Long size, ReceiptListRequestDto receiptListRequestDto) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("userId", userId);
-
-        long paginationSize = (size != null && size > 0) ? size : 20;
-
-        if (receiptListRequestDto.getSort() == null) receiptListRequestDto.setSort(ReceiptSort.LATEST);
-        if (receiptListRequestDto.getCursorId() == null) receiptListRequestDto.setCursorId((receiptListRequestDto.getSort() == ReceiptSort.OLDEST) ? 0L : Long.MAX_VALUE);
-        if (receiptListRequestDto.getPeriod() == null) {
-            params.put("startDate", receiptListRequestDto.getStartDate());
-            params.put("endDate", receiptListRequestDto.getEndDate());
-        } else {
-            params.put("period", receiptListRequestDto.getPeriod());
+    public ReceiptListDto getFilteredList(Long userId, Long cursorId, Integer period, Date startDate, Date endDate, ReceiptType type, ReceiptSort sort, ReceiptFilter filter) {
+        if (cursorId == null) {
+            cursorId = (sort == ReceiptSort.LATEST || sort == null) ? Long.MAX_VALUE : 0L;
         }
-        List<Receipt> receipts = receiptMapper.getFilteredList(params);
-        Long nextCursorId = (receipts.size() < paginationSize) ? null : receipts.get(receipts.size() - 1).getReceiptId();
-        return ReceiptListCursorDto.from(receipts, nextCursorId);
+        ReceiptType finalType = (type == ReceiptType.ALL) ? null : type;
+        List<Receipt> receipts = receiptMapper.getFilteredList(userId, cursorId, period, startDate, endDate, finalType, filter, sort);
+        Long nextCursorId = receipts.size() < 20 ? null : receipts.get(receipts.size() - 1).getReceiptId();
+        return ReceiptListDto.from(userId, receipts, nextCursorId);
     }
 
 

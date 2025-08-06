@@ -40,14 +40,15 @@ public class ReceiptController {
     @GetMapping("/list")
     public ResponseEntity<?> getList(
             @ApiIgnore @UserId Long userId,
-            @RequestParam(value = "size", required = false) Long size,
-            @ModelAttribute ReceiptListRequestDto receiptListRequestDto) {
-        try {
-            ReceiptListCursorDto dto = receiptService.getFilteredList(userId, size, receiptListRequestDto);
-            return ResponseEntity.ok(dto);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("message", "서버 오류로 인해 실패했습니다."));
-        }
+            @RequestParam(required = false) Long cursorId,
+            @RequestParam(required = false) Integer period,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate,
+            @RequestParam(required = false) ReceiptType type,
+            @RequestParam(required = false) ReceiptSort sort,
+            @RequestParam(required = false) ReceiptFilter filter) {
+        ReceiptListDto dto = receiptService.getFilteredList(userId, cursorId, period, startDate, endDate, type, sort, filter);
+        return ResponseEntity.ok(dto);
     }
 
     @ApiOperation(value = "영수증 상세 조회", notes = "영수증 아이디를 활용해 영수증에 기록된 모든 정보를 확인합니다.")

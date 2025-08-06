@@ -1,9 +1,7 @@
 package org.refit.spring.mapper;
 
 import org.apache.ibatis.annotations.*;
-import org.refit.spring.ceo.entity.Ceo;
 import org.refit.spring.receipt.ReceiptQueryProvider;
-import org.refit.spring.receipt.dto.ReceiptDetailDto;
 import org.refit.spring.receipt.dto.RejectedReceiptDto;
 import org.refit.spring.receipt.entity.Receipt;
 import org.refit.spring.receipt.entity.ReceiptContent;
@@ -13,7 +11,6 @@ import org.refit.spring.receipt.enums.ReceiptType;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 @Mapper
 public interface ReceiptMapper {
@@ -29,7 +26,14 @@ public interface ReceiptMapper {
     void update(@Param("userId") Long userId, @Param("receipt") Receipt receipt);
 
     @SelectProvider(type = ReceiptQueryProvider.class, method = "buildFilteredQuery")
-    List<Receipt> getFilteredList(Map<String, Object> params);
+    List<Receipt> getFilteredList(@Param("userId") Long userId,
+                                  @Param("cursorId") Long cursorId,
+                                  @Param("period") Integer period,
+                                  @Param("startDate") Date startDate,
+                                  @Param("endDate") Date endDate,
+                                  @Param("type") ReceiptType type,
+                                  @Param("filter") ReceiptFilter filter,
+                                  @Param("sort") ReceiptSort sort);
 
     @Select("SELECT * FROM receipt_content rc JOIN receipt r ON rc.receipt_id = r.receipt_id WHERE r.user_id = #{userId} AND rc.receipt_id = #{receiptId}")
     List<ReceiptContent> findContentsByReceiptId(@Param("userId") Long userId, @Param("receiptId") Long receiptId);
