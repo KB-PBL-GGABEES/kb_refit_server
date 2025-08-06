@@ -4,6 +4,7 @@ import lombok.extern.log4j.Log4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.refit.spring.ceo.dto.ReceiptDto;
 import org.refit.spring.config.RootConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -22,7 +23,7 @@ class CeoServiceImplTest {
     @DisplayName("경비 처리가 필요한 내역 조회")
     @Test
     void getPendingDetail() {
-
+        Long userId = 1L;
     }
 
     @DisplayName("경비 청구 항목 상세 조회")

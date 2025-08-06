@@ -58,8 +58,6 @@ public class ReceiptProcessService {
         //필수 파라미터 validation
         validateRequiredFields(requiredFields);
 
-
-
         // 1. OpenAPI 요청
         String url = validateUrl + "?serviceKey=" + apiKey + "&returnType=JSON";
 
