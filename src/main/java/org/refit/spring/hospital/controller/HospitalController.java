@@ -31,10 +31,9 @@ public class HospitalController {
     @GetMapping("/list")
     public ResponseEntity<?> getHospitalExpensesWithFilter(
             @ApiIgnore @UserId Long userId,
-            @RequestParam(value = "size", required = false) Long size,
             @ModelAttribute MedicalListRequestDto medicalListRequestDto) {
         try {
-            MedicalReceiptListCursorDto dto = hospitalService.getFilteredList(userId, size, medicalListRequestDto);
+            MedicalReceiptListCursorDto dto = hospitalService.getFilteredList(userId, medicalListRequestDto);
             return ResponseEntity.ok(dto);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
