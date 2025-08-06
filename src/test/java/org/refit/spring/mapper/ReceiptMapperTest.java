@@ -1,26 +1,15 @@
 package org.refit.spring.mapper;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.refit.spring.ceo.entity.Card;
-import org.refit.spring.ceo.entity.Company;
 import org.refit.spring.config.RootConfig;
 import org.refit.spring.receipt.dto.RejectedReceiptDto;
 import org.refit.spring.receipt.entity.Receipt;
 import org.refit.spring.receipt.entity.ReceiptContent;
-import org.refit.spring.receipt.enums.ReceiptFilter;
-import org.refit.spring.receipt.enums.ReceiptSort;
-import org.refit.spring.receipt.enums.ReceiptType;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -125,15 +114,15 @@ class ReceiptMapperTest {
             receipt.setCompanyId(2018168693L);
             receiptMapper.create(receipt);
         }
-//        List<Receipt> list = receiptMapper.getFilteredList();
-//        assertNotNull(list);
+        List<Receipt> list = receiptMapper.getFilteredList(1L, null, null, null, null, null, null, null);
+        assertNotNull(list);
 
         long prevId = Long.MAX_VALUE;
-//        for (Receipt receipt : list) {
-//            assertTrue(receipt.getReceiptId() < 9999L);
-//            assertTrue(receipt.getReceiptId() < prevId);
-//            prevId = receipt.getReceiptId();
-//        }
+        for (Receipt receipt : list) {
+            assertTrue(receipt.getReceiptId() < 9999L);
+            assertTrue(receipt.getReceiptId() < prevId);
+            prevId = receipt.getReceiptId();
+        }
     }
 
     @DisplayName("영수증 아이디를 바탕으로 영수증 항목을 찾습니다.")
@@ -263,10 +252,10 @@ class ReceiptMapperTest {
         assertNotNull(list);
     }
 
-    @DisplayName("배지를 찾습니다.")
+    @DisplayName("배지를 찾습니다. 단, 존재하지 않을 때만")
     @Test
     void findBadge() {
-        Long badge = receiptMapper.findBadge(1L, 78L);
+        Long badge = receiptMapper.findBadge(5L, 391L);
         assertNotNull(badge);
         assertEquals(1L, badge);
     }
@@ -274,7 +263,7 @@ class ReceiptMapperTest {
     @DisplayName("카테고리를 찾습니다.")
     @Test
     void findCategory() {
-        Long category = receiptMapper.findCategory(1L, 78L);
+        Long category = receiptMapper.findCategory(5L, 391L);
         assertNotNull(category);
         assertEquals(1, category);
     }
