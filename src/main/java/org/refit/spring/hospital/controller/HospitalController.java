@@ -64,7 +64,7 @@ public class HospitalController {
 
 
     // 병원 영수증 상세 조회
-    @ApiOperation(value = "의료비 납입 내역 상세 조회", notes = "의료비 납입 내역을 상세 조회할 수 있습니다.")
+    @ApiOperation(value = "병원 영수증 상세 조회", notes = "병원 영수증을 상세 조회할 수 있습니다.")
     @GetMapping("/detail")
     public ResponseEntity<?> getHospitalExpenseDetail(@ApiIgnore @UserId Long userId,
                                                       @RequestParam("receiptId") Long receiptId) {
