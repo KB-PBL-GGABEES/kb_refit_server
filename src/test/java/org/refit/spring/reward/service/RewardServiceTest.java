@@ -13,13 +13,13 @@ import org.refit.spring.reward.entity.Reward;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {RootConfig.class})
+@SpringJUnitWebConfig(classes = {RootConfig.class})
 @Log4j
 class RewardServiceTest {
 

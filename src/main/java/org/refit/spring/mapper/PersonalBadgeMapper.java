@@ -33,7 +33,7 @@ public interface PersonalBadgeMapper {
     @Select("SELECT badge_id FROM personal_badge WHERE personal_badge_id = #{personalBadgeId}")
     Long findBadgeIdByPersonalBadgeId(Long personalBadgeId);
 
-    @Select("SELECT badge_condition FROM badge WHERE badge_id = #{badgeId}")
+    @Select("SELECT badge_condition_desc FROM badge WHERE badge_id = #{badgeId}")
     String getCondition(@Param("badgeId") Long badgeId);
 
     @Insert("INSERT personal_badge (is_worn, created_at, updated_at, badge_id, user_id) VALUES (0, now(), now(), #{badgeId}, #{userId})")

@@ -8,6 +8,7 @@ import org.refit.spring.reward.entity.Reward;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
@@ -16,8 +17,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {RootConfig.class})
+@SpringJUnitWebConfig(classes = {RootConfig.class})
 @Transactional
 class RewardMapperTest {
 
