@@ -39,8 +39,6 @@ public class HospitalController {
             @RequestParam(required = false) HospitalSort sort,
             @RequestParam(required = false) HospitalFilter filter) {
 
-        System.out.println("=== [Controller] cursorId: " + cursorId + " / sort: " + sort);
-
         MedicalReceiptListCursorDto dto = hospitalService.getFilteredList(
                 userId, cursorId, period, startDate, endDate, type, filter, sort
         );

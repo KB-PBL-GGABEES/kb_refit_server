@@ -31,7 +31,7 @@ public class ReceiptProcessController {
             List<ReceiptSelectDto> companyList = receiptProcessService.getCompanySelectionListByUserId(userId);
             return ResponseEntity.ok(companyList);
         } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.singletonMap("message", "조회되는 회사 목록이 없습니다."));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.singletonMap("message", e.getMessage()));
         }
         catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -43,21 +43,13 @@ public class ReceiptProcessController {
     @GetMapping
     public ResponseEntity<?> getCompanyInfo(@RequestParam("companyId") Long companyId) {
         try {
-            ReceiptProcessCheckDto companyInfo = receiptProcessService.getCompanyInfoByReceiptId(companyId);
-            if (companyInfo == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Collections.singletonMap("message", "해당 영수증에 대한 회사 정보가 존재하지 않습니다."));
-            }
-
-            // 응답 포맷 맞춤
-            Map<String, Object> response = new LinkedHashMap<>();
-            response.put("companyId", companyId);
-            response.put("companyName", companyInfo.getCompanyName());
-            response.put("address", companyInfo.getAddress());
-
-            return ResponseEntity.ok(response);
-
-        } catch (Exception e) {
+            ReceiptProcessCheckDto companyInfo = receiptProcessService.getCompanyInfoByCompanyId(companyId);
+            return ResponseEntity.ok(companyInfo);
+        }
+        catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.singletonMap("message", e.getMessage()));
+        }
+        catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Collections.singletonMap("message", "회사 정보 확인 중 오류가 발생했습니다."));
         }
@@ -89,25 +81,14 @@ public class ReceiptProcessController {
     public ResponseEntity<?> upsertReceiptProcess(@ApiIgnore @UserId Long userId,
                                                   @RequestBody ReceiptProcessRequestDto dto) {
         try {
-            // 유효성 검사
-            if (dto.getReceiptId() == null ||
-                    dto.getProgressType() == null || dto.getProgressType().trim().isEmpty() ||
-                    dto.getProgressDetail() == null || dto.getProgressDetail().trim().isEmpty()) {
-                return ResponseEntity.badRequest()
-                        .body(Collections.singletonMap("message", "receiptId, progressType, progressDetail는 필수 입력 항목입니다."));
-            }
-
-            // 비어 있는 voucher는 null 처리
-            if (dto.getFileName() != null && dto.getFileName().trim().isEmpty()) {
-                dto.setFileName(null);
-            }
-
-            // 서비스 호출
             receiptProcessService.upsertReceiptProcess(dto, userId);
-
             return ResponseEntity.noContent().build();
 
-        } catch (IllegalArgumentException e) {
+        }
+        catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.singletonMap("message", e.getMessage()));
+        }
+        catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(Collections.singletonMap("message", e.getMessage()));
         } catch (Exception e) {
