@@ -36,6 +36,18 @@ public class ReceiptService {
 
     private final DataSource dataSource;
 
+    public void validateRequiredFields(Map<String, Object> fields) {
+        List<String> missing = new ArrayList<>();
+
+        for (Map.Entry<String, Object> entry: fields.entrySet()) {
+            Object value = entry.getValue();
+            if (value == null) missing.add(entry.getKey());
+        }
+        if (!missing.isEmpty()) {
+            throw new IllegalArgumentException("다음 필수 항목이 누락되었거나 비어 있습니다: " + String.join(", ", missing));
+        }
+    }
+
     @Transactional
     public Receipt create(ReceiptRequestDto dto, Long userId) {
         List<ReceiptContentRequestsDto> requestList = dto.getContentsList();
@@ -234,8 +246,8 @@ public class ReceiptService {
         return new RejectedReceiptListDto(rejectedList);
     }
 
-    public void changeState(Long userId, Long receiptProcessId) {
-        int update = receiptMapper.updateProcessState(userId, receiptProcessId);
+    public void changeState(Long userId, Long receiptId) {
+        int update = receiptMapper.updateProcessState(userId, receiptId);
         if (update == 0) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 영수증은 처리 대상이 아닙니다.");
     }
 
