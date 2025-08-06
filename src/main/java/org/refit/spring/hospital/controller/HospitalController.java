@@ -37,7 +37,7 @@ public class HospitalController {
             return ResponseEntity.ok(dto);
         }
         catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Collections.singletonMap("message", e.getMessage()));
         }
         catch (Exception e) {
