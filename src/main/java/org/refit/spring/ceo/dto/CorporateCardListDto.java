@@ -1,5 +1,6 @@
 package org.refit.spring.ceo.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -7,6 +8,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.refit.spring.ceo.entity.CorporateCardList;
+
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -20,14 +23,15 @@ public class CorporateCardListDto {
     @ApiModelProperty(value = "주문합계", example = "4100")
     private Long totalPrice;
     @ApiModelProperty(value = "결제 일시", example = "2025-07-27 09:30:00")
-    private String createdAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+    private LocalDateTime createdAt;
     @ApiModelProperty(value = "영수 처리 상태", example = "null")
     private String processState;
     @ApiModelProperty(value = "법인카드 여부", example = "true")
     private boolean corporate;
 
     public static CorporateCardListDto of(CorporateCardList vo) {
-        CorporateCardListDto CorporateCardList = CorporateCardListDto.builder()
+        return CorporateCardListDto.builder()
                 .receiptId(vo.getReceiptId())
                 .companyName(vo.getCompanyName())
                 .totalPrice(vo.getTotalPrice())
@@ -35,7 +39,5 @@ public class CorporateCardListDto {
                 .processState(vo.getProcessState())
                 .corporate(vo.isCorporate())
                 .build();
-
-        return CorporateCardList;
     }
 }

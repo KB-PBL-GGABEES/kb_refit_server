@@ -61,15 +61,15 @@ public interface CeoMapper {
             "        SELECT company_id FROM company WHERE ceo_id = #{userId}))")
     int countPendingReceipts(@Param("userId") Long userId);
 
-    // 이번 달 경비 처리 완료 내역 개수
+    // 이번 달에 경비 처리 완료 내역 개수
     @Select("SELECT COUNT(*) " +
             "FROM receipt r " +
             "JOIN receipt_process p ON r.receipt_id = p.receipt_id " +
             "JOIN card c ON r.card_id = c.card_id\n" +
             "WHERE p.process_state IN ('accepted', 'rejected')\n" +
             "AND c.is_corporate = FALSE\n" +
-            "  AND MONTH(r.created_at) = MONTH(CURDATE())\n" +
-            "  AND YEAR(r.created_at) = YEAR(CURDATE())\n" +
+            "  AND MONTH(r.updated_at) = MONTH(CURDATE())\n" +
+            "  AND YEAR(r.updated_at) = YEAR(CURDATE())\n" +
             "  AND EXISTS (\n" +
             "    SELECT 1 FROM employee e\n" +
             "    WHERE e.user_id = r.user_id\n" +
