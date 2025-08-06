@@ -170,14 +170,10 @@ public class HospitalController {
                                             @RequestBody InsuranceClaimDto dto) {
         try {
             hospitalService.insertInsuranceClaim(dto, userId);
-            Map<String, String> successMap = new HashMap<>();
-            successMap.put("message", "보험 청구가 완료되었습니다.");
-            return ResponseEntity.ok(successMap);
-
+            return ResponseEntity.ok(Collections.singletonMap("message", "보험 청구가 완료되었습니다."));
         } catch (IllegalArgumentException e) {
-            Map<String, String> errorMap = new HashMap<>();
-            errorMap.put("error", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMap);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Collections.singletonMap("error", e.getMessage()));
         }
     }
 }
