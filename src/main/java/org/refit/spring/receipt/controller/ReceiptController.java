@@ -16,8 +16,12 @@ import org.refit.spring.receipt.service.ReceiptService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import springfox.documentation.annotations.ApiIgnore;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.NoSuchElementException;
 
 
 @Api(tags = "영수증 API", description = "영수증 등록 및 조회 관련 API입니다.")
@@ -26,9 +30,6 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class ReceiptController {
     private final ReceiptService receiptService;
-
-
-
 
 
     @ApiOperation(value = "영수증 목록 조회", notes = "전체 영수증을 조회하며, 파라미터로 필터링이 가능합니다.")
@@ -59,9 +60,21 @@ public class ReceiptController {
     public ResponseEntity<?> get(
             @ApiIgnore @UserId Long userId,
             @RequestParam(required = false) Long cursorId,
-            @RequestParam("receiptId") Long receiptId) {
-        ReceiptDetailDto receipt = receiptService.get(userId, cursorId, receiptId);
-        return ResponseEntity.ok(receipt);
+            @RequestParam(required = false) Long receiptId) {
+        try {
+            Map<String, Object> requiredFields = new HashMap<>();
+            requiredFields.put("receiptId", receiptId);
+            receiptService.validateRequiredFields(requiredFields);
+
+            ReceiptDetailDto receipt = receiptService.get(userId, cursorId, receiptId);
+            return ResponseEntity.ok(receipt);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.badRequest().body("해당 영수증이 존재하지 않습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("서버 내부 오류가 발생했습니다.");
+        }
     }
 
     @ApiOperation(value = "한 달 비용 조회", notes = "이번 달과 지난 달의 사용 내역 합계를 확인합니다.")
@@ -93,7 +106,19 @@ public class ReceiptController {
     @PatchMapping("/completeDeposit")
     public ResponseEntity<?> changeState(@ApiIgnore @UserId Long userId,
                                          @RequestBody ChangeStateRequestDto requestDto) {
-        receiptService.changeState(userId, requestDto.getReceiptId());
-        return ResponseEntity.noContent().build();
+        try {
+            Map<String, Object> requiredFields = new HashMap<>();
+            requiredFields.put("receiptId", requestDto.getReceiptId());
+            receiptService.validateRequiredFields(requiredFields);
+
+            receiptService.changeState(userId, requestDto.getReceiptId());
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("서버 내부 오류가 발생했습니다.");
+        }
     }
 }
