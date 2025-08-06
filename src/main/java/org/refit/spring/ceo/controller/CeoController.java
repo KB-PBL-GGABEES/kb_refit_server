@@ -80,7 +80,7 @@ public class CeoController {
 
         Map<String, Object> result = new HashMap<>();
         result.put("list", list);
-        result.put("nextCursorId", nextCursorId);
+        result.put("cursorId", nextCursorId);
 
         return ResponseEntity.ok(result);
     }
@@ -97,14 +97,6 @@ public class CeoController {
         return ResponseEntity.ok(ceoService.monthlySummary(userId));
     }
 
-//        try {
-//            receiptExportService.generateAndSendCsvByEmail(userId, request.getEmail());
-//            return ResponseEntity.ok("이메일 전송 완료");
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body("이메일 전송 실패: " + e.getMessage());
-//        }
-
     @ApiOperation(value = "처리 완료된 항목 이메일 전송", notes = "경비 처리가 완료된(승인/반려) 항목을 특정 이메일로 보냅니다.")
     @PostMapping("/sendEmail")
     @ApiResponses(value = {
@@ -114,8 +106,8 @@ public class CeoController {
     })
     public ResponseEntity<?> sendEmail(
             @RequestBody EmailSendDto request, @ApiIgnore @UserId Long userId) {
-        //csv파일로 만들기
 
+        //csv파일로 만들기
         try {
             receiptExportService.generateAndSendCsvByEmail(userId, request.getEmail());
             return ResponseEntity.ok("이메일 전송 완료");
@@ -178,7 +170,7 @@ public class CeoController {
 
         Map<String, Object> result = new HashMap<>();
         result.put("list", list);
-        result.put("nextCursorId", nextCursorId);
+        result.put("cursorId", nextCursorId);
 
         return ResponseEntity.ok(result);
     }
