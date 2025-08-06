@@ -48,11 +48,11 @@ public class HospitalQueryProvider {
 
         // 처리 여부 필터
         HospitalFilter filter = (HospitalFilter) params.get("filter");
-        if (filter != null && !filter.isAll()) {
-            if (filter == HospitalFilter.NONE) {
+        if (filter != null && !filter.isProcessed()) {
+            if (filter == HospitalFilter.UNPROCESSED) {
                 sql.append(" AND (hp.process_state IS NULL OR hp.process_state = 'none') ");
-            } else {
-                sql.append(" AND hp.process_state = '").append(filter.getDbValue()).append("' ");
+            } else if (filter == HospitalFilter.PROCESSED) {
+                sql.append(" AND hp.process_state IN ('accepted', 'rejected') ");
             }
         }
 
