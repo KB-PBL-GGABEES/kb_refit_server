@@ -35,30 +35,15 @@ public class HospitalController {
         try {
             MedicalReceiptListCursorDto dto = hospitalService.getFilteredList(userId, medicalListRequestDto);
             return ResponseEntity.ok(dto);
-        } catch (Exception e) {
+        }
+        catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Collections.singletonMap("message", e.getMessage()));
+        }
+        catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Collections.singletonMap("message", "서버 오류로 인해 실패했습니다."));
         }
-    }
-
-
-    @ApiOperation(value = "최근 N개월 내 의료비 납입 내역 조회", notes = "최근 N개월 내의 병원 영수증을 조회할 수 있습니다.")
-    @GetMapping("/list/months")
-    public ResponseEntity<?> getHospitalExpensesWithinMonths(@ApiIgnore @UserId Long userId,
-                                                             @RequestParam(value = "cursorId", required = false) Long cursorId,
-                                                             @RequestParam(value = "period") Integer period) {
-        MedicalReceiptListCursorDto dto = hospitalService.getListMonths(userId, cursorId, period);
-        return ResponseEntity.ok(dto);
-    }
-
-    @ApiOperation(value = "기간 필터로 의료비 납입 내역 조회", notes = "시작일과 종료일 사이의 병원 영수증 목록을 조회합니다.")
-    @GetMapping("/list/period")
-    public ResponseEntity<?> getHospitalExpensesByPeriod(@ApiIgnore @UserId Long userId,
-                                                         @RequestParam(value = "cursorId", required = false) Long cursorId,
-                                                         @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
-                                                         @RequestParam("endDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate) {
-        MedicalReceiptListCursorDto dto = hospitalService.getListPeriod(userId, cursorId, startDate, endDate);
-        return ResponseEntity.ok(dto);
     }
 
 
