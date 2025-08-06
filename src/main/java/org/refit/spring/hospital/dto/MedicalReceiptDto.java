@@ -8,7 +8,7 @@ import java.util.Date;
 
 @Getter
 @Setter
-public class MedicalReceiptListDto {
+public class MedicalReceiptDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date createdAt;
     private String storeName;
