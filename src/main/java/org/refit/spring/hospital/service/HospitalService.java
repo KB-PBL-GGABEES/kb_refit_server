@@ -60,7 +60,6 @@ public class HospitalService {
         params.put("filter", medicalListRequestDto.getFilter());
         params.put("type", medicalListRequestDto.getType());
         params.put("size", paginationSize);
-
         validateRequiredFields(params);
 
         List<MedicalReceiptDto> list = hospitalMapper.getFilteredList(params);
