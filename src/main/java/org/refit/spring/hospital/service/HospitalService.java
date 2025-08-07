@@ -79,15 +79,12 @@ public class HospitalService {
 
         validateRequiredFields(requiredFields);
 
-        List<MedicalReceiptDetailDto> results =
-                hospitalMapper.findHospitalExpenseDetailByUserIdAndReceiptId(userId, receiptId);
-
-
-        if (results == null || results.isEmpty()) {
+        MedicalReceiptDetailDto result = hospitalMapper.findHospitalExpenseDetailByUserIdAndReceiptId(userId, receiptId);
+        if (result == null) {
             throw new IllegalArgumentException("해당 영수증을 찾을 수 없습니다.");
         }
 
-        return results.get(0);
+        return result;
     }
 
     // 진료비 세부산정내역 PDF 파일명 DB저장
