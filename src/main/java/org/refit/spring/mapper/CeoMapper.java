@@ -177,29 +177,27 @@ public interface CeoMapper {
                             @Param("rejectedReason") String rejectedReason);
 
     // 이번 달 법카 사용 금액 조회
-    @Select("SELECT SUM(r.total_price) AS totalPrice " +
-            "FROM receipt r " +
-            "JOIN card c ON r.card_id = c.card_id " +
-            "JOIN employee e ON r.user_id = e.user_id " +
-            "JOIN employee emp ON emp.company_id = e.company_id " +
-            "WHERE c.is_corporate = TRUE " +
-            "AND c.is_corporate = TRUE " +
-            "AND emp.user_id = #{ceoId} " +
-            "AND MONTH(r.created_at) = MONTH(CURDATE()) " +
-            "AND YEAR(r.created_at) = YEAR(CURDATE())")
+    @Select("SELECT SUM(r.total_price) AS totalPrice\n" +
+            "FROM receipt r\n" +
+            "JOIN card c ON r.card_id = c.card_id\n" +
+            "JOIN employee e ON r.user_id = e.user_id\n" +
+            "JOIN company cp ON e.company_id = cp.company_id\n" +
+            "WHERE c.is_corporate = TRUE\n" +
+            "  AND cp.ceo_id = #{ceoId}\n" +
+            "  AND MONTH(r.created_at) = MONTH(CURDATE())\n" +
+            "  AND YEAR(r.created_at) = YEAR(CURDATE())\n")
     Long getCorporateCardCostThisMonth(@Param("ceoId") Long ceoId);
 
     // 지난달 법카 사용 금액 조회
-    @Select("SELECT SUM(r.total_price) AS lastMonth " +
-            "FROM receipt r " +
-            "JOIN card c ON r.card_id = c.card_id " +
-            "JOIN employee e ON r.user_id = e.user_id " +
-            "JOIN employee emp ON emp.company_id = e.company_id " +
-            "WHERE c.is_corporate = TRUE " +
-            "AND c.is_corporate = TRUE " +
-            "AND emp.user_id = #{ceoId} " +
-            "AND MONTH(r.created_at) = MONTH(DATE_SUB(CURDATE(), INTERVAL 1 MONTH)) " +
-            "AND YEAR(r.created_at) = YEAR(DATE_SUB(CURDATE(), INTERVAL 1 MONTH))")
+    @Select("SELECT SUM(r.total_price) AS lastMonth\n" +
+            "FROM receipt r\n" +
+            "JOIN card c ON r.card_id = c.card_id\n" +
+            "JOIN employee e ON r.user_id = e.user_id\n" +
+            "JOIN company cp ON e.company_id = cp.company_id\n" +
+            "WHERE c.is_corporate = TRUE\n" +
+            "  AND cp.ceo_id = #{ceoId}\n" +
+            "  AND MONTH(r.created_at) = MONTH(DATE_SUB(CURDATE(), INTERVAL 1 MONTH))\n" +
+            "  AND YEAR(r.created_at) = YEAR(DATE_SUB(CURDATE(), INTERVAL 1 MONTH))\n")
     Long getCorporateCardCostLastMonth(@Param("ceoId") Long ceoId);
 
     // 법카 내역 조회
