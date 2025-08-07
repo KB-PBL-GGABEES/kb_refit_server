@@ -25,7 +25,7 @@ public class ReceiptResponseDto {
     public static ReceiptResponseDto from(Receipt receipt, Long userId, Long carbon, Long price, String processState) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return new ReceiptResponseDto(
-                userId,
+                receipt.getUserId(),
                 receipt.getReceiptId(),
                 receipt.getContentList(),
                 receipt.getTotalPrice(),

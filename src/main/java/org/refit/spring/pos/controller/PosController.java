@@ -78,7 +78,7 @@ public class PosController {
                 requiredFields.put("merchandiseId", dto.getMerchandiseId());
             }
             receiptService.validateRequiredFields(requiredFields);
-            Receipt receipt = receiptService.create(receiptRequestDto, userId);
+            Receipt receipt = receiptService.create(receiptRequestDto);
             Reward reward = rewardService.create(CARBON_POINT, receipt.getTotalPrice(), userId, receipt.getReceiptId());
             userService.updatePoint(userId, reward.getCarbonPoint(), reward.getReward());
             ReceiptResponseDto dto = ReceiptResponseDto.from(receipt, userId, reward.getCarbonPoint(), reward.getReward(), "none");

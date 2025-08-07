@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.sql.DataSource;
-import javax.swing.text.html.Option;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -51,11 +50,12 @@ public class ReceiptService {
     }
 
     @Transactional
-    public Receipt create(ReceiptRequestDto dto, Long userId) throws ParseException {
+    public Receipt create(ReceiptRequestDto dto) throws ParseException {
         List<ReceiptContentRequestsDto> requestList = dto.getContentsList();
         Merchandise firstMerchandise = merchandiseMapper.findByMerchandiseId(requestList.get(0).getMerchandiseId());
-        Receipt receipt = initReceipt(dto.getCardId(), firstMerchandise.getCompanyId(), receiptMapper.getCompanyName(firstMerchandise.getCompanyId()), userId);
-        Long category = receiptMapper.findCategory(userId, receipt.getReceiptId());
+        Long userIdByCardId = receiptMapper.findCardId(dto.getCardId());
+        Receipt receipt = initReceipt(dto.getCardId(), firstMerchandise.getCompanyId(), receiptMapper.getCompanyName(firstMerchandise.getCompanyId()), userIdByCardId);
+        Long category = receiptMapper.findCategory(userIdByCardId, receipt.getReceiptId());
         if (category == 1) {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             Long price = firstMerchandise.getMerchandisePrice();
@@ -64,22 +64,23 @@ public class ReceiptService {
             receipt.setSupplyPrice(supply);
             receipt.setSurtax(price - supply);
             receipt.setUpdatedAt(new Date());
-            User user = userMapper.findByUserId(userId);
+            User user = userMapper.findByUserId(userIdByCardId);
             hospitalMapper.insertEmptyHospitalProcess(receipt.getReceiptId(), user.getName() + "_" + sdf.format(receipt.getCreatedAt()) + "_이비인후과");
         }
         else {
             List<ReceiptContentDetailDto> list = makeContents(dto.getContentsList(), receipt);
             receipt.setContentList(list);
-            ceoMapper.insertProcess(null, userId, receipt.getReceiptId());
+            ceoMapper.insertProcess(null, userIdByCardId, receipt.getReceiptId());
         }
         updatePrice(receipt);
-        receiptMapper.update(userId, receipt);
+        receiptMapper.update(userIdByCardId, receipt);
         return receipt;
     }
 
 
     @Transactional
     public Receipt refund(Long userId, Long receiptId) {
+        System.out.println(userId);
         Receipt nowReceipt = receiptMapper.get(userId, receiptId);
         if (nowReceipt == null) throw new IllegalArgumentException("존재하지 않는 영수증입니다.");
         if (nowReceipt.getTotalPrice() <= 0) throw new IllegalArgumentException("이미 환불된 영수증입니다.");
