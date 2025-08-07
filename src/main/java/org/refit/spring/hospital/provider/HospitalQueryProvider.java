@@ -48,11 +48,14 @@ public class HospitalQueryProvider {
 
         // 처리 여부 필터
         HospitalFilter filter = (HospitalFilter) params.get("filter");
-        if (filter != null && !filter.isProcessed()) {
-            if (filter == HospitalFilter.UNPROCESSED) {
-                sql.append(" AND (hp.process_state IS NULL OR hp.process_state = 'none') ");
-            } else if (filter == HospitalFilter.PROCESSED) {
+
+        if (filter != null && filter != HospitalFilter.ALL) {
+            if (filter.isProcessed()) {
+                // 처리된 상태: accepted, rejected
                 sql.append(" AND hp.process_state IN ('accepted', 'rejected') ");
+            } else {
+                // 처리되지 않은 상태: NULL, none, inProgress
+                sql.append(" AND (hp.process_state IS NULL OR hp.process_state IN ('none', 'inProgress')) ");
             }
         }
 
@@ -63,7 +66,7 @@ public class HospitalQueryProvider {
             sql.append(" ORDER BY r.created_at DESC");
         }
 
-        sql.append(" LIMIT #{size}");
+        sql.append(" LIMIT #{size} ");
         return sql.toString();
     }
 }
