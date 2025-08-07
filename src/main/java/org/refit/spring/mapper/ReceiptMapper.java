@@ -85,4 +85,7 @@ public interface ReceiptMapper {
 
     @Select("SELECT ceo_name FROM company WHERE company_id = #{companyId}")
     String findCeoName(@Param("companyId") Long companyId);
+
+    @Select("SELECT user_id FROM card WHERE card_id = #{cardId}")
+    Long findCardId(@Param("cardId") Long cardId);
 }
