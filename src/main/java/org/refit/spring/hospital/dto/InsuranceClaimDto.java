@@ -9,7 +9,6 @@ import java.util.Date;
 @Getter
 @Setter
 public class InsuranceClaimDto {
-    private String processState;
     private Long receiptId;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd", timezone = "Asia/Seoul")
     private Date sickedDate;

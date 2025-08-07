@@ -22,6 +22,7 @@ public interface HospitalMapper {
             "c.company_id AS companyId, " +
             "c.ceo_name AS ceoName, " +
             "c.address AS address, " +
+            "(r.supply_price + r.surtax) AS totalPrice," +
             "r.supply_price AS supplyPrice, " +
             "r.surtax AS surtax, " +
             "r.transaction_type AS transactionType, " +
@@ -29,6 +30,7 @@ public interface HospitalMapper {
             "hp.process_state AS processState, " +
             "hp.sicked_date AS sickedDate, " +
             "hp.visited_reason AS visitedReason, " +
+            "hp.rejected_reason AS rejectedReason, " +
             "i.insurance_name AS insuranceName " +
             "FROM receipt r " +
             "JOIN company c ON r.company_id = c.company_id " +
