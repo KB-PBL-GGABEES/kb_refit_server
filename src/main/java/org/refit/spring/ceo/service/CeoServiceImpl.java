@@ -3,7 +3,6 @@ package org.refit.spring.ceo.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.refit.spring.ceo.dto.*;
-import org.refit.spring.ceo.enums.RejectState;
 import org.refit.spring.ceo.enums.Sort;
 import org.refit.spring.mapper.CeoMapper;
 import org.refit.spring.receipt.dto.ReceiptContentDetailDto;
