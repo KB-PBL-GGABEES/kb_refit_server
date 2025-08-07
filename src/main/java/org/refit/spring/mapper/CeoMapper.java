@@ -1,20 +1,17 @@
 package org.refit.spring.mapper;
 
 import org.apache.ibatis.annotations.*;
-import org.refit.spring.ceo.CeoReceiptQueryProvider;
-import org.refit.spring.ceo.CorporateCardQueryProvider;
-import org.refit.spring.ceo.dto.CorporateCardListDto;
+import org.refit.spring.ceo.provider.CeoReceiptQueryProvider;
+import org.refit.spring.ceo.provider.CorporateCardQueryProvider;
+import org.refit.spring.ceo.dto.CorporateCardDto;
 import org.refit.spring.ceo.dto.ReceiptExceptMerchandiseDto;
 import org.refit.spring.ceo.entity.Ceo;
 import org.refit.spring.ceo.dto.ReceiptProcessApplicantDto;
-import org.refit.spring.ceo.enums.ProcessState;
-import org.refit.spring.ceo.enums.RejectState;
-import org.refit.spring.ceo.enums.Sort;
 import org.refit.spring.receipt.dto.ReceiptContentDetailDto;
 import org.refit.spring.ceo.dto.ReceiptDetailDto;
 
-import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface CeoMapper {
@@ -123,14 +120,7 @@ public interface CeoMapper {
 
     // 경비 처리 완료 내역 조회
     @SelectProvider(type = CeoReceiptQueryProvider.class, method = "buildFilteredQuery")
-    List<Ceo> getCompletedReceipts(
-            @Param("userId") Long userId,
-            @Param("cursorId") Long cursorId,
-            @Param("period") Integer period,
-            @Param("startDate") Date startDate,
-            @Param("endDate") Date endDate,
-            @Param("processState") ProcessState processState,
-            @Param("sort") Sort sort);
+    List<Ceo> getCompletedReceipts(Map<String, Object> params);
 
     //이메일 전송 용 완료 항목 조회
     @Select("SELECT " +
@@ -214,12 +204,5 @@ public interface CeoMapper {
 
     // 법카 내역 조회
     @SelectProvider(type = CorporateCardQueryProvider.class, method = "buildFilteredQuery")
-    List<CorporateCardListDto> getCorporateCardReceipts(
-            @Param("userId") Long userId,
-            @Param("cursorId") Long cursorId,
-            @Param("period") Integer period,
-            @Param("startDate") Date startDate,
-            @Param("endDate") Date endDate,
-            @Param("rejectState") RejectState rejectState,
-            @Param("sort") Sort sort);
+    List<CorporateCardDto> getCorporateCardReceipts(Map<String, Object> params);
 }

@@ -1,9 +1,8 @@
-package org.refit.spring.ceo;
+package org.refit.spring.ceo.provider;
 
 
-import org.refit.spring.ceo.enums.ProcessState;
-import org.refit.spring.ceo.enums.RejectState;
 import org.refit.spring.ceo.enums.Sort;
+import org.refit.spring.ceo.enums.State;
 
 import java.util.Map;
 
@@ -23,18 +22,17 @@ public class CorporateCardQueryProvider {
         sql.append(" AND e.company_id = (SELECT company_id FROM employee WHERE user_id = #{userId} LIMIT 1)");
 
         // 필터 (전체, 미처리, 반려)
-        RejectState rejectState = (RejectState) params.get("rejectState");
-        if(rejectState != null && rejectState != RejectState.Whole) {
-            if (rejectState.UnRejected()) {
+        State state = (State) params.get("state");
+        if(state != null && state != State.Whole) {
+            if (state.UnProcess()) {
                 sql.append(" AND rp.process_state IS NULL ");
-            } else if (rejectState.Rejected()) {
+            } else if (state.Process()) {
                 sql.append(" AND rp.process_state = 'rejected' ");
             }
         }
 
         // 기간 (1, 3, 6개월, 직접입력)
-        Integer period = (Integer) params.get("period");
-        if (period != null && period > 0) {
+        if (params.get("period") != null) {
             sql.append(" AND r.created_at >= DATE_SUB(NOW(), INTERVAL #{period} MONTH)");
         } else if (params.get("startDate") != null && params.get("endDate") != null) {
             sql.append(" AND r.created_at >= #{startDate} AND r.created_at < DATE_ADD(#{endDate}, INTERVAL 1 DAY)");
@@ -53,7 +51,7 @@ public class CorporateCardQueryProvider {
             sql.append(" AND r.receipt_id > #{cursorId} ORDER BY r.created_at ASC");
         }
 
-        sql.append(" LIMIT 20");
+        sql.append(" LIMIT #{size} ");
 
         return sql.toString();
     }

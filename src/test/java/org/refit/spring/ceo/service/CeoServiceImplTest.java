@@ -12,8 +12,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 
-import java.util.List;
-
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringJUnitWebConfig(classes = {RootConfig.class})
@@ -52,14 +50,19 @@ class CeoServiceImplTest {
         assertThat(result.getReceiptDetail().getReceiptId()).isEqualTo(receiptId);
     }
 
-    @DisplayName("커서 기반 완료 목록 조회")
+    @DisplayName("커서 기반 경비 완료 내역 조회")
     @Test
     void getCompletedReceipts() {
         Long userId = 1L;
-        List<ReceiptDto> result = ceoService.getCompletedReceipts(userId, null, null, null, null, null, Sort.Newest);
+        ReceiptFilterDto filter = new ReceiptFilterDto();
+        filter.setCursorId(Long.MAX_VALUE);
+        filter.setSort(Sort.Newest);
+        filter.setSize(10L);
 
-        log.info("조회된 건수 : " + result.size());
-        result.forEach(r -> log.info("receiptId = " + r.getReceiptId()));
+        ReceiptListCursorDto result = ceoService.getCompletedReceipts(userId, filter);
+
+        log.info("조회된 건수 : " + result.getReceiptList().size());
+        result.getReceiptList().forEach(r -> log.info("receiptId = " + r.getReceiptId()));
 
         assertThat(result).isNotNull();
     }
@@ -106,11 +109,16 @@ class CeoServiceImplTest {
     @Test
     void getCorporateCardReceipts() {
         Long userId = 1L;
+        ReceiptFilterDto filter = new ReceiptFilterDto();
+        filter.setCursorId(Long.MAX_VALUE);
+        filter.setSort(Sort.Newest);
+        filter.setSize(10L);
 
-        List<CorporateCardListDto> list = ceoService.getCorporateCardReceipts(userId, null, null, null, null, null, Sort.Newest);
+        CorporateCardListCursorDto result = ceoService.getCorporateCardReceipts(userId, filter);
 
-        log.info("조회된 내역 수 : " + list.size());
-        list.forEach(c -> log.info("receiptId = " + c.getReceiptId()));
-        assertThat(list).isNotNull();
+        log.info("조회된 법카 건수 : " + result.getCorporateCardList().size());
+        result.getCorporateCardList().forEach(c -> log.info("receiptId = " + c.getReceiptId()));
+
+        assertThat(result).isNotNull();
     }
 }

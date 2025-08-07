@@ -3,8 +3,6 @@ package org.refit.spring.ceo.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.refit.spring.ceo.dto.*;
-import org.refit.spring.ceo.entity.Ceo;
-import org.refit.spring.ceo.enums.ProcessState;
 import org.refit.spring.ceo.enums.RejectState;
 import org.refit.spring.ceo.enums.Sort;
 import org.refit.spring.mapper.CeoMapper;
@@ -14,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -71,18 +68,41 @@ public class CeoServiceImpl implements CeoService {
 
     // 경비 처리 완료 내역 조회
     @Override
-    public List<ReceiptDto> getCompletedReceipts(Long userId, Long cursorId, Integer period, Date startDate, Date endDate, ProcessState processState, Sort sort) {
+    public ReceiptListCursorDto getCompletedReceipts(Long userId, ReceiptFilterDto receiptFilterDto) {
         validateRequiredFields(Collections.singletonMap("userId", userId));
 
-        if (cursorId == null) {
-            cursorId = (sort == Sort.Oldest) ? 0L : Long.MAX_VALUE;
+        Map<String, Object> params = new HashMap<>();
+        params.put("userId", userId);
+
+        long paginationSize = (receiptFilterDto.getSize() != null && receiptFilterDto.getSize() > 0) ? receiptFilterDto.getSize() : 20;
+
+        // 기본 정렬값
+        if (receiptFilterDto.getSort() == null) receiptFilterDto.setSort(Sort.Newest);
+
+        // 커서 초기화
+        if (receiptFilterDto.getCursorId() == null) {
+            receiptFilterDto.setCursorId((receiptFilterDto.getSort() == Sort.Oldest) ? 0L : Long.MAX_VALUE);
         }
 
-        List<Ceo> result = ceoMapper.getCompletedReceipts(userId, cursorId, period, startDate, endDate, processState, sort);
+        // 날짜 필터
+        if (receiptFilterDto.getPeriod() == null) {
+            params.put("startDate", receiptFilterDto.getStartDate());
+            params.put("endDate", receiptFilterDto.getEndDate());
+        } else {
+            params.put("period",  receiptFilterDto.getPeriod());
+        }
 
-        return result.stream()
-                .map(ReceiptDto::of)
-                .collect(Collectors.toList());
+        params.put("cursorId", receiptFilterDto.getCursorId());
+        params.put("sort", receiptFilterDto.getSort());
+        params.put("state", receiptFilterDto.getState());
+        params.put("size", paginationSize);
+
+        List<ReceiptDto> list = ceoMapper.getCompletedReceipts(params).stream().map(ReceiptDto::of).toList();
+
+        // 커서 아이디 초기화
+        Long nextCursorId = (list.size() < paginationSize) ?  null : list.get(list.size() - 1).getReceiptId();
+
+        return ReceiptListCursorDto.from(list, nextCursorId);
     }
 
     @Override
@@ -141,15 +161,40 @@ public class CeoServiceImpl implements CeoService {
 
     // 법카 내역 조회
     @Override
-    public List<CorporateCardListDto> getCorporateCardReceipts(Long userId, Long cursorId, Integer period, Date startDate, Date endDate, RejectState rejectState, Sort sort) {
+    public CorporateCardListCursorDto getCorporateCardReceipts(Long userId, ReceiptFilterDto receiptFilterDto) {
         validateRequiredFields(Collections.singletonMap("userId", userId));
 
-        if (cursorId == null) {
-            cursorId = (sort == Sort.Oldest) ? 0L : Long.MAX_VALUE;
+        Map<String, Object> params = new HashMap<>();
+        params.put("userId", userId);
+
+        long paginationSize = (receiptFilterDto.getSize() != null && receiptFilterDto.getSize() > 0) ? receiptFilterDto.getSize() : 20;
+
+        // 기본 정렬값
+        if (receiptFilterDto.getSort() == null) receiptFilterDto.setSort(Sort.Newest);
+
+        // 커서 초기화
+        if (receiptFilterDto.getCursorId() == null) {
+            receiptFilterDto.setCursorId((receiptFilterDto.getSort() == Sort.Oldest) ? 0L : Long.MAX_VALUE);
         }
 
-        List<CorporateCardListDto> result = ceoMapper.getCorporateCardReceipts(userId, cursorId, period, startDate, endDate, rejectState, sort);
+        // 날짜 필터
+        if (receiptFilterDto.getPeriod() == null) {
+            params.put("startDate", receiptFilterDto.getStartDate());
+            params.put("endDate", receiptFilterDto.getEndDate());
+        } else {
+            params.put("period",  receiptFilterDto.getPeriod());
+        }
 
-        return result;
+        params.put("cursorId", receiptFilterDto.getCursorId());
+        params.put("sort", receiptFilterDto.getSort());
+        params.put("state", receiptFilterDto.getState());
+        params.put("size", paginationSize);
+
+        List<CorporateCardDto> list = ceoMapper.getCorporateCardReceipts(params);
+
+        // 커서 아이디 초기화
+        Long nextCursorId = (list.size() < paginationSize) ?  null : list.get(list.size() - 1).getReceiptId();
+
+        return CorporateCardListCursorDto.from(list, nextCursorId);
     }
 }

@@ -5,14 +5,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-import java.util.Date;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CorporateCardList {
+public class CorporateCard {
     private Long receiptId;         // 영수증
     private String companyName;     // 상호명
     private Long totalPrice;        // 주문 합계

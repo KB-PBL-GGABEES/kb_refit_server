@@ -4,10 +4,9 @@ import lombok.extern.log4j.Log4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.refit.spring.ceo.dto.CorporateCardListDto;
+import org.refit.spring.ceo.dto.CorporateCardDto;
 import org.refit.spring.ceo.dto.ReceiptProcessApplicantDto;
 import org.refit.spring.ceo.entity.Ceo;
-import org.refit.spring.ceo.enums.ProcessState;
 import org.refit.spring.ceo.enums.RejectState;
 import org.refit.spring.ceo.enums.Sort;
 import org.refit.spring.config.RootConfig;
@@ -18,8 +17,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringJUnitWebConfig(classes = {RootConfig.class})
 @ExtendWith(SpringExtension.class)
@@ -97,23 +99,24 @@ class CeoMapperTest {
     }
 
     @Test
-    @DisplayName("getCompleteReceipts - 경비 처리 완료 내역 조회")
+    @DisplayName("커서 기반 경비 완료 내역 조회")
     void getCompletedReceipts() {
-        Long userId = 1L;
-        Long cursorId = Long.MAX_VALUE;
-        Integer period = null;
-        Date startDate = null;
-        Date endDate = null;
-        ProcessState processState = null;
-        Sort sort = Sort.Newest;
+        Map<String, Object> params = new HashMap<>();
+        params.put("userId", 1L);
+        params.put("cursorId", Long.MAX_VALUE);
+        params.put("sort", Sort.Newest);
+        params.put("size", 10L);
+        params.put("state", null);
+        params.put("period", null);
+        params.put("startDate", null);
+        params.put("endDate", null);
 
-        List<Ceo> list = ceoMapper.getCompletedReceipts(userId, cursorId, period, startDate, endDate, processState, sort);
-        if(list.isEmpty()) {
-            log.info("getCompleteReceipts - 조회 결과 : 0건 (빈 리스트)");
-        } else {
-            log.info("getCompleteReceipts - 조회 결과 : " + list.size() + "건");
-            list.forEach(dto -> log.info(dto));
-        }
+        List<Ceo> list = ceoMapper.getCompletedReceipts(params);
+
+        log.info("조회 결과 수 : " + list.size());
+        list.forEach(c -> log.info("receiptId = " + c.getReceiptId()));
+
+        assertThat(list).isNotNull();
     }
 
     @Test
@@ -156,22 +159,23 @@ class CeoMapperTest {
     }
 
     @Test
-    @DisplayName("getCorporateCardReceipts - 법카 내역 조회")
+    @DisplayName("커서 기반 법카 내역 조회")
     void getCorporateCardReceipts() {
-        Long userId = 1L;
-        Long cursorId = Long.MAX_VALUE;
-        Integer period = null;
-        Date startDate = null;
-        Date endDate = null;
-        RejectState rejectState = null;
-        Sort sort = Sort.Newest;
+        Map<String, Object> params = new HashMap<>();
+        params.put("userId", 1L);
+        params.put("cursorId", Long.MAX_VALUE);
+        params.put("sort", Sort.Newest);
+        params.put("size", 10L);
+        params.put("state", null);
+        params.put("period", null);
+        params.put("startDate", null);
+        params.put("endDate", null);
 
-        List<CorporateCardListDto> list = ceoMapper.getCorporateCardReceipts(userId, cursorId, period, startDate, endDate, rejectState, sort);
-        if(list.isEmpty()) {
-            log.info("getCorporateCardReceipts - 조회 결과 : 0건 (빈 리스트)");
-        } else {
-            log.info("getCorporateCardReceipts - 조회 결과 : " + list.size() + "건");
-            list.forEach(dto -> log.info(dto));
-        }
+        List<CorporateCardDto> list = ceoMapper.getCorporateCardReceipts(params);
+
+        log.info("법카 조회 수 : " + list.size());
+        list.forEach(c -> log.info("receiptId = " + c.getReceiptId()));
+
+        assertThat(list).isNotNull();
     }
 }
