@@ -24,8 +24,8 @@ public class ReceiptQueryProvider {
         }
         ReceiptType type = (ReceiptType) params.get("type");
         if (type != null && type != ReceiptType.ALL) {
-            if (type == ReceiptType.APPROVED) sql.append(" AND r.transaction_type = '카드 결제' ");
-            else if (type == ReceiptType.CANCELED) sql.append(" AND r.transaction_type = '환불' ");
+            if (type == ReceiptType.APPROVED) sql.append(" AND r.total_price > 0 ");
+            else if (type == ReceiptType.CANCELED) sql.append(" AND r.total_price < 0 ");
         }
 
         ReceiptFilter filter = (ReceiptFilter) params.get("filter");
@@ -37,7 +37,7 @@ public class ReceiptQueryProvider {
 
         if (sort == ReceiptSort.LATEST) sql.append(" ORDER BY r.created_at DESC");
         else sql.append(" ORDER BY r.created_at ASC");
-        sql.append(" LIMIT 20");
+        sql.append(" LIMIT #{size}");
 
         return sql.toString();
     }
