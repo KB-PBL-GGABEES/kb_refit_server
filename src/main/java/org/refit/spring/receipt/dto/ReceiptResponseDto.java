@@ -22,7 +22,7 @@ public class ReceiptResponseDto {
     private String createdAt;
     private String companyName;
 
-    public static ReceiptResponseDto from(Receipt receipt, Long userId, Long carbon, Long price, String processState) {
+    public static ReceiptResponseDto from(Receipt receipt, Long carbon, Long price, String processState) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return new ReceiptResponseDto(
                 receipt.getUserId(),

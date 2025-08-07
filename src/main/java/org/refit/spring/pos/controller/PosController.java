@@ -81,7 +81,7 @@ public class PosController {
             Receipt receipt = receiptService.create(receiptRequestDto);
             Reward reward = rewardService.create(CARBON_POINT, receipt.getTotalPrice(), userId, receipt.getReceiptId());
             userService.updatePoint(userId, reward.getCarbonPoint(), reward.getReward());
-            ReceiptResponseDto dto = ReceiptResponseDto.from(receipt, userId, reward.getCarbonPoint(), reward.getReward(), "none");
+            ReceiptResponseDto dto = ReceiptResponseDto.from(receipt, reward.getCarbonPoint(), reward.getReward(), "none");
             receiptService.checkAndInsertBadge(userId, receipt.getReceiptId());
             URI location = URI.create("/receipt/" + receipt.getReceiptId());
 
@@ -109,7 +109,7 @@ public class PosController {
             Receipt receipt = receiptService.refund(userId, receiptId);
             Reward reward = rewardService.create(-CARBON_POINT, receipt.getTotalPrice(), userId, receiptId);
             userService.updatePoint(userId, reward.getCarbonPoint(), reward.getReward());
-            ReceiptResponseDto dto = ReceiptResponseDto.from(receipt, userId, reward.getCarbonPoint(), reward.getReward(), "none");
+            ReceiptResponseDto dto = ReceiptResponseDto.from(receipt, reward.getCarbonPoint(), reward.getReward(), "none");
             URI location = URI.create("/receipt/" + receipt.getReceiptId());
             return ResponseEntity.created(location).body(dto);
         } catch (IllegalArgumentException e) {
