@@ -1,7 +1,6 @@
 package org.refit.spring.ceo.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j;
 import lombok.extern.slf4j.Slf4j;
 import org.refit.spring.ceo.dto.*;
 import org.refit.spring.ceo.entity.Ceo;
