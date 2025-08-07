@@ -6,19 +6,17 @@ import org.refit.spring.common.exception.DataMismatchException;
 import org.refit.spring.mapper.PersonalBadgeMapper;
 import org.refit.spring.mapper.RewardMapper;
 import org.refit.spring.mapper.UserMapper;
+import org.refit.spring.receipt.dto.ReceiptListCursorDto;
 import org.refit.spring.receipt.enums.ReceiptSort;
-import org.refit.spring.reward.dto.RewardListDto;
-import org.refit.spring.reward.dto.RewardSummaryDto;
-import org.refit.spring.reward.dto.RewardWalletRequestDto;
-import org.refit.spring.reward.dto.RewardWalletResponseDto;
+import org.refit.spring.receipt.enums.ReceiptType;
+import org.refit.spring.receipt.service.ReceiptService;
+import org.refit.spring.reward.dto.*;
 import org.refit.spring.reward.entity.Reward;
 import org.refit.spring.reward.enums.RewardType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +26,18 @@ public class RewardService {
     private final RewardMapper rewardMapper;
     private final UserMapper userMapper;
     private final PersonalBadgeMapper personalBadgeMapper;
+
+    public void validateRequiredFields(Map<String, Object> fields) {
+        List<String> missing = new ArrayList<>();
+
+        for (Map.Entry<String, Object> entry: fields.entrySet()) {
+            Object value = entry.getValue();
+            if (value == null) missing.add(entry.getKey());
+        }
+        if (!missing.isEmpty()) {
+            throw new IllegalArgumentException("다음 필수 항목이 누락되었거나 비어 있습니다: " + String.join(", ", missing));
+        }
+    }
 
     public Reward create(Long carbon, Long totalPrice, Long userId, Long receiptId) {
         Reward reward = new Reward();
@@ -44,14 +54,38 @@ public class RewardService {
     }
 
     @Transactional(readOnly = true)
-    public RewardListDto getList(Long userId, Long cursorId, Integer period, Date startDate, Date endDate, RewardType type, ReceiptSort sort) {
-        if (cursorId == null) {
-            cursorId = (sort == ReceiptSort.LATEST || sort == null) ? Long.MAX_VALUE : 0L;
+    public RewardListCursorDto getList(Long userId, RewardListRequestDto rewardListRequestDto) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("userId", userId);
+
+        long paginationSize = (rewardListRequestDto.getSize() != null && rewardListRequestDto.getSize() > 0) ? rewardListRequestDto.getSize() : 20;
+
+        params.put("size", paginationSize);
+        if (rewardListRequestDto.getSort() == null) rewardListRequestDto.setSort(ReceiptSort.LATEST);
+
+        if (rewardListRequestDto.getCursorId() == null) {
+            rewardListRequestDto.setCursorId((rewardListRequestDto.getSort() == ReceiptSort.OLDEST) ? 0L : Long.MAX_VALUE);
         }
-        RewardType finalType = (type == RewardType.ALL) ? null : type;
-        List<Reward> rewards = rewardMapper.getList(userId, cursorId, period, startDate, endDate, finalType, sort);
-        Long nextCursorId = rewards.size() < 20 ? null : rewards.get(rewards.size() - 1).getRewardId();
-        return RewardListDto.from(userId, rewards, nextCursorId);
+
+        if (rewardListRequestDto.getPeriod() == null) {
+            params.put("startDate", rewardListRequestDto.getStartDate());
+            params.put("endDate", rewardListRequestDto.getEndDate());
+        } else {
+            params.put("period",rewardListRequestDto.getPeriod());
+        }
+
+        if (rewardListRequestDto.getType() == null) rewardListRequestDto.setType(RewardType.ALL);
+
+        params.put("cursorId", rewardListRequestDto.getCursorId());
+        params.put("sort", rewardListRequestDto.getSort());
+        params.put("type", rewardListRequestDto.getType());
+
+        validateRequiredFields(params);
+
+        List<Reward> list = rewardMapper.getList(params);
+
+        Long nextCursorId = (list.size() < paginationSize) ? null : list.get(list.size() - 1).getRewardId();
+        return RewardListCursorDto.from(list, nextCursorId);
     }
 
     @Transactional(readOnly = true)

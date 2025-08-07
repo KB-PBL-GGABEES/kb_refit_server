@@ -5,11 +5,6 @@ import org.refit.spring.receipt.ReceiptQueryProvider;
 import org.refit.spring.receipt.dto.RejectedReceiptDto;
 import org.refit.spring.receipt.entity.Receipt;
 import org.refit.spring.receipt.entity.ReceiptContent;
-import org.refit.spring.receipt.enums.ReceiptFilter;
-import org.refit.spring.receipt.enums.ReceiptSort;
-import org.refit.spring.receipt.enums.ReceiptType;
-
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
