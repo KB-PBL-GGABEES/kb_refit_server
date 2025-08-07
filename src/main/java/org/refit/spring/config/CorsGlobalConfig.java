@@ -19,7 +19,7 @@ public class CorsGlobalConfig {
                 "https://kb-refit-client.vercel.app",
                 "https://kb-refit-client-ceo.vercel.app"
         ));
-        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         config.setAllowedHeaders(Arrays.asList("Content-Type", "Authorization"));
         config.setAllowCredentials(true);
         config.setMaxAge(3600L);
