@@ -55,13 +55,16 @@ public class HospitalController {
         try {
             MedicalReceiptDetailDto result = hospitalService.findHospitalExpenseDetail(userId, receiptId);
             return ResponseEntity.ok(result);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND) // 404 Not Found
+                    .body(Collections.singletonMap("message", e.getMessage()));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Collections.singletonMap("message", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Collections.singletonMap("message", e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Collections.singletonMap("message", "서버 오류로 인해 실패했습니다."));
         }
-
     }
 
     // 진료비 세부산정내역 PDF 파일명 DB저장
