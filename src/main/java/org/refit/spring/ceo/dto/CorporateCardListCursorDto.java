@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CorporateCardListCursorDto {
-    private List<CorporateCardDto> corporateCardList; // 변경
+    private List<CorporateCardDto> corporateCardList;
     private Long cursorId;
 
     public static CorporateCardListCursorDto from(List<CorporateCardDto> list, Long nextCursorId) {
