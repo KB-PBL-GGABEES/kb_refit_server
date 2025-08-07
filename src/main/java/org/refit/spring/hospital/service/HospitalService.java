@@ -82,7 +82,10 @@ public class HospitalService {
         List<MedicalReceiptDetailDto> results =
                 hospitalMapper.findHospitalExpenseDetailByUserIdAndReceiptId(userId, receiptId);
 
-        if (results == null || results.isEmpty()) return null;
+
+        if (results == null || results.isEmpty()) {
+            throw new IllegalArgumentException("해당 영수증을 찾을 수 없습니다.");
+        }
 
         return results.get(0);
     }
@@ -168,7 +171,9 @@ public class HospitalService {
         // 1. 이미 hospital_process 존재하는지 확인
         String existingState = hospitalMapper.findProcessStateByReceiptId(dto.getReceiptId());
 
-        if (existingState != null && !existingState.equalsIgnoreCase("none")) {
+        if (existingState != null
+                && !existingState.equalsIgnoreCase("none")
+                && !existingState.equalsIgnoreCase("rejected")) {
             throw new IllegalArgumentException("이미 보험 청구가 접수된 영수증입니다.");
         }
 
