@@ -4,11 +4,10 @@ import lombok.extern.log4j.Log4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.refit.spring.config.RootConfig;
-import org.refit.spring.reward.dto.RewardListDto;
-import org.refit.spring.reward.dto.RewardSummaryDto;
-import org.refit.spring.reward.dto.RewardWalletRequestDto;
-import org.refit.spring.reward.dto.RewardWalletResponseDto;
+import org.refit.spring.receipt.enums.ReceiptSort;
+import org.refit.spring.reward.dto.*;
 import org.refit.spring.reward.entity.Reward;
+import org.refit.spring.reward.enums.RewardType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 
@@ -37,13 +36,24 @@ class RewardServiceTest {
     @DisplayName("리워드 목록 조회 테스트")
     @Test
     void getList() {
-        RewardListDto dto = service.getList(5L, null, null, null, null, null, null);
+        Long userId = 5L;
+        RewardListRequestDto requestDto = new RewardListRequestDto();
+        requestDto.setSize(10L);
+        requestDto.setCursorId(null);
+        requestDto.setSort(ReceiptSort.LATEST);
+        requestDto.setPeriod(1);
+        requestDto.setStartDate(null);
+        requestDto.setEndDate(null);
+        requestDto.setType(RewardType.ALL);
+
+        RewardListCursorDto dto = service.getList(userId, requestDto);
+
         assertNotNull(dto);
-        assertEquals(5L, dto.getUserId());
+        assertEquals(5L, userId);
         List<Reward> list = dto.getRewardList();
         assertNotNull(list);
         if (!list.isEmpty()) {
-            assertTrue(list.get(0).getUserId().equals(5L));
+            assertEquals(5L, (long) list.get(0).getUserId());
         }
     }
 

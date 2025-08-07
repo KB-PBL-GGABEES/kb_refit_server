@@ -11,7 +11,9 @@ import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -114,7 +116,9 @@ class ReceiptMapperTest {
             receipt.setCompanyId(2018168693L);
             receiptMapper.create(receipt);
         }
-        List<Receipt> list = receiptMapper.getFilteredList(1L, null, null, null, null, null, null, null);
+        Map<String, Object> params = new HashMap<>();
+//        params.put("")
+        List<Receipt> list = receiptMapper.getFilteredList(params);
         assertNotNull(list);
 
         long prevId = Long.MAX_VALUE;

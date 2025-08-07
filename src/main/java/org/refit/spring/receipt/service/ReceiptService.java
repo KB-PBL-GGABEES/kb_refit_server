@@ -85,7 +85,7 @@ public class ReceiptService {
     public Receipt refund(Long userId, Long receiptId) {
         Receipt nowReceipt = receiptMapper.get(userId, receiptId);
         if (nowReceipt == null) throw new IllegalArgumentException("존재하지 않는 영수증입니다.");
-        if (nowReceipt.getTransactionType().equals("환불")) throw new IllegalArgumentException("이미 환불된 영수증입니다.");
+        if (nowReceipt.getTotalPrice() <= 0) throw new IllegalArgumentException("이미 환불된 영수증입니다.");
         Receipt refundReceipt = new Receipt();
         refundReceipt.setTotalPrice(-nowReceipt.getTotalPrice());
         refundReceipt.setSupplyPrice(-nowReceipt.getSupplyPrice());
@@ -302,7 +302,6 @@ public class ReceiptService {
         if (badgeId != null) {
             String sqlTemplate = personalBadgeMapper.getCondition(badgeId);
             String sql = sqlTemplate.replace("${userId}", userId.toString());
-            System.out.println(sql);
             try (Connection conn = dataSource.getConnection();
                  Statement stmt = conn.createStatement();
                  ResultSet rs = stmt.executeQuery(sql)) {

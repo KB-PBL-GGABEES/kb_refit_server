@@ -10,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 
 import java.text.ParseException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @SpringJUnitWebConfig(classes = {RootConfig.class})
 @Log4j
@@ -38,7 +40,16 @@ class ReceiptServiceTest {
     @Test
     void getList() {
         Long userId = 5L;
-        ReceiptListDto listDto = service.getFilteredList(userId, null, null, null, null, null, null, null);
+        ReceiptListRequestDto requestDto = new ReceiptListRequestDto();
+        requestDto.setSize(10L);
+        requestDto.setSort(null);
+        requestDto.setFilter(null);
+        requestDto.setPeriod(1);
+        requestDto.setStartDate(null);
+        requestDto.setEndDate(null);
+        requestDto.setType(null);
+        requestDto.setCursorId(null);
+        ReceiptListCursorDto listDto = service.getFilteredList(userId, requestDto);
         log.info(listDto.getReceiptList());
         log.info(listDto.getNextCursorId());
     }

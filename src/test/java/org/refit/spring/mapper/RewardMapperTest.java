@@ -12,7 +12,9 @@ import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -39,7 +41,8 @@ class RewardMapperTest {
     @DisplayName("리스트 조회 테스트")
     @Test
     void getList() {
-        List<Reward> list = rewardMapper.getList(1L, null, null, null, null, null, null);
+        Map<String, Object> params = new HashMap<>();
+        List<Reward> list = rewardMapper.getList(params);
         assertNotNull(list);
     }
     @Test
