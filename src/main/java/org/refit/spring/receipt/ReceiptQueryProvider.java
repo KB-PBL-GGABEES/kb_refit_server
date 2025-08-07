@@ -31,7 +31,7 @@ public class ReceiptQueryProvider {
         ReceiptFilter filter = (ReceiptFilter) params.get("filter");
         if (filter != null) {
             if (filter.isProcessed()) sql.append(" AND rp.process_state IN ('accepted', 'rejected') ");
-            else sql.append(" AND (rp.process_state IS NULL or rp.process_state NOT IN ('accepted', 'rejected') ");
+            else sql.append(" AND (rp.process_state IS NULL or rp.process_state NOT IN ('accepted', 'rejected')) ");
         }
 
 
