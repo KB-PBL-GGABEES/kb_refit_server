@@ -36,15 +36,16 @@ public class RewardService {
         }
     }
 
-    public Reward create(Long carbon, Long totalPrice, Long userId, Long receiptId) {
+    @Transactional
+    public Reward create(Long carbon, Long totalPrice, Long userIdByCard, Long receiptId) {
         Reward reward = new Reward();
         reward.setCarbonPoint(carbon);
-        if (personalBadgeMapper.checkIsWorn(userId, receiptId)) {
+        if (personalBadgeMapper.checkIsWorn(userIdByCard, receiptId)) {
             reward.setReward((long) (totalPrice * REWARD_RATE));
         }
         else reward.setReward(0L);
         reward.setCreatedAt(new Date());
-        reward.setUserId(userId);
+        reward.setUserId(userIdByCard);
         rewardMapper.createCarbon(reward);
         rewardMapper.createReward(reward);
         return reward;
