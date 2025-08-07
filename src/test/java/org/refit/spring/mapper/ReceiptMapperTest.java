@@ -117,7 +117,6 @@ class ReceiptMapperTest {
             receiptMapper.create(receipt);
         }
         Map<String, Object> params = new HashMap<>();
-//        params.put("")
         List<Receipt> list = receiptMapper.getFilteredList(params);
         assertNotNull(list);
 
