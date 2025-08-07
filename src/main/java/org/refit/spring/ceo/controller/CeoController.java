@@ -4,7 +4,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
-import lombok.extern.log4j.Log4j2;
 import org.refit.spring.auth.annotation.UserId;
 import org.refit.spring.ceo.dto.*;
 import org.refit.spring.ceo.dto.ReceiptDto;
