@@ -80,7 +80,6 @@ public class ReceiptService {
 
     @Transactional
     public Receipt refund(Long userId, Long receiptId) {
-        System.out.println(userId);
         Receipt nowReceipt = receiptMapper.get(userId, receiptId);
         if (nowReceipt == null) throw new IllegalArgumentException("존재하지 않는 영수증입니다.");
         if (nowReceipt.getTotalPrice() <= 0) throw new IllegalArgumentException("이미 환불된 영수증입니다.");
