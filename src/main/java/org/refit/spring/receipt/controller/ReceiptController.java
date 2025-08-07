@@ -8,8 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.refit.spring.auth.annotation.UserId;
 import org.refit.spring.auth.service.UserService;
 import org.refit.spring.ceo.entity.Company;
+import org.refit.spring.ceo.entity.Receipt;
 import org.refit.spring.receipt.dto.*;
-import org.refit.spring.receipt.entity.Receipt;
 import org.refit.spring.receipt.enums.ReceiptFilter;
 import org.refit.spring.receipt.enums.ReceiptSort;
 import org.refit.spring.receipt.enums.ReceiptType;
@@ -40,15 +40,19 @@ public class ReceiptController {
     @GetMapping("/list")
     public ResponseEntity<?> getList(
             @ApiIgnore @UserId Long userId,
-            @RequestParam(required = false) Long cursorId,
-            @RequestParam(required = false) Integer period,
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate,
-            @RequestParam(required = false) ReceiptType type,
-            @RequestParam(required = false) ReceiptSort sort,
-            @RequestParam(required = false) ReceiptFilter filter) {
-        ReceiptListDto dto = receiptService.getFilteredList(userId, cursorId, period, startDate, endDate, type, sort, filter);
-        return ResponseEntity.ok(dto);
+            @ModelAttribute ReceiptListRequestDto receiptListRequestDto) {
+        try {
+            ReceiptListCursorDto dto = receiptService.getFilteredList(userId, receiptListRequestDto);
+            return ResponseEntity.ok(dto);
+        }
+        catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Collections.singletonMap("message", e.getMessage()));
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("message", "서버 오류로 인해 실패했습니다."));
+        }
     }
 
     @ApiOperation(value = "영수증 상세 조회", notes = "영수증 아이디를 활용해 영수증에 기록된 모든 정보를 확인합니다.")

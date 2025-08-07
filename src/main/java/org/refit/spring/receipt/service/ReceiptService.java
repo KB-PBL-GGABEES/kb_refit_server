@@ -2,6 +2,9 @@ package org.refit.spring.receipt.service;
 
 import lombok.RequiredArgsConstructor;
 import org.refit.spring.auth.entity.User;
+import org.refit.spring.hospital.dto.MedicalReceiptDto;
+import org.refit.spring.hospital.dto.MedicalReceiptListCursorDto;
+import org.refit.spring.hospital.enums.HospitalSort;
 import org.refit.spring.mapper.*;
 import org.refit.spring.merchandise.entity.Merchandise;
 import org.refit.spring.receipt.dto.*;
@@ -181,14 +184,42 @@ public class ReceiptService {
     }
 
     @Transactional(readOnly = true)
-    public ReceiptListDto getFilteredList(Long userId, Long cursorId, Integer period, Date startDate, Date endDate, ReceiptType type, ReceiptSort sort, ReceiptFilter filter) {
-        if (cursorId == null) {
-            cursorId = (sort == ReceiptSort.LATEST || sort == null) ? Long.MAX_VALUE : 0L;
+    public ReceiptListCursorDto getFilteredList(Long userId, ReceiptListRequestDto receiptListRequestDto) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("userId", userId);
+
+        long paginationSize = (receiptListRequestDto.getSize() != null && receiptListRequestDto.getSize() > 0) ? receiptListRequestDto.getSize() : 20;
+
+        params.put("size", paginationSize);
+        if (receiptListRequestDto.getSort() == null) receiptListRequestDto.setSort(ReceiptSort.LATEST);
+
+        if (receiptListRequestDto.getCursorId() == null) {
+            receiptListRequestDto.setCursorId((receiptListRequestDto.getSort() == ReceiptSort.OLDEST) ? 0L : Long.MAX_VALUE);
         }
-        ReceiptType finalType = (type == ReceiptType.ALL) ? null : type;
-        List<Receipt> receipts = receiptMapper.getFilteredList(userId, cursorId, period, startDate, endDate, finalType, filter, sort);
-        Long nextCursorId = receipts.size() < 20 ? null : receipts.get(receipts.size() - 1).getReceiptId();
-        return ReceiptListDto.from(userId, receipts, nextCursorId);
+        if (receiptListRequestDto.getFilter() == null) receiptListRequestDto.setFilter(ReceiptFilter.ALL);
+
+        if (receiptListRequestDto.getPeriod() == null) {
+            params.put("startDate", receiptListRequestDto.getStartDate());
+            params.put("endDate", receiptListRequestDto.getEndDate());
+        } else {
+            params.put("period",receiptListRequestDto.getPeriod());
+        }
+
+        if (receiptListRequestDto.getType() == null) receiptListRequestDto.setType(ReceiptType.ALL);
+
+        params.put("cursorId", receiptListRequestDto.getCursorId());
+        params.put("sort", receiptListRequestDto.getSort());
+        params.put("filter", receiptListRequestDto.getFilter());
+        params.put("type", receiptListRequestDto.getType());
+
+        validateRequiredFields(params);
+
+
+        List<Receipt> list = receiptMapper.getFilteredList(params);
+
+        // 커서 아이디 초기화
+        Long nextCursorId = (list.size() < paginationSize) ?  null : list.get(list.size() - 1).getReceiptId();
+        return ReceiptListCursorDto.from(list, nextCursorId);
     }
 
 
