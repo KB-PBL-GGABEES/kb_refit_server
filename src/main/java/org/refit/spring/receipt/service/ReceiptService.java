@@ -2,9 +2,6 @@ package org.refit.spring.receipt.service;
 
 import lombok.RequiredArgsConstructor;
 import org.refit.spring.auth.entity.User;
-import org.refit.spring.hospital.dto.MedicalReceiptDto;
-import org.refit.spring.hospital.dto.MedicalReceiptListCursorDto;
-import org.refit.spring.hospital.enums.HospitalSort;
 import org.refit.spring.mapper.*;
 import org.refit.spring.merchandise.entity.Merchandise;
 import org.refit.spring.receipt.dto.*;

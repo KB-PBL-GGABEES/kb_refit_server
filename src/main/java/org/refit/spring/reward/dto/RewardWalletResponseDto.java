@@ -1,7 +1,6 @@
 package org.refit.spring.reward.dto;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Builder;
 import lombok.Data;
 
 @Data
