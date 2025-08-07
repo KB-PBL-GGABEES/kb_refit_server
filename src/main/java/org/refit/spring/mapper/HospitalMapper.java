@@ -111,7 +111,7 @@ public interface HospitalMapper {
 
    // 보험 청구 내용 수정 (state=none일 때만)
     @Update("UPDATE hospital_process " +
-            "SET process_state = #{processState}, sicked_date = #{sickedDate}, visited_reason = #{visitedReason}, insurance_id = #{insuranceId} " +
+            "SET process_state = 'inProgress', sicked_date = #{sickedDate}, visited_reason = #{visitedReason}, insurance_id = #{insuranceId} " +
             "WHERE receipt_id = #{receiptId}")
     void updateInsuranceClaim(InsuranceClaimDto dto);
 

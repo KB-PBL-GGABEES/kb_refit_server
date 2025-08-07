@@ -177,11 +177,7 @@ public class HospitalService {
         if (!isSubscribed) {
             throw new IllegalArgumentException("가입된 보험에 가입되어 있지 않습니다.");
         }
-
-        // 3. 기본값 처리
-        if (dto.getProcessState() == null || dto.getProcessState().trim().isEmpty()) {
-            dto.setProcessState("inProgress");
-        }
+        
         // 4. INSERT or UPDATE
         if (existingState != null) {
             // 기존 hospital_process가 있지만 상태가 none이면 갱신
