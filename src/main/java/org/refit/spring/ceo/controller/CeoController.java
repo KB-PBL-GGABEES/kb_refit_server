@@ -32,7 +32,7 @@ public class CeoController {
 
         try {
             return ResponseEntity.ok(ceoService.getPendingDetail(userId));
-        } catch (IllegalStateException e) {
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Collections.singletonMap("message", e.getMessage()));
         } catch (Exception e) {
             log.error("경비 대기 내역 조회 실패", e);
@@ -50,7 +50,7 @@ public class CeoController {
             return ResponseEntity.ok(ceoService.getReceiptList(receiptId));
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.singletonMap("message", e.getMessage()));
-        } catch (IllegalStateException e) {
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Collections.singletonMap("message", e.getMessage()));
         } catch (Exception e) {
             log.error("영수증 상세 내역 조회 실패", e);
@@ -69,7 +69,7 @@ public class CeoController {
             ReceiptListCursorDto dto = ceoService.getCompletedReceipts(userId, receiptFilterDto);
             return ResponseEntity.ok(dto);
 
-        } catch (IllegalStateException e) {
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Collections.singletonMap("message", e.getMessage()));
         } catch (Exception e) {
             log.error("경비 처리 완료 내역 조회 실패", e);
@@ -121,7 +121,7 @@ public class CeoController {
             return ResponseEntity.ok(result);
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.singletonMap("message", e.getMessage()));
-        } catch (IllegalStateException e) {
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Collections.singletonMap("message", e.getMessage()));
         } catch (Exception e) {
             log.error("영수 처리 실패", e);
@@ -154,7 +154,7 @@ public class CeoController {
             CorporateCardListCursorDto dto = ceoService.getCorporateCardReceipts(userId, receiptFilterDto);
             return ResponseEntity.ok(dto);
 
-        } catch (IllegalStateException e) {
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Collections.singletonMap("message", e.getMessage()));
         } catch (Exception e) {
             log.error("법카 내역 조회 실패", e);
