@@ -63,7 +63,7 @@ public class HospitalQueryProvider {
             sql.append(" ORDER BY r.created_at DESC");
         }
 
-        sql.append(" LIMIT 10");
+        sql.append(" LIMIT #{size}");
         return sql.toString();
     }
 }
