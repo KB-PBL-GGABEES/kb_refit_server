@@ -40,7 +40,7 @@ public interface HospitalMapper {
             "WHERE r.user_id = #{userId} " +
             "AND r.receipt_id = #{receiptId} " +
             "AND cat.category_id = 1")
-    List<MedicalReceiptDetailDto> findHospitalExpenseDetailByUserIdAndReceiptId(
+    MedicalReceiptDetailDto findHospitalExpenseDetailByUserIdAndReceiptId(
             @Param("userId") Long userId,
             @Param("receiptId") Long receiptId
     );
