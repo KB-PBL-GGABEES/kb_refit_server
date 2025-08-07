@@ -15,9 +15,11 @@ import org.refit.spring.wallet.dto.WalletResponseDto;
 import org.refit.spring.wallet.service.WalletService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.beans.PropertyEditorSupport;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +33,28 @@ public class WalletController {
 
     private final WalletService walletService;
     private final RewardService rewardService;
+
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+        binder.registerCustomEditor(Long.class, new PropertyEditorSupport() {
+            @Override
+            public void setAsText(String text) {
+                try {
+                    setValue(Long.parseLong(text));
+                } catch (NumberFormatException e) {
+                    throw new IllegalArgumentException("숫자형태의 ID만 입력 가능합니다.");
+                }
+            }
+        });
+    }
+
+    // 예외 핸들러 추가
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<?> handleIllegalArgument(IllegalArgumentException e) {
+        Map<String, String> error = new HashMap<>();
+        error.put("message", e.getMessage()); // 또는 "잘못된 요청입니다."
+        return ResponseEntity.badRequest().body(error); // 400
+    }
 
     @ApiOperation(value = "뱃지 도감 조회", notes = "전체 뱃지 도감 리스트와 현재 보유 여부를 확인할 수 있습니다.")
     @GetMapping("/badge")
@@ -49,8 +73,13 @@ public class WalletController {
     @ApiOperation(value = "특정 뱃지 정보 조회", notes = "특정한 뱃지의 상세 정보를 조회할 수 있습니다.")
     @GetMapping("/badge/detail/{badgeId}")
     public ResponseEntity<BadgeResponseDto.specificBadgeDetailDto> getBadgeDetail(@ApiIgnore @UserId Long userId, @PathVariable("badgeId") Long badgeId) {
-        BadgeResponseDto.specificBadgeDetailDto result = walletService.getSpecificBadgeDetail(badgeId, userId);
-        return ResponseEntity.ok(result);
+        try {
+            BadgeResponseDto.specificBadgeDetailDto result = walletService.getSpecificBadgeDetail(badgeId, userId);
+            return ResponseEntity.ok(result);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
+
     }
 
     @ApiOperation(value = "뱃지 장착/해제", notes = "최대 4개까지 뱃지를 장착할 수 있으며, 초과 시 기존 뱃지를 교체합니다.")
