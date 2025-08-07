@@ -81,7 +81,7 @@ public class HospitalService {
 
         MedicalReceiptDetailDto result = hospitalMapper.findHospitalExpenseDetailByUserIdAndReceiptId(userId, receiptId);
         if (result == null) {
-            throw new IllegalArgumentException("해당 영수증을 찾을 수 없습니다.");
+            throw new NoSuchElementException("해당 영수증을 찾을 수 없습니다.");
         }
 
         return result;
