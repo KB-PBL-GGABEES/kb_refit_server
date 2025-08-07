@@ -28,7 +28,7 @@ public class RewardQueryProvider {
         }
         if (sort == ReceiptSort.LATEST) sql.append(" ORDER BY created_at DESC");
         else sql.append(" ORDER BY created_at ASC");
-        sql.append(" LIMIT 20");
+        sql.append(" LIMIT #{size}");
 
         return sql.toString();
     }

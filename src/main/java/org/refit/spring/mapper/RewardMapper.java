@@ -1,13 +1,11 @@
 package org.refit.spring.mapper;
 
 import org.apache.ibatis.annotations.*;
-import org.refit.spring.receipt.enums.ReceiptSort;
 import org.refit.spring.reward.RewardQueryProvider;
 import org.refit.spring.reward.entity.Reward;
-import org.refit.spring.reward.enums.RewardType;
 
-import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface RewardMapper {
@@ -21,13 +19,7 @@ public interface RewardMapper {
     void createReward(Reward reward);
 
     @SelectProvider(type = RewardQueryProvider.class, method = "buildFilteredQuery")
-    List<Reward> getList(@Param("userId") Long userId,
-                         @Param("cursorId") Long cursorId,
-                         @Param("period") Integer period,
-                         @Param("startDate") Date startDate,
-                         @Param("endDate") Date endDate,
-                         @Param("type") RewardType type,
-                         @Param("sort") ReceiptSort sort);
+    List<Reward> getList(Map<String, Object> params);
 
     @Select("SELECT IFNULL(SUM(reward), 0) FROM reward WHERE user_id = #{userId}")
     Long getTotalCashback(@Param("userId") Long userId);

@@ -7,18 +7,17 @@ import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.refit.spring.auth.annotation.UserId;
 import org.refit.spring.receipt.enums.ReceiptSort;
-import org.refit.spring.reward.dto.RewardListDto;
-import org.refit.spring.reward.dto.RewardSummaryDto;
-import org.refit.spring.reward.dto.RewardWalletRequestDto;
-import org.refit.spring.reward.dto.RewardWalletResponseDto;
+import org.refit.spring.reward.dto.*;
 import org.refit.spring.reward.enums.RewardType;
 import org.refit.spring.reward.service.RewardService;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.net.URI;
+import java.util.Collections;
 import java.util.Date;
 
 @Api(tags = "리워드 API", description = "리워드 내역과 메인 화면용 포인트 리스트 관련 API입니다.")
@@ -37,14 +36,19 @@ public class RewardController {
     @GetMapping("/list")
     public ResponseEntity<?> getList(
             @ApiIgnore @UserId Long userId,
-            @RequestParam(required = false) Long cursorId,
-            @RequestParam(required = false) Integer period,
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate,
-            @RequestParam(required = false) RewardType type,
-            @RequestParam(required = false) ReceiptSort sort) {
-        RewardListDto dto = rewardService.getList(userId, cursorId, period, startDate, endDate, type, sort);
-        return ResponseEntity.ok(dto);
+            @ModelAttribute RewardListRequestDto rewardListRequestDto) {
+        try {
+            RewardListCursorDto dto = rewardService.getList(userId, rewardListRequestDto);
+            return ResponseEntity.ok(dto);
+        }
+        catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Collections.singletonMap("message", e.getMessage()));
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("message", "서버 오류로 인해 실패했습니다."));
+        }
     }
 
     @ApiOperation(value = "포인트 리스트 조회", notes = "메인 페이지 포인트 리스트에서 보여지는 리워드들을 제공합니다.")
