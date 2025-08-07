@@ -1,6 +1,6 @@
-package org.refit.spring.ceo;
+package org.refit.spring.ceo.provider;
 
-import org.refit.spring.ceo.enums.ProcessState;
+import org.refit.spring.ceo.enums.State;
 import org.refit.spring.ceo.enums.Sort;
 
 import java.util.Map;
@@ -27,18 +27,17 @@ public class CeoReceiptQueryProvider {
         sql.append(" AND e.company_id IN (SELECT company_id FROM company WHERE ceo_id = #{userId}))");
 
         // 필터 (전체, 경비 승인, 경비 기각)
-        ProcessState processState = (ProcessState) params.get("processState");
-        if (processState != null && processState != ProcessState.Whole) {
-            if(processState.Accepted()) {
+        State state = (State) params.get("state");
+        if (state != null && state != State.Whole) {
+            if(state.Process()) {
                 sql.append(" AND p.process_state = 'accepted'");
-            } else if(processState.Rejected()) {
+            } else if(state.UnProcess()) {
                 sql.append(" AND p.process_state = 'rejected'");
             }
         }
 
         // 기간 (1, 3, 6개월, 직접입력)
-        Integer period = (Integer) params.get("period");
-        if (period != null && period > 0) {
+        if (params.get("period") != null) {
             sql.append(" AND r.created_at >= DATE_SUB(NOW(), INTERVAL #{period} MONTH)");
         } else if (params.get("startDate") != null && params.get("endDate") != null) {
             sql.append(" AND r.created_at >= #{startDate} AND r.created_at < DATE_ADD(#{endDate}, INTERVAL 1 DAY)");
@@ -57,7 +56,7 @@ public class CeoReceiptQueryProvider {
             sql.append(" AND r.receipt_id > #{cursorId} ORDER BY r.created_at ASC");
         }
 
-        sql.append(" LIMIT 20");
+        sql.append(" LIMIT #{size} ");
 
         return sql.toString();
     }

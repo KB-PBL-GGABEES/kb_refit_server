@@ -1,12 +1,6 @@
 package org.refit.spring.ceo.service;
 
 import org.refit.spring.ceo.dto.*;
-import org.refit.spring.ceo.enums.ProcessState;
-import org.refit.spring.ceo.enums.RejectState;
-import org.refit.spring.ceo.enums.Sort;
-
-import java.util.Date;
-import java.util.List;
 
 public interface CeoService {
 
@@ -17,7 +11,7 @@ public interface CeoService {
     ReceiptProcessDetailDto getReceiptList(Long receipted);
 
     // 경비 처리 완료 내역 조회
-    List<ReceiptDto> getCompletedReceipts(Long userId, Long cursorId, Integer period, Date startDate, Date endDate, ProcessState processState, Sort sort);
+    ReceiptListCursorDto getCompletedReceipts(Long userId, ReceiptFilterDto receiptFilterDto);
 
     int monthlySummary(Long userId);
 
@@ -31,5 +25,5 @@ public interface CeoService {
     CorporateCardTotalPriceDto getCorporateCardTotalPrice(Long userId);
 
     // 법카 내역 조회
-    List<CorporateCardListDto> getCorporateCardReceipts(Long userId, Long cursorId, Integer period, Date startDate, Date endDate, RejectState rejectState, Sort sort);
+    CorporateCardListCursorDto getCorporateCardReceipts(Long userId, ReceiptFilterDto receiptFilterDto);
 }

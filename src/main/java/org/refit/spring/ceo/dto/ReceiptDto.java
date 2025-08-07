@@ -1,6 +1,5 @@
 package org.refit.spring.ceo.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -9,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.refit.spring.ceo.entity.Ceo;
 
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Data
@@ -28,8 +26,6 @@ public class ReceiptDto {
     private String createdAt;
     @ApiModelProperty(value = "영수 처리 상태", example = "none")
     private String processState;
-
-
 
     public static ReceiptDto of(Ceo vo) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");

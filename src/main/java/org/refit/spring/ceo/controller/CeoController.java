@@ -6,14 +6,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.refit.spring.auth.annotation.UserId;
 import org.refit.spring.ceo.dto.*;
-import org.refit.spring.ceo.dto.ReceiptDto;
 import org.refit.spring.ceo.dto.EmailSendDto;
-import org.refit.spring.ceo.enums.ProcessState;
-import org.refit.spring.ceo.enums.RejectState;
-import org.refit.spring.ceo.enums.Sort;
 import org.refit.spring.ceo.service.CeoService;
 import org.refit.spring.ceo.service.ReceiptExportService;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -68,23 +63,12 @@ public class CeoController {
     @GetMapping("/completed")
     public ResponseEntity<?> getCompletedReceipts(
             @ApiIgnore @UserId Long userId,
-            @RequestParam(required = false) Long cursorId,
-            @RequestParam(required = false) Integer period,
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate,
-            @RequestParam(required = false) ProcessState processState,
-            @RequestParam(required = false) Sort sort) {
+            @ModelAttribute ReceiptFilterDto receiptFilterDto) {
 
         try {
-            List<ReceiptDto> list = ceoService.getCompletedReceipts(userId, cursorId, period, startDate, endDate, processState, sort);
+            ReceiptListCursorDto dto = ceoService.getCompletedReceipts(userId, receiptFilterDto);
+            return ResponseEntity.ok(dto);
 
-            Long nextCursorId = list.size() < 20 ? null : list.get(list.size() - 1).getReceiptId();
-
-            Map<String, Object> result = new HashMap<>();
-            result.put("list", list);
-            result.put("cursorId", nextCursorId);
-
-            return ResponseEntity.ok(result);
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(Collections.singletonMap("message", e.getMessage()));
         } catch (Exception e) {
@@ -164,23 +148,12 @@ public class CeoController {
     @GetMapping("/corporateCard")
     public ResponseEntity<?> getCorporateCard(
             @ApiIgnore @UserId Long userId,
-            @RequestParam(required = false) Long cursorId,
-            @RequestParam(required = false) Integer period,
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate,
-            @RequestParam(required = false) RejectState rejectState,
-            @RequestParam(required = false) Sort sort) {
+            @ModelAttribute ReceiptFilterDto receiptFilterDto) {
 
         try {
-            List<CorporateCardListDto> list = ceoService.getCorporateCardReceipts(userId, cursorId, period, startDate, endDate, rejectState, sort);
+            CorporateCardListCursorDto dto = ceoService.getCorporateCardReceipts(userId, receiptFilterDto);
+            return ResponseEntity.ok(dto);
 
-            Long nextCursorId = list.size() < 20 ? null : list.get(list.size() - 1).getReceiptId();
-
-            Map<String, Object> result = new HashMap<>();
-            result.put("list", list);
-            result.put("cursorId", nextCursorId);
-
-            return ResponseEntity.ok(result);
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(Collections.singletonMap("message", e.getMessage()));
         } catch (Exception e) {
