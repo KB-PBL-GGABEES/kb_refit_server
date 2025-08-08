@@ -88,4 +88,10 @@ public interface ReceiptMapper {
 
     @Select("SELECT user_id FROM card WHERE card_id = #{cardId}")
     Long findCardId(@Param("cardId") Long cardId);
+
+    @Select("SELECT * FROM receipt r " +
+            "INNER JOIN company c ON r.company_id = c.company_id " +
+            "WHERE r.company_id = #{companyId} " +
+            "ORDER BY r.created_at DESC")
+    List<Receipt> findReceiptByCompanyId(@Param("companyId") Long companyId);
 }

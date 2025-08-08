@@ -221,9 +221,7 @@ public class ReceiptService {
 
 
     @Transactional(readOnly = true)
-    public ReceiptDetailDto get(Long userId, Long cursorId, Long receiptId) {
-        if (cursorId == null) cursorId = Long.MAX_VALUE;
-
+    public ReceiptDetailDto get(Long userId, Long receiptId) {
         Receipt receipt = receiptMapper.get(userId, receiptId);
         if (receipt == null) {
             throw new NoSuchElementException();
@@ -309,4 +307,9 @@ public class ReceiptService {
             } catch (SQLException e) {}
         }
     }
-}
+
+    public ReceiptListDto findReceiptByCompanyId(Long userId, Long cursorId, Long companyId) {
+        List<Receipt> receiptList = receiptMapper.findReceiptByCompanyId(companyId);
+        return new ReceiptListDto(userId, receiptList, cursorId);
+    }
+ }

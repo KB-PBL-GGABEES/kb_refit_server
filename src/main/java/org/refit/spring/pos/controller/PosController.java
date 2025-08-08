@@ -11,12 +11,14 @@ import org.refit.spring.auth.service.UserService;
 import org.refit.spring.pos.dto.PosResponseDto;
 import org.refit.spring.pos.service.PosService;
 import org.refit.spring.receipt.dto.ReceiptContentRequestsDto;
+import org.refit.spring.receipt.dto.ReceiptListDto;
 import org.refit.spring.receipt.dto.ReceiptRequestDto;
 import org.refit.spring.receipt.dto.ReceiptResponseDto;
 import org.refit.spring.receipt.entity.Receipt;
 import org.refit.spring.receipt.service.ReceiptService;
 import org.refit.spring.reward.entity.Reward;
 import org.refit.spring.reward.service.RewardService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -120,5 +122,26 @@ public class PosController {
         }
 
     }
-
+    @ApiOperation(value = "가게 별 영수증 목록 조회", notes = "가게 별 영수증 목록 전체를 가져옵니다.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "잘못된 요청"),
+            @ApiResponse(code = 500, message = "서버 내부 오류")
+    })
+    @GetMapping("/receipt")
+    public ResponseEntity<?> findReceiptByCompanyId(@ApiIgnore @UserId Long userId,
+                                                    @RequestParam(required = false) Long companyId) {
+        try {
+            Map<String, Object> requiredFields = new HashMap<>();
+            requiredFields.put("companyId", companyId);
+            receiptService.validateRequiredFields(requiredFields);
+            ReceiptListDto dto = receiptService.findReceiptByCompanyId(userId, null, companyId);
+            return ResponseEntity.ok(dto);
+        }
+        catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(500).body("서버 내부 오류가 발생했습니다.");
+        }
+    }
 }
