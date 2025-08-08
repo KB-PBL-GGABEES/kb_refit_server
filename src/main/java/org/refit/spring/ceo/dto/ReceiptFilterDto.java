@@ -20,6 +20,7 @@ public class ReceiptFilterDto {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date endDate;
     private State state;
+    private Long price; // 환불관련
     private Sort sort;
     private Long size;
 }

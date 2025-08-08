@@ -20,8 +20,8 @@ public class CorporateCardQueryProvider {
         sql.append(" LEFT JOIN receipt_process rp ON r.receipt_id = rp.receipt_id");
         sql.append(" WHERE c.is_corporate = TRUE");
         sql.append(" AND e.company_id IN (SELECT company_id FROM company WHERE ceo_id = #{userId})");
-
-        // 필터 (전체, 돈 보냄, 안보냄)
+        
+        // 필터 (전체, 돈 보냄, 안보냄, 기본)
         State state = (State) params.get("state");
         if(state != null && state != State.WHOLE) {
             if (state.Deposit()) {
@@ -31,6 +31,13 @@ public class CorporateCardQueryProvider {
             } else if (state.InProgress()) {
                 sql.append(" AND rp.process_state = 'inProgress' ");
             }
+        }
+
+        // 환불 금액 확인
+        if (params.get("price") != null && (Long) params.get("price") > 0) {
+            sql.append(" AND r.total_price > 0");
+        } else if(params.get("price") != null && (Long) params.get("price") < 0) {
+            sql.append(" AND r.total_price < 0");
         }
         
         // 기간 (1, 3, 6개월, 직접입력)
