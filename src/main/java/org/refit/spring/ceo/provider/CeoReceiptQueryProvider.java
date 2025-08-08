@@ -28,7 +28,7 @@ public class CeoReceiptQueryProvider {
 
         // 필터 (전체, 경비 승인, 경비 기각)
         State state = (State) params.get("state");
-        if (state != null && state != State.Whole) {
+        if (state != null && state != State.WHOLE) {
             if(state.Process()) {
                 sql.append(" AND p.process_state = 'accepted'");
             } else if(state.UnProcess()) {
@@ -46,13 +46,13 @@ public class CeoReceiptQueryProvider {
         // 정렬 (최신순, 과거순)
         Sort sort = (Sort) params.get("sort");
         if(sort == null) {  // 기본 정렬
-            sort = Sort.Newest;
+            sort = Sort.NEWEST;
             params.put("sort", sort);
         }
 
-        if(sort == Sort.Newest) {
+        if(sort == Sort.NEWEST) {
             sql.append(" AND r.receipt_id < #{cursorId} ORDER BY r.created_at DESC");
-        } else if(sort == Sort.Oldest) {
+        } else if(sort == Sort.OLDEST) {
             sql.append(" AND r.receipt_id > #{cursorId} ORDER BY r.created_at ASC");
         }
 
