@@ -1,8 +1,10 @@
 package org.refit.spring.ceo.provider;
 
 
+import org.refit.spring.ceo.enums.RefundState;
 import org.refit.spring.ceo.enums.Sort;
 import org.refit.spring.ceo.enums.State;
+import org.refit.spring.receipt.enums.ReceiptType;
 
 import java.util.Map;
 
@@ -34,12 +36,12 @@ public class CorporateCardQueryProvider {
         }
 
         // 환불 금액 확인
-        if (params.get("price") != null && (Long) params.get("price") > 0) {
-            sql.append(" AND r.total_price > 0");
-        } else if(params.get("price") != null && (Long) params.get("price") < 0) {
-            sql.append(" AND r.total_price < 0");
+        RefundState refund = (RefundState) params.get("refund");
+        if (refund != null && refund != RefundState.WHOLE) {
+            if (refund == RefundState.UNREFUND) sql.append(" AND r.total_price > 0 ");
+            else if (refund == RefundState.FETUND) sql.append(" AND r.total_price < 0 ");
         }
-        
+
         // 기간 (1, 3, 6개월, 직접입력)
         if (params.get("period") != null) {
             sql.append(" AND r.created_at >= DATE_SUB(NOW(), INTERVAL #{period} MONTH)");

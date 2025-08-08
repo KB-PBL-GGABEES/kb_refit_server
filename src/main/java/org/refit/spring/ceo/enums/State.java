@@ -3,9 +3,7 @@ package org.refit.spring.ceo.enums;
 public enum State {
     WHOLE, PROCESS, UNPROCESS, ACCEPTED, REJECTED, DEPOSIT, INPROGRESS;
 
-    public boolean Process() {
-        return this == PROCESS;
-    }
+    public boolean Process() { return this == PROCESS; }
 
     public boolean UnProcess() { return this == UNPROCESS; }
 
