@@ -39,7 +39,7 @@ public class CorporateCardQueryProvider {
         RefundState refund = (RefundState) params.get("refund");
         if (refund != null && refund != RefundState.WHOLE) {
             if (refund == RefundState.UNREFUND) sql.append(" AND r.total_price > 0 ");
-            else if (refund == RefundState.FETUND) sql.append(" AND r.total_price < 0 ");
+            else if (refund == RefundState.REFUND) sql.append(" AND r.total_price < 0 ");
         }
 
         // 기간 (1, 3, 6개월, 직접입력)
