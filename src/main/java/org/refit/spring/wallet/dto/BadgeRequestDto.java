@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.refit.spring.wallet.entity.BadgePreset;
 
 public class BadgeRequestDto {
     @Getter

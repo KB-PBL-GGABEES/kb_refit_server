@@ -1,7 +1,7 @@
 package org.refit.spring.mapper;
 
 import org.apache.ibatis.annotations.*;
-import org.refit.spring.reward.RewardQueryProvider;
+import org.refit.spring.reward.provider.RewardQueryProvider;
 import org.refit.spring.reward.entity.Reward;
 
 import java.util.List;

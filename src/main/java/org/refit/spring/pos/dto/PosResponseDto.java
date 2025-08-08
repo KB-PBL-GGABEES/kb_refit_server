@@ -4,7 +4,6 @@ import lombok.*;
 import org.refit.spring.merchandise.entity.Merchandise;
 import org.refit.spring.pos.entity.Company;
 
-import java.util.Date;
 import java.util.List;
 
 public class PosResponseDto {

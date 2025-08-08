@@ -2,7 +2,6 @@ package org.refit.spring.wallet.dto;
 
 import lombok.*;
 import org.refit.spring.auth.entity.User;
-import org.refit.spring.wallet.entity.PersonalBadge;
 import org.refit.spring.wallet.entity.PersonalWalletBrand;
 import org.refit.spring.wallet.entity.WalletBrand;
 

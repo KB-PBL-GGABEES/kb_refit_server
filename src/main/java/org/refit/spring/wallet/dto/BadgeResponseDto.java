@@ -4,9 +4,7 @@ import lombok.*;
 import org.refit.spring.wallet.entity.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-import static io.swagger.models.properties.PropertyBuilder.build;
 
 public class BadgeResponseDto {
     @Getter

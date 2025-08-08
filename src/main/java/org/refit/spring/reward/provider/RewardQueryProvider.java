@@ -1,4 +1,4 @@
-package org.refit.spring.reward;
+package org.refit.spring.reward.provider;
 
 import org.refit.spring.receipt.enums.ReceiptSort;
 import org.refit.spring.reward.enums.RewardType;
