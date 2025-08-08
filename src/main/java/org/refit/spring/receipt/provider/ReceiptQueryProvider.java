@@ -1,4 +1,4 @@
-package org.refit.spring.receipt;
+package org.refit.spring.receipt.provider;
 
 import org.refit.spring.receipt.enums.ReceiptFilter;
 import org.refit.spring.receipt.enums.ReceiptSort;

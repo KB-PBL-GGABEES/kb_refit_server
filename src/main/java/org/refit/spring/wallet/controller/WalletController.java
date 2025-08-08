@@ -13,7 +13,6 @@ import org.refit.spring.wallet.dto.BadgeRequestDto;
 import org.refit.spring.wallet.dto.BadgeResponseDto;
 import org.refit.spring.wallet.dto.WalletResponseDto;
 import org.refit.spring.wallet.service.WalletService;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
