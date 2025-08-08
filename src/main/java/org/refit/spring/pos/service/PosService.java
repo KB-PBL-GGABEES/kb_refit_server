@@ -31,8 +31,8 @@ public class PosService {
         return PosResponseDto.GetMerchandiseListDto.from(dtoList, companyId);
     }
 
-    public PosResponseDto.GetCompanyListDto getCompanyList() {
-        List<Company> companyList = companyMapper.findAll();
+    public PosResponseDto.GetCompanyListDto getMyCompanyList(Long userId) {
+        List<Company> companyList = companyMapper.findAllByUserId(userId);
 
         if (companyList == null || companyList.isEmpty()) {
             return null;

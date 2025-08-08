@@ -144,7 +144,8 @@ public interface CeoMapper {
             "JOIN card cr ON r.card_id = cr.card_id " +
             "JOIN receipt_process p ON r.receipt_id = p.receipt_id " +
             "WHERE c.ceo_id = #{userId} " +
-            "AND p.process_state = 'accepted'")
+            "AND p.process_state = 'accepted'" +
+            "AND DATE_FORMAT(r.created_at, '%Y-%m') = DATE_FORMAT(NOW(), '%Y-%m')")
     List<ReceiptExceptMerchandiseDto> getCompletedReceiptDetails(@Param("userId") Long userId);
 
     // 처리 완료된 항목 이메일 전송

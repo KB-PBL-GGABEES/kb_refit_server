@@ -51,10 +51,11 @@ public class PosController {
         return ResponseEntity.ok(list);
     }
 
-    @ApiOperation(value = "모든 company 조회", notes = "POS 기계에서 모든 가게 리스트를 조회할 수 있습니다.")
+    //내 사업장만 뜨도록 추가
+    @ApiOperation(value = "로그인한 사용자의 모든 company 조회", notes = "POS 기계에서 로그인한 사업자의 모든 가게 리스트를 조회할 수 있습니다.")
     @GetMapping("/company")
-    public ResponseEntity<?> getCompanyList() {
-        PosResponseDto.GetCompanyListDto list = posService.getCompanyList();
+    public ResponseEntity<?> getCompanyList(@ApiIgnore @UserId Long userId) {
+        PosResponseDto.GetCompanyListDto list = posService.getMyCompanyList(userId);
         if (list == null) {
             return ResponseEntity.noContent().build();
         }
