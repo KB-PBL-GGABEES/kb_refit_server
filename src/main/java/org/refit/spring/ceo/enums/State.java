@@ -1,19 +1,19 @@
 package org.refit.spring.ceo.enums;
 
 public enum State {
-    Whole, Process, UnProcess, Accepted, Rejected, Deposit, InProgress;
+    WHOLE, PROCESS, UNPROCESS, ACCEPTED, REJECTED, DEPOSIT, INPROGRESS;
 
     public boolean Process() {
-        return this == Process;
+        return this == PROCESS;
     }
 
-    public boolean UnProcess() { return this == UnProcess; }
+    public boolean UnProcess() { return this == UNPROCESS; }
 
-    public boolean Rejected() { return this == Rejected; }
+    public boolean Accepted() { return this == ACCEPTED; }
 
-    public boolean Accepted() { return this == Accepted; }
+    public boolean Rejected() { return this == REJECTED; }
 
-    public boolean Deposit() { return this == Deposit; }
+    public boolean Deposit() { return this == DEPOSIT; }
 
-    public boolean InProgress() { return this == InProgress; }
+    public boolean InProgress() { return this == INPROGRESS; }
 }

@@ -23,7 +23,7 @@ public class CorporateCardQueryProvider {
 
         // 필터 (전체, 돈 보냄, 안보냄)
         State state = (State) params.get("state");
-        if(state != null && state != State.Whole) {
+        if(state != null && state != State.WHOLE) {
             if (state.Deposit()) {
                 sql.append(" AND rp.process_state = 'deposit' ");
             } else if (state.Rejected()) {
@@ -43,13 +43,13 @@ public class CorporateCardQueryProvider {
         // 정렬 (최신순, 과거순)
         Sort sort = (Sort) params.get("sort");
         if(sort == null) {  // 기본 정렬
-            sort = Sort.Newest;
+            sort = Sort.NEWEST;
             params.put("sort", sort);
         }
 
-        if(sort == Sort.Newest) {
+        if(sort == Sort.NEWEST) {
             sql.append(" AND r.receipt_id < #{cursorId} ORDER BY r.created_at DESC");
-        } else if(sort == Sort.Oldest) {
+        } else if(sort == Sort.OLDEST) {
             sql.append(" AND r.receipt_id > #{cursorId} ORDER BY r.created_at ASC");
         }
 

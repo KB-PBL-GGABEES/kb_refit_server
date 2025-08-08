@@ -1,9 +1,9 @@
 package org.refit.spring.ceo.enums;
 
 public enum Sort {
-    Newest, Oldest;
+    NEWEST, OLDEST;
 
     public String toOrderBy() {
-        return this == Oldest ? "ASC" : "DESC";
+        return this == OLDEST ? "ASC" : "DESC";
     }
 }
