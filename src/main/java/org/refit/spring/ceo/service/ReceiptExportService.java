@@ -39,7 +39,7 @@ public class ReceiptExportService {
             // Header
             writer.writeNext(new String[]{
                     "영수증ID", "사용자ID", "사업자번호", "상호명", "대표자명", "주소", "총금액", "공급가", "부가세",
-                    "거래유형", "처리상태", "카드번호", "법인카드여부", "거절사유", "생성일시"
+                    "거래유형", "처리상태", "카드번호", "법인카드여부", "생성일시"
             });
 
             for (ReceiptExceptMerchandiseDto dto : receiptList) {
@@ -57,7 +57,6 @@ public class ReceiptExportService {
                         dto.getProcessState(),
                         dto.getCardNumber(),
                         String.valueOf(dto.getIsCorporate()),
-                        dto.getRejectedReason() != null ? dto.getRejectedReason() : "",
                         dto.getCreatedAt().toString()
                 });
             }
