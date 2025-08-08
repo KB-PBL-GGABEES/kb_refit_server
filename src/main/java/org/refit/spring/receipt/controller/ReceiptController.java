@@ -56,14 +56,13 @@ public class ReceiptController {
     @GetMapping("/detail")
     public ResponseEntity<?> get(
             @ApiIgnore @UserId Long userId,
-            @RequestParam(required = false) Long cursorId,
             @RequestParam(required = false) Long receiptId) {
         try {
             Map<String, Object> requiredFields = new HashMap<>();
             requiredFields.put("receiptId", receiptId);
             receiptService.validateRequiredFields(requiredFields);
 
-            ReceiptDetailDto receipt = receiptService.get(userId, cursorId, receiptId);
+            ReceiptDetailDto receipt = receiptService.get(userId, receiptId);
             return ResponseEntity.ok(receipt);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
