@@ -36,10 +36,13 @@ public class CorporateCardQueryProvider {
         }
 
         // 환불 금액 확인
-        RefundState refund = (RefundState) params.get("refund");
+        RefundState refund = (RefundState) params.get("refundState");
         if (refund != null && refund != RefundState.WHOLE) {
-            if (refund == RefundState.UNREFUND) sql.append(" AND r.total_price > 0 ");
-            else if (refund == RefundState.REFUND) sql.append(" AND r.total_price < 0 ");
+            if (refund.UnRefund()) {
+                sql.append(" AND r.total_price > 0 ");
+            } else if (refund.Refund()) {
+                sql.append(" AND r.total_price < 0 ");
+            }
         }
 
         // 기간 (1, 3, 6개월, 직접입력)

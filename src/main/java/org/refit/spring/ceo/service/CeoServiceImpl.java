@@ -187,6 +187,7 @@ public class CeoServiceImpl implements CeoService {
         params.put("cursorId", receiptFilterDto.getCursorId());
         params.put("sort", receiptFilterDto.getSort());
         params.put("state", receiptFilterDto.getState());
+        params.put("refundState", receiptFilterDto.getRefundState());
         params.put("size", paginationSize);
 
         List<CorporateCardDto> list = ceoMapper.getCorporateCardReceipts(params);
