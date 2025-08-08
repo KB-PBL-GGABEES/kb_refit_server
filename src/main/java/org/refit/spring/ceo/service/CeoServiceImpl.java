@@ -76,11 +76,11 @@ public class CeoServiceImpl implements CeoService {
         long paginationSize = (receiptFilterDto.getSize() != null && receiptFilterDto.getSize() > 0) ? receiptFilterDto.getSize() : 20;
 
         // 기본 정렬값
-        if (receiptFilterDto.getSort() == null) receiptFilterDto.setSort(Sort.Newest);
+        if (receiptFilterDto.getSort() == null) receiptFilterDto.setSort(Sort.NEWEST);
 
         // 커서 초기화
         if (receiptFilterDto.getCursorId() == null) {
-            receiptFilterDto.setCursorId((receiptFilterDto.getSort() == Sort.Oldest) ? 0L : Long.MAX_VALUE);
+            receiptFilterDto.setCursorId((receiptFilterDto.getSort() == Sort.OLDEST) ? 0L : Long.MAX_VALUE);
         }
 
         // 날짜 필터
@@ -169,11 +169,11 @@ public class CeoServiceImpl implements CeoService {
         long paginationSize = (receiptFilterDto.getSize() != null && receiptFilterDto.getSize() > 0) ? receiptFilterDto.getSize() : 20;
 
         // 기본 정렬값
-        if (receiptFilterDto.getSort() == null) receiptFilterDto.setSort(Sort.Newest);
+        if (receiptFilterDto.getSort() == null) receiptFilterDto.setSort(Sort.NEWEST);
 
         // 커서 초기화
         if (receiptFilterDto.getCursorId() == null) {
-            receiptFilterDto.setCursorId((receiptFilterDto.getSort() == Sort.Oldest) ? 0L : Long.MAX_VALUE);
+            receiptFilterDto.setCursorId((receiptFilterDto.getSort() == Sort.OLDEST) ? 0L : Long.MAX_VALUE);
         }
 
         // 날짜 필터
