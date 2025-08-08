@@ -24,18 +24,13 @@ public class CorporateCardQueryProvider {
         // 필터 (전체, 돈 보냄, 안보냄)
         State state = (State) params.get("state");
         if(state != null && state != State.Whole) {
-            if (state.Process()) {
+            if (state.Deposit()) {
                 sql.append(" AND rp.process_state = 'deposit' ");
-            } else if (state.UnProcess()) {
+            } else if (state.Rejected()) {
                 sql.append(" AND rp.process_state = 'rejected' ");
+            } else if (state.InProgress()) {
+                sql.append(" AND rp.process_state = 'inProgress' ");
             }
-        }
-
-        // 가격이 양수인지 아닌지
-        if (params.get("price") != null && (Long) params.get("price") > 0) {
-            sql.append(" AND r.total_price > 0");
-        } else if(params.get("price") != null && (Long) params.get("price") < 0) {
-            sql.append(" AND r.total_price < 0");
         }
         
         // 기간 (1, 3, 6개월, 직접입력)

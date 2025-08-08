@@ -95,7 +95,6 @@ public class CeoServiceImpl implements CeoService {
         params.put("sort", receiptFilterDto.getSort());
         params.put("state", receiptFilterDto.getState());
         params.put("size", paginationSize);
-        params.put("price", receiptFilterDto.getPrice());
 
         List<ReceiptDto> list = ceoMapper.getCompletedReceipts(params).stream().map(ReceiptDto::of).toList();
 
@@ -189,8 +188,6 @@ public class CeoServiceImpl implements CeoService {
         params.put("sort", receiptFilterDto.getSort());
         params.put("state", receiptFilterDto.getState());
         params.put("size", paginationSize);
-
-        params.put("price", receiptFilterDto.getPrice());
 
         List<CorporateCardDto> list = ceoMapper.getCorporateCardReceipts(params);
 
