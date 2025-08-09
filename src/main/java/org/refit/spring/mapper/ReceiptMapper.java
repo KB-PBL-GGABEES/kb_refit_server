@@ -30,7 +30,9 @@ public interface ReceiptMapper {
     @Select("SELECT * FROM receipt WHERE user_id = #{userId} AND receipt_id = #{receiptId}")
     Receipt get(@Param("userId") Long userId, @Param("receiptId") Long receiptId);
 
-    @Select("SELECT IFNULL(SUM(total_price), 0) FROM receipt WHERE user_id = #{userId} AND MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE())")
+    @Select("SELECT IFNULL(SUM(total_price), 0) FROM receipt r " +
+            "INNER JOIN company c ON r.company_id = c.company_id " +
+            "WHERE r.user_id = #{userId} AND c.category_id != 1 AND MONTH(r.created_at) = MONTH(CURRENT_DATE()) AND YEAR(r.created_at) = YEAR(CURRENT_DATE())")
     Long getThisMonthTotal(@Param("userId") Long userId);
 
     @Select("SELECT IFNULL(SUM(total_price), 0) FROM receipt WHERE user_id = #{userId} AND MONTH(created_at) = MONTH(DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH)) AND YEAR(created_at) = YEAR(DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH))")
