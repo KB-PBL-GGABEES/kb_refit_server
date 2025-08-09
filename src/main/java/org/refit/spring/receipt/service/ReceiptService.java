@@ -65,7 +65,24 @@ public class ReceiptService {
             receipt.setSurtax(price - supply);
             receipt.setUpdatedAt(new Date());
             User user = userMapper.findByUserId(userIdByCardId);
-            hospitalMapper.insertEmptyHospitalProcess(receipt.getReceiptId(), user.getName() + "_" + sdf.format(receipt.getCreatedAt()) + "_이비인후과");
+            if (user.getName().equals("손영호")) {
+                hospitalMapper.insertEmptyHospitalProcess(receipt.getReceiptId(), "c2337434-dc8b-4cf1-aa84-32dd563e8815.pdf");
+            }
+            else if (user.getName().equals("강수민")) {
+                hospitalMapper.insertEmptyHospitalProcess(receipt.getReceiptId(), "c1671409-a63e-4098-8c2f-a50f6f6fff56.pdf");
+            }
+            else if (user.getName().equals("강지원")) {
+                hospitalMapper.insertEmptyHospitalProcess(receipt.getReceiptId(), "f299bd9d-40c5-4bb2-839f-e2b2531f00a4.pdf");
+            }
+            else if (user.getName().equals("김연후")) {
+                hospitalMapper.insertEmptyHospitalProcess(receipt.getReceiptId(), "d13bd1ca-0611-4303-8c7e-f35dab980664.pdf");
+            }
+            else if (user.getName().equals("조경환")) {
+                hospitalMapper.insertEmptyHospitalProcess(receipt.getReceiptId(), "77550348-7c63-40cb-aca2-4478ff7fa2e9.pdf");
+            }
+            else if (user.getName().equals("최은서")) {
+                hospitalMapper.insertEmptyHospitalProcess(receipt.getReceiptId(), "7c3cccfb-8935-40ea-bb85-23fa10cb6453.pdf");
+            }
         }
         else {
             List<ReceiptContentDetailDto> list = makeContents(dto.getContentsList(), receipt);
