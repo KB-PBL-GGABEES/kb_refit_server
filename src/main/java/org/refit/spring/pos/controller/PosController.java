@@ -79,9 +79,9 @@ public class PosController {
             receiptService.validateRequiredFields(requiredFields);
             Receipt receipt = receiptService.create(receiptRequestDto);
             Reward reward = rewardService.create(CARBON_POINT, receipt.getTotalPrice(), receipt.getUserId(), receipt.getReceiptId());
-            userService.updatePoint(userId, reward.getCarbonPoint(), reward.getReward());
+            userService.updatePoint(receipt.getUserId(), reward.getCarbonPoint(), reward.getReward() + 100);
             ReceiptResponseDto dto = ReceiptResponseDto.from(receipt, reward.getCarbonPoint(), reward.getReward(), "none");
-            receiptService.checkAndInsertBadge(userId, receipt.getReceiptId());
+            receiptService.checkAndInsertBadge(receipt.getUserId(), receipt.getReceiptId());
             URI location = URI.create("/receipt/" + receipt.getReceiptId());
 
             return ResponseEntity.created(location).body(dto);
@@ -107,7 +107,7 @@ public class PosController {
             receiptService.validateRequiredFields(requiredFields);
             Receipt receipt = receiptService.refund(userId, receiptId);
             Reward reward = rewardService.create(-CARBON_POINT, receipt.getTotalPrice(), userId, receiptId);
-            userService.updatePoint(userId, reward.getCarbonPoint(), reward.getReward());
+            userService.updatePoint(receipt.getUserId(), reward.getCarbonPoint(), reward.getReward() - 100);
             ReceiptResponseDto dto = ReceiptResponseDto.from(receipt, reward.getCarbonPoint(), reward.getReward(), "none");
             URI location = URI.create("/receipt/" + receipt.getReceiptId());
             return ResponseEntity.created(location).body(dto);
