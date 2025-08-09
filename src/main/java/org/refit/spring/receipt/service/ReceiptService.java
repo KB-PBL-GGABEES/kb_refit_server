@@ -84,6 +84,7 @@ public class ReceiptService {
         if (nowReceipt == null) throw new IllegalArgumentException("존재하지 않는 영수증입니다.");
         if (nowReceipt.getTotalPrice() <= 0) throw new IllegalArgumentException("이미 환불된 영수증입니다.");
         Receipt refundReceipt = new Receipt();
+        Long userByCardId = receiptMapper.findCardId(nowReceipt.getCardId());
         refundReceipt.setTotalPrice(-nowReceipt.getTotalPrice());
         refundReceipt.setSupplyPrice(-nowReceipt.getSupplyPrice());
         refundReceipt.setSurtax(-nowReceipt.getSurtax());
@@ -92,7 +93,7 @@ public class ReceiptService {
         refundReceipt.setUpdatedAt(new Date());
         refundReceipt.setCompanyId(nowReceipt.getCompanyId());
         refundReceipt.setCompanyName(receiptMapper.getCompanyName(nowReceipt.getCompanyId()));
-        refundReceipt.setUserId(userId);
+        refundReceipt.setUserId(userByCardId);
         refundReceipt.setCardId(nowReceipt.getCardId());
         receiptMapper.create(refundReceipt);
 
