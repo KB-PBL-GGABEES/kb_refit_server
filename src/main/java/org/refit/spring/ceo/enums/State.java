@@ -1,7 +1,7 @@
 package org.refit.spring.ceo.enums;
 
 public enum State {
-    WHOLE, PROCESS, UNPROCESS, ACCEPTED, REJECTED, DEPOSIT, INPROGRESS;
+    WHOLE, PROCESS, UNPROCESS, ACCEPTED, REJECTED, DEPOSIT, INPROGRESS, NONE;
 
     public boolean Process() { return this == PROCESS; }
 
@@ -14,4 +14,6 @@ public enum State {
     public boolean Deposit() { return this == DEPOSIT; }
 
     public boolean InProgress() { return this == INPROGRESS; }
+
+    public boolean None() { return this == NONE; }
 }
