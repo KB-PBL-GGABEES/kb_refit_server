@@ -30,8 +30,8 @@ public class CorporateCardQueryProvider {
                 sql.append(" AND rp.process_state = 'deposit' ");
             } else if (state.Rejected()) {
                 sql.append(" AND rp.process_state = 'rejected' ");
-            } else if (state.InProgress()) {
-                sql.append(" AND rp.process_state = 'inProgress' ");
+            } else if (state.None()) {
+                sql.append(" AND rp.process_state = 'none' ");
             }
         }
 
