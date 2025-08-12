@@ -56,7 +56,7 @@ class CeoServiceImplTest {
         Long userId = 1L;
         ReceiptFilterDto filter = new ReceiptFilterDto();
         filter.setCursorId(Long.MAX_VALUE);
-        filter.setSort(Sort.Newest);
+        filter.setSort(Sort.NEWEST);
         filter.setSize(10L);
 
         ReceiptListCursorDto result = ceoService.getCompletedReceipts(userId, filter);
@@ -111,7 +111,7 @@ class CeoServiceImplTest {
         Long userId = 1L;
         ReceiptFilterDto filter = new ReceiptFilterDto();
         filter.setCursorId(Long.MAX_VALUE);
-        filter.setSort(Sort.Newest);
+        filter.setSort(Sort.NEWEST);
         filter.setSize(10L);
 
         CorporateCardListCursorDto result = ceoService.getCorporateCardReceipts(userId, filter);

@@ -104,7 +104,7 @@ class CeoMapperTest {
         Map<String, Object> params = new HashMap<>();
         params.put("userId", 1L);
         params.put("cursorId", Long.MAX_VALUE);
-        params.put("sort", Sort.Newest);
+        params.put("sort", Sort.NEWEST);
         params.put("size", 10L);
         params.put("state", null);
         params.put("period", null);
@@ -164,7 +164,7 @@ class CeoMapperTest {
         Map<String, Object> params = new HashMap<>();
         params.put("userId", 1L);
         params.put("cursorId", Long.MAX_VALUE);
-        params.put("sort", Sort.Newest);
+        params.put("sort", Sort.NEWEST);
         params.put("size", 10L);
         params.put("state", null);
         params.put("period", null);
