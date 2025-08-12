@@ -1,5 +1,6 @@
 package org.refit.spring.ceo.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -8,7 +9,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.refit.spring.ceo.entity.Ceo;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 @Data
 @Builder
@@ -23,7 +26,8 @@ public class ReceiptDto {
     @ApiModelProperty(value = "주문합계", example = "5900")
     private Long totalPrice;
     @ApiModelProperty(value = "결제 일시", example = "2025-05-13 14:10:00")
-    private String createdAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+    private Date createdAt;
     @ApiModelProperty(value = "영수 처리 상태", example = "none")
     private String processState;
 
@@ -34,10 +38,7 @@ public class ReceiptDto {
                 .receiptId(vo.getReceiptId())
                 .companyName(vo.getCompanyName())
                 .totalPrice(vo.getTotalPrice())
-                .createdAt(
-                        vo.getCreatedAt() != null
-                                ? vo.getCreatedAt().format(formatter)
-                                : null)
+                .createdAt(vo.getCreatedAt())
                 .processState(vo.getProcessState())
                 .build();
 
