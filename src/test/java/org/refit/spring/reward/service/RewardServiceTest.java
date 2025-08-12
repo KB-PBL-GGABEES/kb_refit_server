@@ -25,7 +25,7 @@ class RewardServiceTest {
     @DisplayName("리워드 생성 테스트")
     @Test
     void create() {
-        Reward result = service.create(100L, 10000L, 5L, 391L);
+        Reward result = service.create(100L, 10000L, 5L, 496L);
 
         assertEquals(100L, (long) result.getCarbonPoint());
         assertEquals( 10000L * 0.05, (long) result.getReward());

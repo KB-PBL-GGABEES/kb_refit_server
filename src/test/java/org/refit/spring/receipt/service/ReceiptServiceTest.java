@@ -30,14 +30,14 @@ class ReceiptServiceTest {
         dto.setCardId(1L);
         dto.setContentsList(List.of(content));
 
-        Receipt receipt = service.create(dto, 1L);
+        Receipt receipt = service.create(dto);
         log.info(receipt);
     }
 
     @DisplayName("구매 영수증 목록 조회 테스트")
     @Test
     void getList() {
-        Long userId = 5L;
+        Long userId = 496L;
         ReceiptListRequestDto requestDto = new ReceiptListRequestDto();
         requestDto.setSize(10L);
         requestDto.setSort(null);
@@ -55,9 +55,8 @@ class ReceiptServiceTest {
     @DisplayName("구매 영수증 상세 조회 테스트")
     @Test
     void get() {
-        Long receiptId = 8L;
-        Long cursorId = null;
-        ReceiptDetailDto receipt = service.get(5L, cursorId, receiptId);
+        Long receiptId = 496L;
+        ReceiptDetailDto receipt = service.get(5L, receiptId);
         log.info(receipt.getReceiptId());
         log.info(receipt.getTotalPrice());
         for (ReceiptContentDetailDto contentDto: receipt.getReceiptContents()) {
@@ -86,8 +85,7 @@ class ReceiptServiceTest {
         dto.setContentsList(List.of(content));
         dto.setCardId(1L);
 
-        Receipt original = service.create(dto, 1L);
-        Receipt refund = service.refund(1L, original.getReceiptId());
+        Receipt refund = service.refund(5L, 496L);
 
         log.info(refund);
     }
