@@ -1,5 +1,6 @@
 package org.refit.spring.receipt.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,9 +17,9 @@ import java.util.Date;
 public class ReceiptListRequestDto {
     private Long cursorId;
     private Integer period;
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
     private Date startDate;
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
     private Date endDate;
     private ReceiptType type;
     private ReceiptSort sort;
