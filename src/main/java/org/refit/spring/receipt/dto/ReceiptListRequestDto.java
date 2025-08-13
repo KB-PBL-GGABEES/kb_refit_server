@@ -9,7 +9,7 @@ import org.refit.spring.receipt.enums.ReceiptSort;
 import org.refit.spring.receipt.enums.ReceiptType;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -19,10 +19,10 @@ public class ReceiptListRequestDto {
     private Integer period;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
-    private Date startDate;
+    private LocalDate startDate;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
-    private Date endDate;
+    private LocalDate endDate;
     private ReceiptType type;
     private ReceiptSort sort;
     private ReceiptFilter filter;
