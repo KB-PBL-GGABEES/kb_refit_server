@@ -8,7 +8,7 @@ import org.refit.spring.receipt.enums.ReceiptSort;
 import org.refit.spring.reward.enums.RewardType;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -18,10 +18,10 @@ public class RewardListRequestDto {
     private Integer period;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
-    private Date startDate;
+    private LocalDate startDate;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
-    private Date endDate;
+    private LocalDate endDate;
     private RewardType type;
     private ReceiptSort sort;
     private Long size;
