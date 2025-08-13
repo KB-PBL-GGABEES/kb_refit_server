@@ -11,7 +11,6 @@ import org.refit.spring.hospital.enums.HospitalType;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 
 @Getter
