@@ -135,7 +135,7 @@ public interface CeoMapper {
             "  r.supply_price, " +
             "  r.surtax, " +
             "  r.transaction_type, " +
-            "  r.created_at, r.updated_at," +
+            "  r.created_at, p.updated_at," +
             "  p.process_state, " +
             "  cr.card_number, " +
             "  cr.is_corporate, " +
