@@ -31,8 +31,6 @@ class HospitalServiceTest {
     @Test
     void getFilteredList() {
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-
             MedicalListRequestDto dto = new MedicalListRequestDto();
             dto.setFilter(HospitalFilter.ALL);
             dto.setStartDate(LocalDate.parse("2022-01-01"));
