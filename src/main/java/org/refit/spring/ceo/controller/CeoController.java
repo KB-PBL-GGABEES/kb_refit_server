@@ -9,6 +9,7 @@ import org.refit.spring.ceo.dto.*;
 import org.refit.spring.ceo.dto.EmailSendDto;
 import org.refit.spring.ceo.service.CeoService;
 import org.refit.spring.ceo.service.ReceiptExportService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -67,6 +68,7 @@ public class CeoController {
 
         try {
             ReceiptListCursorDto dto = ceoService.getCompletedReceipts(userId, receiptFilterDto);
+            System.out.println(dto);
             return ResponseEntity.ok(dto);
 
         } catch (IllegalArgumentException e) {
@@ -95,11 +97,13 @@ public class CeoController {
     @ApiOperation(value = "처리 완료된 항목 이메일 전송", notes = "경비 처리가 완료된(승인/반려) 항목을 특정 이메일로 보냅니다.")
     @PostMapping("/sendEmail")
     public ResponseEntity<?> sendEmail(
-            @RequestBody EmailSendDto request, @ApiIgnore @UserId Long userId) {
+            @RequestBody EmailSendDto request, @ApiIgnore @UserId Long userId,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate) {
 
         //csv파일로 만들기
         try {
-            receiptExportService.generateAndSendCsvByEmail(userId, request.getEmail());
+            receiptExportService.generateAndSendCsvByEmail(userId, request.getEmail(), startDate, endDate);
             return ResponseEntity.ok("이메일 전송 완료");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
