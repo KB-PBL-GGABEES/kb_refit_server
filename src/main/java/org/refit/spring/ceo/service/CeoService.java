@@ -108,6 +108,15 @@ public class CeoService {
         return numberSend;
     }
 
+    public int acceptedSummary (Long userId, Date startDate, Date endDate) {
+        validateRequiredFields(Collections.singletonMap("userId", userId));
+        validateRequiredFields(Collections.singletonMap("startDate", startDate));
+        validateRequiredFields(Collections.singletonMap("endDate", endDate));
+        int cnt = ceoMapper.countAcceptedReceipts(userId, startDate, endDate);
+
+        return cnt;
+    }
+
     // 처리 완료된 항목 이메일 전송
     public EmailSendDto sendEmail(String email, Long userId) {
         validateRequiredFields(Collections.singletonMap("userId", userId));

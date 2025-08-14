@@ -167,6 +167,21 @@ public interface CeoMapper {
             "        SELECT company_id FROM company WHERE ceo_id = #{userId}))")
     int countCompletedReceipts(@Param("userId") Long userId);
 
+    @Select("SELECT COUNT(*)\n" +
+            "FROM receipt r\n" +
+            "JOIN receipt_process p ON r.receipt_id = p.receipt_id\n" +
+            "JOIN card c ON r.card_id = c.card_id\n" +
+            "WHERE p.process_state = 'accepted'\n" +
+            "AND c.is_corporate = FALSE\n" +
+            "  AND EXISTS (\n" +
+            "    SELECT 1 FROM employee e\n" +
+            "    WHERE e.user_id = r.user_id\n" +
+            " AND p.updated_at >= #{startDate} AND p.updated_at < DATE_ADD(#{endDate}, INTERVAL 1 DAY) " +
+            "      AND e.company_id IN (\n" +
+            "        SELECT company_id FROM company WHERE ceo_id = #{userId}))")
+    int countAcceptedReceipts(@Param("userId") Long userId, @Param("startDate") Date startDate, @Param("endDate") Date endDate);
+
+
     // 영수 처리 승인 및 반려
     @Select("SELECT receipt_process_id FROM receipt_process WHERE receipt_id = #{receiptId}")
     Long getReceiptId(@Param("receiptId") Long receiptId);

@@ -97,17 +97,29 @@ public class CeoController {
     @ApiOperation(value = "처리 완료된 항목 이메일 전송", notes = "경비 처리가 완료된(승인/반려) 항목을 특정 이메일로 보냅니다.")
     @PostMapping("/sendEmail")
     public ResponseEntity<?> sendEmail(
-            @RequestBody EmailSendDto request, @ApiIgnore @UserId Long userId,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate) {
+            @RequestBody EmailSendDto request, @ApiIgnore @UserId Long userId) {
 
         //csv파일로 만들기
         try {
-            receiptExportService.generateAndSendCsvByEmail(userId, request.getEmail(), startDate, endDate);
+            receiptExportService.generateAndSendCsvByEmail(userId, request.getEmail(), request.getStartDate(), request.getEndDate());
             return ResponseEntity.ok("이메일 전송 완료");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("이메일 전송 실패: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/acceptedCount")
+    @ApiOperation(value = "경비 처리 승인 항목 개수", notes = "주어진 기간 동안의 경비 처리 승인 항목의 개수를 세어 반환합니다.")
+    public ResponseEntity<?> countAccepted(@ApiIgnore @UserId Long userId,
+                                           @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
+                                           @RequestParam("endDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate) {
+        try {
+            return ResponseEntity.ok(ceoService.acceptedSummary(userId, startDate, endDate));
+        } catch (Exception e) {
+            log.error("경비 처리 승인 항목 조회 실패", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("message", "경비 처리 승인 항목 개수 오류 발생"));
         }
     }
 
