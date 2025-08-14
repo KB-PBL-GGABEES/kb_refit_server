@@ -26,6 +26,8 @@ public class ReceiptExceptMerchandiseDto {
     private String transactionType;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date createdAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+    private Date updatedAt;
     @ApiModelProperty(value = "영수 처리 여부", example = "accepted")
     private String processState;
     private String cardNumber;
