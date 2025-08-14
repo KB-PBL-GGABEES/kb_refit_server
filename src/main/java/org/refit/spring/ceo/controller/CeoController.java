@@ -95,7 +95,7 @@ public class CeoController {
     }
 
     @ApiOperation(value = "처리 완료된 항목 이메일 전송", notes = "경비 처리가 완료된(승인/반려) 항목을 특정 이메일로 보냅니다.")
-    @PostMapping("/sendEmail")
+    @PostMapping("/email/send")
     public ResponseEntity<?> sendEmail(
             @RequestBody EmailSendDto request, @ApiIgnore @UserId Long userId) {
 
@@ -109,7 +109,7 @@ public class CeoController {
         }
     }
 
-    @GetMapping("/acceptedCount")
+    @GetMapping("/expense/accepted/count")
     @ApiOperation(value = "경비 처리 승인 항목 개수", notes = "주어진 기간 동안의 경비 처리 승인 항목의 개수를 세어 반환합니다.")
     public ResponseEntity<?> countAccepted(@ApiIgnore @UserId Long userId,
                                            @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
