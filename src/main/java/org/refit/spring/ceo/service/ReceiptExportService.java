@@ -12,6 +12,8 @@ import com.opencsv.CSVWriter;
 
 import javax.mail.internet.MimeMessage;
 import java.io.*;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -20,9 +22,9 @@ public class ReceiptExportService {
     private final CeoMapper ceoMapper;
     private final JavaMailSender javaMailSender;
 
-    public void generateAndSendCsvByEmail(Long userId, String emailAddress) throws Exception {
+    public void generateAndSendCsvByEmail(Long userId, String emailAddress, Date startDate, Date endDate) throws Exception {
         // 1. 처리 완료된 영수증 리스트 조회
-        List<ReceiptExceptMerchandiseDto> receiptList = ceoMapper.getCompletedReceiptDetails(userId);
+        List<ReceiptExceptMerchandiseDto> receiptList = ceoMapper.getCompletedReceiptDetails(userId, startDate, endDate);
 
         // 2. CSV 파일 생성
         File csvFile = exportToCsv(receiptList);

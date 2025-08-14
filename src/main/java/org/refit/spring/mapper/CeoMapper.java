@@ -10,6 +10,7 @@ import org.refit.spring.ceo.dto.ReceiptProcessApplicantDto;
 import org.refit.spring.receipt.dto.ReceiptContentDetailDto;
 import org.refit.spring.ceo.dto.ReceiptDetailDto;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -145,8 +146,10 @@ public interface CeoMapper {
             "JOIN receipt_process p ON r.receipt_id = p.receipt_id " +
             "WHERE c.ceo_id = #{userId} " +
             "AND p.process_state = 'accepted'" +
-            "AND DATE_FORMAT(r.created_at, '%Y-%m') = DATE_FORMAT(NOW(), '%Y-%m')")
-    List<ReceiptExceptMerchandiseDto> getCompletedReceiptDetails(@Param("userId") Long userId);
+            "AND p.updated_at >= #{startDate} AND p.updated_at < DATE_ADD(#{endDate}, INTERVAL 1 DAY)")
+    List<ReceiptExceptMerchandiseDto> getCompletedReceiptDetails(@Param("userId") Long userId,
+                                                                 @Param("startDate") Date startDate,
+                                                                 @Param("endDate") Date endDate);
 
     // 처리 완료된 항목 이메일 전송
     @Select("SELECT COUNT(*)\n" +
