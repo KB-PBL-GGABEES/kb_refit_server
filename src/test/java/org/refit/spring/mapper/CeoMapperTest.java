@@ -7,7 +7,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.refit.spring.ceo.dto.CorporateCardDto;
 import org.refit.spring.ceo.dto.ReceiptProcessApplicantDto;
 import org.refit.spring.ceo.entity.Ceo;
-import org.refit.spring.ceo.enums.RejectState;
 import org.refit.spring.ceo.enums.Sort;
 import org.refit.spring.config.RootConfig;
 import org.springframework.beans.factory.annotation.Autowired;
