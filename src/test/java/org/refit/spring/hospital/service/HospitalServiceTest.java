@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -35,8 +35,8 @@ class HospitalServiceTest {
 
             MedicalListRequestDto dto = new MedicalListRequestDto();
             dto.setFilter(HospitalFilter.ALL);
-            dto.setStartDate(sdf.parse("2022-01-01"));
-            dto.setEndDate(sdf.parse("2025-08-01"));
+            dto.setStartDate(LocalDate.parse("2022-01-01"));
+            dto.setEndDate(LocalDate.parse("2025-08-01"));
             dto.setType(HospitalType.ALL);
             dto.setSort(HospitalSort.LATEST);
             dto.setSize(10L);
