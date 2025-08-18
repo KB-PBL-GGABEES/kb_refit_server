@@ -2,6 +2,7 @@ package org.refit.spring.receipt.service;
 
 import lombok.RequiredArgsConstructor;
 import org.refit.spring.auth.entity.User;
+import org.refit.spring.firebase.service.FCMService;
 import org.refit.spring.mapper.*;
 import org.refit.spring.merchandise.entity.Merchandise;
 import org.refit.spring.receipt.dto.*;
@@ -34,6 +35,8 @@ public class ReceiptService {
     private final UserMapper userMapper;
     private final HospitalMapper hospitalMapper;
     private final ReceiptProcessMapper receiptProcessMapper;
+
+    private final FCMService fcmService;
 
     private final DataSource dataSource;
 
@@ -320,7 +323,20 @@ public class ReceiptService {
                  ResultSet rs = stmt.executeQuery(sql)) {
                 if (rs.next()) {
                     long res = rs.getLong(1);
-                    if (res > 0) personalBadgeMapper.insertBadge(badgeId, userId);
+                    if (res > 0) {
+                        personalBadgeMapper.insertBadge(badgeId, userId);
+                        // FCM 알림 추가
+                        String token = userMapper.findFcmTokenByUserId(userId);
+                        if (token != null && !token.isEmpty()) {
+                            fcmService.sendMessage(
+                                    token,
+                                    "🎉 새로운 뱃지를 획득했어요!",
+                                    "지금 뱃지 도감에서 확인해보세요."
+                            );
+                            //테스트용, 성공시 삭제
+                            System.out.println("FCM 알림 전송 성공: ");
+                        }
+                    }
                 }
             } catch (SQLException e) {}
         }

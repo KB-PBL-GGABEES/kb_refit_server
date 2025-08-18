@@ -103,6 +103,8 @@ dependencies {
     implementation 'org.springframework:spring-context-support:5.3.9'
     implementation 'javax.mail:mail:1.4.7'
 
+    //Firebase
+    implementation 'com.google.firebase:firebase-admin:9.2.0'
 }
 
 test {

@@ -28,4 +28,12 @@ public interface UserMapper {
 
     @Select("SELECT * FROM user WHERE user_id = #{userId}")
     User findByUserId(@Param("userId") Long userId);
+
+    // 사용자 ID로 FCM 토큰 조회
+    @Select("SELECT fcm_token FROM user WHERE user_id = #{userId}")
+    String findFcmTokenByUserId(@Param("userId") Long userId);
+
+    // 사용자 ID로 FCM 토큰 저장/수정
+    @Update("UPDATE user SET fcm_token = #{fcmToken} WHERE user_id = #{userId}")
+    void updateFcmToken(@Param("userId") Long userId, @Param("fcmToken") String fcmToken);
 }
