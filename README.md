@@ -212,11 +212,11 @@ Spring Legacy에서 FCM 연동 과정에서 임의 토큰으로는 테스트가 
 
 
 #### 🐞 이슈 트래킹 기록
-
+https://ghks027.tistory.com/2
 
 
 #### 트러블 슈팅 요약
-
+배포 서버에서 receiptId와 receiptProcessId가 다르게 저장되어 있음에도 불구하고 프론트에서는 receiptId만 전달, 백엔드는 이를 receiptProcessId로 오인해 잘못된 영수증이 처리되는 문제가 발생했다. 로컬 테스트 환경에서는 두 값이 우연히 같아서 문제가 드러나지 않았으며 이를 해결하기 위해 프론트 요청을 receiptId 기준으로 통일하고 백엔드에서 매핑하도록 로직을 수정했다.
 
 
 ### 👩‍💻 김연후 
