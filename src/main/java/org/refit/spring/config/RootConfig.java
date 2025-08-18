@@ -35,7 +35,8 @@ import javax.sql.DataSource;
         "org.refit.spring.receiptProcess",
         "org.refit.spring.reward",
         "org.refit.spring.wallet",
-        "org.refit.spring.config"
+        "org.refit.spring.config",
+        "org.refit.spring.firebase"
 })
 @MapperScan(basePackages = {"org.refit.spring.mapper"})
 public class RootConfig {

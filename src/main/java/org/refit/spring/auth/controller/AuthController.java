@@ -4,6 +4,7 @@ package org.refit.spring.auth.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import org.refit.spring.auth.annotation.UserId;
 import org.refit.spring.auth.dto.LoginRequestDto;
 import org.refit.spring.auth.dto.UserRequestDto;
 import org.refit.spring.auth.dto.UserResponseDto;
@@ -16,6 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -84,5 +86,11 @@ public class AuthController {
 
     private String getRoleFromDB(String username) {
         return userMapper.findByUsername(username).getRole().name();
+    }
+
+    @PostMapping("/fcm-token")
+    public ResponseEntity<?> getFCMToken(@ApiIgnore @UserId Long userId, @RequestBody String fcmToken) {
+        userMapper.updateFcmToken(userId, fcmToken);
+        return ResponseEntity.ok().build();
     }
 }
