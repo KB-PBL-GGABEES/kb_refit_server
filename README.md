@@ -148,10 +148,10 @@ MySQL 8+ (로컬 또는 Docker)
 👥 팀원
 | 이름 | 사진 | GitHub | 역할 | 담당 기능|
 |---|---|---|---|---|
-| 강수민 | <img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/5434ed55-144b-400f-947a-40b31c79d42b" />| @suminiee | 백엔드 리딩 & 인프라 | spring security적용 및 로그인 구현</br> 전자 지갑 꾸미기 코드 구현</br> blue-green 무중단 배포  |
-| 최은서 | <img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/7c56b67e-d30c-4fd6-9784-8388bde02cbf" />| @Cho2unseo | 백엔드 | 전자영수증 발급 및 리워드 적립 |
-| 조경환 | <img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/89557d9e-28a8-4631-9064-80bf362bf486" />| @ghks027 | 백엔드 | 경비 처리 및 법인카드 승인/반려 |
-| 김연후 | <img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/efea8193-39ab-471a-881a-59a8284a1795" />| @yeonhookim | 백엔드 | 병원 영수증 보험 청구 및 영수 처리 |
+| 강수민 | <img width="150" height="150" alt="image" src="https://github.com/user-attachments/assets/5434ed55-144b-400f-947a-40b31c79d42b" />| @suminiee | 백엔드 리딩 & 인프라 | spring security적용 및 로그인 구현</br> 전자 지갑 꾸미기 코드 구현</br> blue-green 무중단 배포  |
+| 최은서 | <img width="150" height="150" alt="image" src="https://github.com/user-attachments/assets/7c56b67e-d30c-4fd6-9784-8388bde02cbf" />| @Cho2unseo | 백엔드 | 전자영수증 발급 및 리워드 적립 |
+| 조경환 | <img width="150" height="150" alt="image" src="https://github.com/user-attachments/assets/89557d9e-28a8-4631-9064-80bf362bf486" />| @ghks027 | 백엔드 | 경비 처리 및 법인카드 승인/반려 |
+| 김연후 | <img width="150" height="150" alt="image" src="https://github.com/user-attachments/assets/efea8193-39ab-471a-881a-59a8284a1795" />| @yeonhookim | 백엔드 | 병원 영수증 보험 청구 및 영수 처리 |
 
 
 ## 👥 개선 사항 및 후기
@@ -181,6 +181,7 @@ https://velog.io/@suminiee/FCM-spring-legacy%EC%97%90%EC%84%9C-FCM-%EA%B8%B0%EB%
 
 #### 트러블 슈팅 요약
 Spring Legacy에서 FCM 연동 과정에서 임의 토큰으로는 테스트가 불가능해 오류가 발생했고, 이를 해결하기 위해 Firebase 클라이언트 SDK 기반 토큰 발급용 웹 페이지(get_fcm_token.html + service worker)를 만들어 로컬 서버(https:// 대신 localhost)에서 실행하여 유효한 FCM 토큰을 발급받아 정상적으로 알림 전송을 검증했다는 트러블슈팅입니다.
+
  
 
 ### 👩‍💻 최은서
@@ -198,6 +199,7 @@ Spring Legacy에서 FCM 연동 과정에서 임의 토큰으로는 테스트가 
 
 
 #### 트러블 슈팅 요약
+
 
 
 
@@ -219,6 +221,7 @@ https://ghks027.tistory.com/2
 
 #### 트러블 슈팅 요약
 배포 서버에서 receiptId와 receiptProcessId가 다르게 저장되어 있음에도 불구하고 프론트에서는 receiptId만 전달, 백엔드는 이를 receiptProcessId로 오인해 잘못된 영수증이 처리되는 문제가 발생했다. 로컬 테스트 환경에서는 두 값이 우연히 같아서 문제가 드러나지 않았으며 이를 해결하기 위해 프론트 요청을 receiptId 기준으로 통일하고 백엔드에서 매핑하도록 로직을 수정했다.
+
 
 
 ### 👩‍💻 김연후 
