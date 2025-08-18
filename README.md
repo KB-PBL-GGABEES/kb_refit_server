@@ -148,10 +148,10 @@ MySQL 8+ (로컬 또는 Docker)
 👥 팀원
 | 이름 | 사진 | GitHub | 역할 | 담당 기능|
 |---|---|---|---|---|
-| 강수민 | <img width="150" height="150" alt="image" src="https://github.com/user-attachments/assets/5434ed55-144b-400f-947a-40b31c79d42b" />| @suminiee | 백엔드 리딩 & 인프라 | spring security적용 및 로그인 구현</br> 전자 지갑 꾸미기 코드 구현</br> blue-green 무중단 배포  |
-| 최은서 | <img width="150" height="150" alt="image" src="https://github.com/user-attachments/assets/7c56b67e-d30c-4fd6-9784-8388bde02cbf" />| @Cho2unseo | 백엔드 | 전자영수증 발급 및 리워드 적립 |
-| 조경환 | <img width="150" height="150" alt="image" src="https://github.com/user-attachments/assets/89557d9e-28a8-4631-9064-80bf362bf486" />| @ghks027 | 백엔드 | 경비 처리 및 법인카드 승인/반려 |
-| 김연후 | <img width="150" height="150" alt="image" src="https://github.com/user-attachments/assets/efea8193-39ab-471a-881a-59a8284a1795" />| @yeonhookim | 백엔드 | 병원 영수증 보험 청구 및 영수 처리 |
+| 강수민 | <img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/5434ed55-144b-400f-947a-40b31c79d42b" />| @suminiee | 백엔드 리딩 & 인프라 | spring security적용 및 로그인 구현</br> 전자 지갑 꾸미기 코드 구현</br> blue-green 무중단 배포  |
+| 최은서 | <img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/7c56b67e-d30c-4fd6-9784-8388bde02cbf" />| @Cho2unseo | 백엔드 | 전자영수증 발급 및 리워드 적립 |
+| 조경환 | <img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/89557d9e-28a8-4631-9064-80bf362bf486" />| @ghks027 | 백엔드 | 경비 처리 및 법인카드 승인/반려 |
+| 김연후 | <img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/efea8193-39ab-471a-881a-59a8284a1795" />| @yeonhookim | 백엔드 | 병원 영수증 보험 청구 및 영수 처리 |
 
 
 ## 👥 개선 사항 및 후기
@@ -206,7 +206,9 @@ Spring Legacy에서 FCM 연동 과정에서 임의 토큰으로는 테스트가 
 ### 👩‍💻 조경환
 
 #### 📝 프로젝트 후기
+지금까지 경험한 프로젝트 중 가장 큰 규모였습니다. 프론트와 백 모두 미숙한 상태에서 시작하다 보니 두려움이 가득했지만 '모르면 물어보자, 방황하지 말고 부딪히자'라는 마음으로 프로젝트를 시작했습니다. 초반에는 작은 기능 하나를 구현하는 데도 많은 시간이 소요되었고, 부족함을 채우기 위해 다음 할 일을 미리 준비하고 공부하는 습관을 들였습니다. 덕분에 일정에 맞게 완성할 수 있었으며 단순 기능 구현 넘어 설계와 구조화, 예외 처리, 페이징, 쿼리 최적화 등 다양한 작업들을 끝까지 해냈다는 자신감도 얻을 수 있었습니다.
 
+프로젝트를 통해 기술적인 성장뿐 아니라 협업, 팀워크의 가치를 배울 수 있었습니다. 특히 문서화와 코드 리뷰, 깃 전략을 통해 팀 개발 문화의 중요성을 깊이 체감할 값진 경험이었습니다.
 
 
 #### 🔄 이번 프로젝트에서 참여한 부분들
