@@ -10,6 +10,8 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.meta.outputs.image_tag }}
     steps:
       - uses: actions/checkout@v3
 
@@ -71,34 +73,54 @@ jobs:
             echo "🔐 EC2에서 Docker Hub 로그인"
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
 
-            echo "▶️ 현재 실행 중인 서비스 확인"
-            CURRENT=$(docker ps --filter "name=refit-" --format "{{.Names}}" | grep -E 'refit-blue|refit-green' || true)
+            echo "🌐 Docker 네트워크 보장"
+            docker network create refit-network >/dev/null 2>&1 || true
 
-            if [[ "$CURRENT" == *"blue"* ]]; then
-              TARGET="green"
-              PORT=8082
+            echo "🔎 Nginx에서 현재 ACTIVE 포트 판별(proxy_pass 기준)"
+            ACTIVE_PORT=$(grep -Po 'proxy_pass http://localhost:\K[0-9]+' /etc/nginx/conf.d/default.conf | tail -1 || true)
+            if [ -z "${ACTIVE_PORT:-}" ]; then
+              echo "⚠️ proxy_pass 포트를 찾지 못함 → 최초 배포로 간주 (ACTIVE=none)"
+              ACTIVE="none"
+              ACTIVE_PORT="0"
+            elif [ "$ACTIVE_PORT" = "8081" ]; then
+              ACTIVE="blue"
+            elif [ "$ACTIVE_PORT" = "8082" ]; then
+              ACTIVE="green"
             else
-              TARGET="blue"
-              PORT=8081
+              echo "❌ 예상치 못한 ACTIVE_PORT: $ACTIVE_PORT"; exit 1
             fi
 
-            echo "🌀 대상 색상: $TARGET (포트: $PORT)"
+            if [ "$ACTIVE" = "blue" ]; then
+              TARGET="green"; TARGET_PORT="8082"; TARGET_NAME="refit-green"; ACTIVE_NAME="refit-blue"
+            elif [ "$ACTIVE" = "green" ]; then
+              TARGET="blue";  TARGET_PORT="8081";  TARGET_NAME="refit-blue";  ACTIVE_NAME="refit-green"
+            else
+              TARGET="blue";  TARGET_PORT="8081";  TARGET_NAME="refit-blue";  ACTIVE_NAME=""
+            fi
+
+            echo "🟦 ACTIVE=$ACTIVE(:$ACTIVE_PORT) → 🟩 TARGET=$TARGET(:$TARGET_PORT)"
 
             echo "📦 이미지 pull"
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/refit
 
-            echo "🧹 기존 컨테이너 삭제 (refit-$TARGET)"
-            docker rm -f refit-$TARGET || true
+            echo "🧹 대상 슬롯 정리($TARGET_NAME)"
+            docker rm -f "$TARGET_NAME" >/dev/null 2>&1 || true
 
-            echo "🚀 새 컨테이너 실행 (refit-$TARGET)"
-            docker run -d --name refit-$TARGET \
-              --env-file /home/ubuntu/app-$TARGET/refit.env \
+            echo "🚀 새 컨테이너 실행 ($TARGET_NAME)"
+            docker run -d --name "$TARGET_NAME" \
+              --env-file "/home/ubuntu/app-$TARGET/refit.env" \
               --network refit-network \
-              -p $PORT:8080 \
+              -p ${TARGET_PORT}:8080 \
               ${{ secrets.DOCKERHUB_USERNAME }}/refit
 
             echo "🔀 Nginx 설정 proxy_pass 전환"
-            sudo sed -i "s|proxy_pass http://localhost:[0-9]\+;|proxy_pass http://localhost:$PORT;|" /etc/nginx/conf.d/default.conf
+            sudo sed -i "s|proxy_pass http://localhost:[0-9]\+;|proxy_pass http://localhost:${TARGET_PORT};|" /etc/nginx/conf.d/default.conf
             sudo nginx -t && sudo systemctl reload nginx
 
-            echo "✅ 무중단 배포 완료 → 현재: $TARGET"
+            echo "🧹 이전 슬롯 정리"
+            if [ -n "${ACTIVE_NAME:-}" ] && [ "$ACTIVE" != "none" ]; then
+              docker rm -f "$ACTIVE_NAME" >/dev/null 2>&1 || true
+              echo "✔ 이전 활성 컨테이너 ($ACTIVE_NAME) 삭제 완료"
+            fi
+
+            echo "🎉 무중단 배포 완료 → 현재 활성: $TARGET(:$TARGET_PORT)"
