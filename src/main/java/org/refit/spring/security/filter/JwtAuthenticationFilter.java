@@ -24,6 +24,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     // 필터 제외 경로 리스트
     private static final Set<String> EXCLUDE_URLS = Set.of(
             "/api/auth/login",
+            "/api/auth/health",
             "/api/auth/refresh",
             "/api/test",
             "/swagger-ui.html",
