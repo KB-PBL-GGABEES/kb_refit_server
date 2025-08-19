@@ -115,7 +115,7 @@ jobs:
 
             echo "🩺 헬스체크 시작 (TARGET on :${TARGET_PORT})"
             # /actuator/health 를 쓰는 경우 ↓, 없으면 /health 로 변경
-            HEALTH_URL="http://127.0.0.1:${TARGET_PORT}/health"
+            HEALTH_URL="http://127.0.0.1:${TARGET_PORT}/api/auth/health"
             MAX_RETRY=60    # 총 60회 (약 120초) 재시도
             SLEEP_SEC=2
 
