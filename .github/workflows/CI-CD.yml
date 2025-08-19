@@ -113,9 +113,54 @@ jobs:
               -p ${TARGET_PORT}:8080 \
               ${{ secrets.DOCKERHUB_USERNAME }}/refit
 
-            echo "🔀 Nginx 설정 proxy_pass 전환"
+            echo "🩺 헬스체크 시작 (TARGET on :${TARGET_PORT})"
+            # /actuator/health 를 쓰는 경우 ↓, 없으면 /health 로 변경
+            HEALTH_URL="http://127.0.0.1:${TARGET_PORT}/health"
+            MAX_RETRY=60    # 총 60회 (약 120초) 재시도
+            SLEEP_SEC=2
+
+            healthy="no"
+            for i in $(seq 1 $MAX_RETRY); do
+              if curl -fsS "$HEALTH_URL" >/dev/null; then
+                healthy="yes"; break
+              fi
+              sleep $SLEEP_SEC
+            done
+
+            if [ "$healthy" != "yes" ]; then
+              echo "❌ 새 슬롯 헬스체크 실패 → 전환 중단 및 새 컨테이너 정리"
+              docker logs --tail=200 "$TARGET_NAME" || true
+              docker rm -f "$TARGET_NAME" || true
+              exit 1
+            fi
+
+            echo "✅ 헬스 OK → Nginx proxy_pass 전환"
             sudo sed -i "s|proxy_pass http://localhost:[0-9]\+;|proxy_pass http://localhost:${TARGET_PORT};|" /etc/nginx/conf.d/default.conf
             sudo nginx -t && sudo systemctl reload nginx
+
+            echo "👀 전환 후 스모크 테스트 (외부 경로)"
+            # 서비스 도메인으로 교체 권장: https://kb-refit.cloud/health
+            SMOKE_URL="https://kb-refit.cloud/api/auth/health"
+            SMOKE_MAX=10
+            ok="no"
+            for i in $(seq 1 $SMOKE_MAX); do
+              if curl -fkSs "$SMOKE_URL" >/dev/null; then
+                ok="yes"; break
+              fi
+              sleep 2
+            done
+
+            if [ "$ok" != "yes" ]; then
+              echo "⚠️ 스모크 실패 → 롤백 수행"
+              # proxy_pass를 이전 포트로 되돌리기
+              if [ "$ACTIVE_PORT" != "0" ]; then
+                sudo sed -i "s|proxy_pass http://localhost:[0-9]\+;|proxy_pass http://localhost:${ACTIVE_PORT};|" /etc/nginx/conf.d/default.conf
+                sudo nginx -t && sudo systemctl reload nginx
+              fi
+              # 문제 컨테이너 정리
+              docker rm -f "$TARGET_NAME" || true
+              exit 1
+            fi
 
             echo "🧹 이전 슬롯 정리"
             if [ -n "${ACTIVE_NAME:-}" ] && [ "$ACTIVE" != "none" ]; then

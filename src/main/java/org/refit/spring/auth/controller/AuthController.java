@@ -12,6 +12,7 @@ import org.refit.spring.auth.entity.User;
 import org.refit.spring.auth.service.UserService;
 import org.refit.spring.mapper.UserMapper;
 import org.refit.spring.security.jwt.JwtTokenProvider;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -92,5 +93,14 @@ public class AuthController {
     public ResponseEntity<?> getFCMToken(@ApiIgnore @UserId Long userId, @RequestBody String fcmToken) {
         userMapper.updateFcmToken(userId, fcmToken);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping(value = "/health", produces = "application/json;charset=UTF-8")
+    public ResponseEntity<String> healthJson() {
+        String body = "{\"status\":\"UP\"}";
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+        headers.add("Pragma", "no-cache");
+        return new ResponseEntity<>(body, headers, HttpStatus.OK);
     }
 }
