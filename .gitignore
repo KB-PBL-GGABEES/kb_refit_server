@@ -50,5 +50,9 @@ application.yml
 application-*.properties
 application-*.yml
 
+.json
+.json.*
+src/main/resources/kb-refit-firebase-adminsdk-fbsvc-179abaa384.json
+
 
 test.sql

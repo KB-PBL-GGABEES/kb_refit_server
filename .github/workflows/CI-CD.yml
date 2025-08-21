@@ -24,6 +24,12 @@ jobs:
       - name: Grant Execute Permission For Gradlew
         run: chmod +x gradlew
 
+      - name: Set up Firebase key 🔐
+        run: echo "$FIREBASE_ADMIN_JSON" > src/main/resources/kb-refit-firebase-adminsdk-fbsvc-179abaa384.json
+        env:
+          FIREBASE_ADMIN_JSON: ${{ secrets.FIREBASE_ADMIN_JSON }}
+
+
       - name: Gradle Caching
         uses: actions/cache@v3
         with:
