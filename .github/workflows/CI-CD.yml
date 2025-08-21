@@ -25,7 +25,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Set up Firebase key 🔐
-        run: echo "$FIREBASE_ADMIN_JSON" > src/main/resources/kb-refit-firebase-adminsdk-fbsvc-179abaa384.json
+        run: echo "$FIREBASE_ADMIN_JSON" > src/main/resources/kb-refit-885275d6bdbf.json
         env:
           FIREBASE_ADMIN_JSON: ${{ secrets.FIREBASE_ADMIN_JSON }}
 
