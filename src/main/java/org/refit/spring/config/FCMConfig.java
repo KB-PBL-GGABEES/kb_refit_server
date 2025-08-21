@@ -15,7 +15,7 @@ public class FCMConfig {
         try {
             //클래스패스에서 JSON 파일 읽기
             InputStream serviceAccount = getClass().getClassLoader()
-                    .getResourceAsStream("kb-refit-firebase-adminsdk-fbsvc-179abaa384.json");
+                    .getResourceAsStream("kb-refit-885275d6bdbf.json");
 
             if (serviceAccount == null) {
                 throw new IllegalStateException("firebase json 키 파일을 찾을 수 없습니다.");
