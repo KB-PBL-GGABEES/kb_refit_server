@@ -52,7 +52,7 @@ application-*.yml
 
 .json
 .json.*
-src/main/resources/kb-refit-firebase-adminsdk-fbsvc-179abaa384.json
+src/main/resources/kb-refit-885275d6bdbf.json
 
 
 test.sql
